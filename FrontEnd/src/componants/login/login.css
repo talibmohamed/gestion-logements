@@ -1,0 +1,26 @@
+body{
+    background-color: #1D0C5C;
+}
+.houselytics {
+    font-size: 20px;
+    color: white;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.title img{
+    width: 66px;
+    height: 63px;
+}
+
+.title p{
+      font-family: inter, sans-serif;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 37.5px;
+}
+
+.title{
+    margin-top: 100px;
+    margin-bottom: 200px;
+}
