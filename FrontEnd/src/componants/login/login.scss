@@ -4,29 +4,29 @@ body {
 }
 
 .houselytics {
-  font-size: 1.25rem; /* Relative font size */
+  font-size: 1.25rem; 
   color: white;
   font-weight: bold;
-  margin-left: 1rem; /* Relative margin */
+  margin-left: 1rem; 
 }
 
 .right {
   background-color: white;
-  border-top-left-radius: 3rem; /* Relative border radius */
-  border-bottom-left-radius:  3rem; /* Relative border radius */
+  border-top-left-radius: 3rem; 
+  border-bottom-left-radius:  3rem; 
   position: relative;
 }
 
 .title img {
-  width: 3.125rem; /* Relative width */
-  height: 3.125rem; /* Relative height */
+  width: 3.125rem; 
+  height: 3.125rem;
 }
 
 .title p {
   font-family: inter, sans-serif;
-  font-size: 1.5625rem; /* Relative font size */
+  font-size: 1.5625rem; 
   font-weight: 600;
-  line-height: 2.34375rem; /* Relative line height */
+  line-height: 2.34375rem; 
 }
 
 .title {
@@ -36,8 +36,8 @@ body {
 
 .header {
   font-family: inter, sans-serif;
-  font-size: 2.5rem; /* Relative font size */
-  line-height: 3.75rem; /* Relative line height */
+  font-size: 2.5rem; 
+  line-height: 3.75rem;
   font-weight: 700;
   text-align: center;
   margin-bottom: 16vh;
@@ -47,7 +47,7 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
-  padding: 0 1rem; /* Relative padding */
+  padding: 0 1rem; 
 }
 
 .form-control:focus {
@@ -75,11 +75,11 @@ button {
   background-color: #4250be !important;
   width: 50%;
   color: white;
-  font-size: 1.375rem; /* Relative font size */
+  font-size: 1.375rem; 
   font-weight: 700;
-  line-height: 2.0625rem; /* Relative line height */
-  border-radius: 2.5rem; /* Relative border radius */
-  padding: 1rem 2rem; /* Relative padding */
+  line-height: 2.0625rem; 
+  border-radius: 2.5rem; 
+  padding: 1rem 2rem; 
   margin-top: 5vh;
 }
 
@@ -147,10 +147,10 @@ button {
     color: white;
     top: -70px;
     background: rgba(221, 221, 221, 0.062);
-    border-radius: 1.6rem; /* Relative border radius */
-    box-shadow: 0 4px 3rem rgba(0, 0, 0, 0.1); /* Relative box shadow */
-    backdrop-filter: blur(0.82rem); /* Relative blur */
-    -webkit-backdrop-filter: blur(0.82rem); /* Relative blur */
+    border-radius: 1.6rem; 
+    box-shadow: 0 4px 3rem rgba(0, 0, 0, 0.1); 
+    backdrop-filter: blur(0.82rem); 
+    -webkit-backdrop-filter: blur(0.82rem);
     border: 0.01rem solid rgba(255, 255, 255, 0.99);
   }
 
