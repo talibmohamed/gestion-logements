@@ -1,9 +1,9 @@
 <?php
 
-include_once './model/database.php';
-include_once './model/Admin.php';
-include_once './model/jwt.php';
-require_once '../vendor/autoload.php';
+include_once '../model/database.php';
+include_once '../model/residant.php';
+include_once '../model/jwt.php';
+require_once '../../vendor/autoload.php';
 
 use \Firebase\JWT\JWT;
 
@@ -14,9 +14,9 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Instantiate Database and Admin classes
+// Instantiate Database and residant classes
 $database = new Database();
-$admin = new Admin($database);
+$residant = new residant($database);
 
 // Get POST data
 $data = json_decode(file_get_contents("php://input"));
@@ -27,8 +27,8 @@ if ($data && isset($data->email) && isset($data->password)) {
     $email = $data->email;
     $password = $data->password;
 
-    // Call loginUser function from Admin class
-    $response = $admin->loginUser($email, $password);
+    // Call loginUser function from residant class
+    $response = $residant->loginUser($email, $password);
 
     // Return JSON response
     http_response_code(200);

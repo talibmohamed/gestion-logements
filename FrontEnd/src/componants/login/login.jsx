@@ -11,36 +11,14 @@ const SignIn = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      const response = await fetch("http://pfe.test/PHP/api.php", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: username, // Assuming username field is used for email
-          password: password,
-        }),
-      });
-
-      const data = await response.json();
-
-      console.log("Response:", response);
-
-      if (response.ok) {
-        // If login successful, handle the response
-        console.log("Login successful:", data);
-        // Redirect or perform other actions as needed
-      } else {
-        // If login failed, handle the error
-        console.error("Login failed:", data.message);
-        // Display error message to the user
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      // Handle network errors or other exceptions
-    }
+    // Add sign-in logic here send it to the api : http://pfe.test/PHP/api/login.php with a post request 
+    //u will get a response with the json data of the user containing for now "statue" and "jwt" store it ghadi nhtajouh manba3d
+    //for more info about the api check php folder 
+    //comment the code plz
+    //ps am using 123456789 as Database password and houslytics as name you may wanna change it to your own or use that wne u create the database
+    //u will find the database that i used in the root folder of the project
+    console.log("Username:", username);
+    console.log("Password:", password);
   };
 
   return (
