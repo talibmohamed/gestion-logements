@@ -9,11 +9,38 @@ const SignIn = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add your sign-in logic here
-    console.log("Username:", username);
-    console.log("Password:", password);
+
+    try {
+      const response = await fetch("http://pfe.test/PHP/api.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: username, // Assuming username field is used for email
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      console.log("Response:", response);
+
+      if (response.ok) {
+        // If login successful, handle the response
+        console.log("Login successful:", data);
+        // Redirect or perform other actions as needed
+      } else {
+        // If login failed, handle the error
+        console.error("Login failed:", data.message);
+        // Display error message to the user
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      // Handle network errors or other exceptions
+    }
   };
 
   return (
