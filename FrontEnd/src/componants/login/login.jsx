@@ -6,19 +6,37 @@ import "./login.scss";
 import { Form, Button } from "react-bootstrap";
 
 const SignIn = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Add sign-in logic here send it to the api : http://pfe.test/PHP/api/login.php with a post request 
-    //u will get a response with the json data of the user containing for now "statue" and "jwt" store it ghadi nhtajouh manba3d
-    //for more info about the api check php folder 
-    //comment the code plz
-    //ps am using 123456789 as Database password and houslytics as name you may wanna change it to your own or use that wne u create the database
-    //u will find the database that i used in the root folder of the project
-    console.log("Username:", username);
-    console.log("Password:", password);
+//it works just continue redo the error handling and stor the jwt
+    try {
+      const response = await fetch("http://localhost/pfe/php/api/login.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Successful login redirect lchi page 
+        // you can store the JWT token in localStorage binma chafan kighadi ndiro l session
+        console.log("JWT token:", data.jwt_token);//just for the test
+        // Redirect to another page
+      } else {
+        // Login failed, display error message in conssol
+        console.log(data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setError("An error occurred while processing your request");
+    }
   };
 
   return (
@@ -48,12 +66,12 @@ const SignIn = () => {
             <h2 className="header">Sign In Account</h2>
             <Form onSubmit={handleSubmit}>
               <Form.Group className="username-group" controlId="formUsername">
-                <Form.Label>Username or Email</Form.Label>
+                <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Enter username or email"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </Form.Group>
               <Form.Group className="password-group" controlId="formPassword">
@@ -73,6 +91,7 @@ const SignIn = () => {
                 </Button>
               </div>
             </Form>
+            {error && <div className="error">{error}</div>}
             <a href="#">Forgot password?</a>
           </div>
         </div>

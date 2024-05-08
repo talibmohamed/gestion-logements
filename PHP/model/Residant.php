@@ -2,7 +2,6 @@
 
 class residant
 {
-
     // public $res_ID;
     // public $log_ID;
     // public $nom;
@@ -57,5 +56,3 @@ class residant
 }
 
 ?>
-
-}
