@@ -21,10 +21,10 @@ $residant = new residant($database);
 // Get POST data
 $data = json_decode(file_get_contents("php://input"));
 
-// if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-//     http_response_code(200);
-//     exit();
-// }
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
 // Check if $data is not null and contains the expected properties
 if ($data && isset($data->email) && isset($data->password)) {

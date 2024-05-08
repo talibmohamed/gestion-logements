@@ -12,7 +12,7 @@ const SignIn = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-//it works just continue redo the error handling and stor the jwt
+    //it works just continue redo the error handling and stor the jwt
     try {
       const response = await fetch("http://localhost/pfe/php/api/login.php", {
         method: "POST",
@@ -25,9 +25,9 @@ const SignIn = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Successful login redirect lchi page 
+        // Successful login redirect lchi page
         // you can store the JWT token in localStorage binma chafan kighadi ndiro l session
-        console.log("JWT token:", data.jwt_token);//just for the test
+        console.log("JWT token:", data.jwt_token); //just for the test
         // Redirect to another page
       } else {
         // Login failed, display error message in conssol
