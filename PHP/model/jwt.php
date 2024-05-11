@@ -11,7 +11,7 @@ class JwtHandler
     private $jwt_algo = "HS256";
 
     // Function to generate JWT token
-    public function generateJwtToken($data)
+    public function generateJwtToken($data,$admin)
     {
         $issuedAt = time();
         $expirationTime = $issuedAt + 3600; // JWT token expiration time (1 hour)
@@ -19,7 +19,8 @@ class JwtHandler
         $payload = array(
             'iat' => $issuedAt,
             'exp' => $expirationTime,
-            'data' => $data
+            'data' => $data,
+            'admin' => $admin
         );
 
         $jwt = JWT::encode($payload, $this->secret_key, $this->jwt_algo);

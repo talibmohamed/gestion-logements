@@ -36,7 +36,8 @@ class residant
                 if ($password == $user['password']) { //compare the unhashed pass with the password we get from the request
                     // Generate JWT token
                     $jwtHandler = new JwtHandler();
-                    $jwt_token = $jwtHandler->generateJwtToken($user);
+                    $admin = false;
+                    $jwt_token = $jwtHandler->generateJwtToken($user,$admin);
 
                     // Return success response with JWT token
                     return array('status' => 'success', 'jwt_token' => $jwt_token);

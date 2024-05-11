@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import logo from "./logo.svg";
 import house from "./house.jpg";
-import "./login.scss";
+import "./style.scss";
 import { Form, Button } from "react-bootstrap";
 
-const SignIn = () => {
+const login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -100,4 +100,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default login;
