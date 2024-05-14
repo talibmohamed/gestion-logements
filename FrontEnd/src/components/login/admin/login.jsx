@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import logo from "./logo.svg";
 import house from "./house.jpg";
-import "./style.scss";
+import "../style.scss";
 import { Form, Button } from "react-bootstrap";
 
 const login = () => {
@@ -40,7 +40,7 @@ const login = () => {
   };
 
   return (
-    <>
+    <div className="app">
       <div className="container-fluid">
         <div className="row page">
           <div className="col-sm-12 col-md-4 full-height stack-on-small">
@@ -63,13 +63,12 @@ const login = () => {
             </div>
           </div>
           <div className="col-sm-12 col-md-8 d-flex justify-content-center align-items-center flex-column right">
-            <h2 className="header">Sign In Account ADMIN</h2>
-            <Form onSubmit={handleSubmit}>
+            <h2 className="header">Sign In Account</h2>
+            <Form className="form-sign" onSubmit={handleSubmit}>
               <Form.Group className="username-group" controlId="formUsername">
                 <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Enter username or email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
@@ -78,7 +77,6 @@ const login = () => {
                 <Form.Label>Password</Form.Label>
                 <Form.Control
                   type="password"
-                  placeholder="Enter password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
@@ -86,17 +84,17 @@ const login = () => {
               <div className="button-container">
                 {" "}
                 {/* Container for centering the button */}
-                <Button className="button" variant="primary" type="submit">
+                <Button className="button-sign" type="submit">
                   Sign In
                 </Button>
               </div>
             </Form>
             {error && <div className="error">{error}</div>}
-            <a href="#">Forgot password?</a>
+            <a className="forgot" href="#">Forgot password?</a>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
