@@ -15,16 +15,19 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post("http://localhost/pfe/php/api/login.php", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "http://localhost/pfe/php/api/login.php",
+        {
+          email,
+          password,
+        }
+      );
 
-      if (response.data.status === 'success') {
+      if (response.data.status === "success") {
         // Successful login, store the JWT token and redirect
         console.log("JWT token:", response.data.jwt_token); // Just for testing
         localStorage.setItem("jwt_token", response.data.jwt_token);
-        window.location.href = "/home.html"; // Change to your desired redirect URL
+        window.location.href = "/dashboard";
       } else {
         // Login failed, display error message
         setError(response.data.message);
@@ -77,18 +80,16 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </Form.Group>
-              {error && (
-                <div className="error text-danger">
-                  {error}
-                </div>
-              )}
+              {error && <div className="error text-danger">{error}</div>}
               <div className="button-container">
                 <Button className="button-sign" type="submit">
                   Sign In
                 </Button>
               </div>
             </Form>
-            <a className="forgot" href="#">Forgot password?</a>
+            <a className="forgot" href="#">
+              Forgot password?
+            </a>
           </div>
         </div>
       </div>
