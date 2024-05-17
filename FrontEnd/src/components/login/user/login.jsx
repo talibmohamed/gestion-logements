@@ -1,37 +1,33 @@
 import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import axios from "axios";
 import logo from "./logo.svg";
 import house from "./house.jpg";
 import "../style.scss";
 import { Form, Button } from "react-bootstrap";
 
-const login = () => {
+const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    //it works just continue redo the error handling and stor the jwt
+
     try {
-      const response = await fetch("http://localhost/pfe/php/api/login.php", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
+      const response = await axios.post("http://localhost/pfe/php/api/login.php", {
+        email,
+        password,
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Successful login redirect lchi page
-        // you can store the JWT token in localStorage binma chafan kighadi ndiro l session
-        console.log("JWT token:", data.jwt_token); //just for the test
-        // Redirect to another page
+      if (response.data.status === 'success') {
+        // Successful login, store the JWT token and redirect
+        console.log("JWT token:", response.data.jwt_token); // Just for testing
+        localStorage.setItem("jwt_token", response.data.jwt_token);
+        window.location.href = "/home.html"; // Change to your desired redirect URL
       } else {
-        // Login failed, display error message in conssol
-        console.log(data.message);
+        // Login failed, display error message
+        setError(response.data.message);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -81,15 +77,17 @@ const login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </Form.Group>
+              {error && (
+                <div className="error text-danger">
+                  {error}
+                </div>
+              )}
               <div className="button-container">
-                {" "}
-                {/* Container for centering the button */}
                 <Button className="button-sign" type="submit">
                   Sign In
                 </Button>
               </div>
             </Form>
-            {error && <div className="error">{error}</div>}
             <a className="forgot" href="#">Forgot password?</a>
           </div>
         </div>
@@ -98,4 +96,4 @@ const login = () => {
   );
 };
 
-export default login;
+export default Login;

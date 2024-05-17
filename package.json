@@ -3,7 +3,9 @@
     "sass": "^1.75.0"
   },
   "dependencies": {
+    "@mui/icons-material": "^5.15.17",
     "axios": "^1.6.8",
-    "mdb-react-ui-kit": "^8.0.0"
+    "mdb-react-ui-kit": "^8.0.0",
+    "react-pro-sidebar": "^1.1.0"
   }
 }
