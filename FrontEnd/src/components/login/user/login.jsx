@@ -5,6 +5,8 @@ import logo from "./logo.svg";
 import house from "./house.jpg";
 import "../style.scss";
 import { Form, Button } from "react-bootstrap";
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -63,24 +65,50 @@ const Login = () => {
           </div>
           <div className="col-sm-12 col-md-8 d-flex justify-content-center align-items-center flex-column right">
             <h2 className="header">Sign In Account</h2>
+            {error && <div className="error text-danger">{error}</div>}
             <Form className="form-sign" onSubmit={handleSubmit}>
               <Form.Group className="username-group" controlId="formUsername">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="text"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+                <Box
+                  component="div"
+                  className="email-box"
+                  noValidate
+                  autoComplete="off"
+                >
+                  {/* Added email-input class */}
+                  <TextField
+                    label="Email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    focused
+                    InputLabelProps={{
+                      className: "email-input-label",
+                    }}
+                    className="email-input focused-border"
+                  />
+                </Box>
               </Form.Group>
               <Form.Group className="password-group" controlId="formPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <Box
+                  component="div"
+                  className="password-box"
+                  noValidate
+                  autoComplete="off"
+                >
+                  {/* Added password-input class */}
+                  <TextField
+                    label="Password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    focused
+                    InputLabelProps={{
+                      className: "password-input-label",
+                    }}
+                    className="password-input focused-border"
+                  />
+                </Box>
               </Form.Group>
-              {error && <div className="error text-danger">{error}</div>}
               <div className="button-container">
                 <Button className="button-sign" type="submit">
                   Sign In
