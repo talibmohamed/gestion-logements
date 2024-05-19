@@ -1,70 +1,54 @@
 import React from "react";
-import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
+import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Link } from "react-router-dom";
+import "./sidebare.css";
 import {
-  HomeOutlined as HomeOutlinedIcon,
-  PeopleOutlined as PeopleOutlinedIcon,
-  ContactsOutlined as ContactsOutlinedIcon,
-  ReceiptOutlined as ReceiptOutlinedIcon,
-  PersonOutlined as PersonOutlinedIcon,
-  CalendarTodayOutlined as CalendarTodayOutlinedIcon,
-  HelpOutlineOutlined as HelpOutlineOutlinedIcon,
-  BarChartOutlined as BarChartOutlinedIcon,
-  PieChartOutlineOutlined as PieChartOutlineOutlinedIcon,
-  TimelineOutlined as TimelineOutlinedIcon,
-  MenuOutlined as MenuOutlinedIcon,
-  MapOutlined as MapOutlinedIcon,
+  GridViewRounded as GridViewRoundedIcon,
+  ReceiptRounded as ReceiptRoundedIcon,
+  BarChartRounded as BarChartRoundedIcon,
+  MonetizationOnRounded as MonetizationOnRoundedIcon,
+  AccountCircleRounded as AccountCircleRoundedIcon,
+  LogoutRounded as LogoutRoundedIcon,
 } from "@mui/icons-material";
 
-const Sidebar = () => {
+const SidebarComponent = () => {
   return (
-    <ProSidebar>
-      <Menu
-        iconShape="circle"
-        styles={{
-          backgroundColor: "#263238",
-          marginTop: "65px", // Adjust this value as needed
-        }}
-      >
-        <MenuItem icon={<HomeOutlinedIcon />}>
-          <Link to="/">Home</Link>
+    <Sidebar className="sidebar">
+      <Menu>
+        <MenuItem
+          component={<Link to="/dashboard" />}
+          icon={<GridViewRoundedIcon />}
+        >
+          Overview
         </MenuItem>
-        <MenuItem icon={<PeopleOutlinedIcon />}>
-          <Link to="/people">People</Link>
+        <MenuItem
+          component={<Link to="/dashboard/statistics" />}
+          icon={<BarChartRoundedIcon />}
+        >
+          Statistics
         </MenuItem>
-        <MenuItem icon={<ContactsOutlinedIcon />}>
-          <Link to="/contacts">Contacts</Link>
+        <MenuItem
+          component={<Link to="/dashboard/facture" />}
+          icon={<ReceiptRoundedIcon />}
+        >
+          Facture
         </MenuItem>
-        <MenuItem icon={<ReceiptOutlinedIcon />}>
-          <Link to="/receipts">Receipts</Link>
+        <MenuItem
+          component={<Link to="/dashboard/reclamation" />}
+          icon={<MonetizationOnRoundedIcon />}
+        >
+          Reclamation
         </MenuItem>
-        <MenuItem icon={<PersonOutlinedIcon />}>
-          <Link to="/profile">Profile</Link>
+        <MenuItem
+          component={<Link to="/dashboard/profile" />}
+          icon={<AccountCircleRoundedIcon />}
+        >
+          Profile
         </MenuItem>
-        <MenuItem icon={<CalendarTodayOutlinedIcon />}>
-          <Link to="/calendar">Calendar</Link>
-        </MenuItem>
-        <MenuItem icon={<HelpOutlineOutlinedIcon />}>
-          <Link to="/help">Help</Link>
-        </MenuItem>
-        <MenuItem icon={<BarChartOutlinedIcon />}>
-          <Link to="/charts">Charts</Link>
-        </MenuItem>
-        <MenuItem icon={<PieChartOutlineOutlinedIcon />}>
-          <Link to="/piecharts">Pie Charts</Link>
-        </MenuItem>
-        <MenuItem icon={<TimelineOutlinedIcon />}>
-          <Link to="/timeline">Timeline</Link>
-        </MenuItem>
-        <MenuItem icon={<MenuOutlinedIcon />}>
-          <Link to="/menu">Menu</Link>
-        </MenuItem>
-        <MenuItem icon={<MapOutlinedIcon />}>
-          <Link to="/map">Map</Link>
-        </MenuItem>
+        <MenuItem icon={<LogoutRoundedIcon />}> Logout </MenuItem>
       </Menu>
-    </ProSidebar>
+    </Sidebar>
   );
 };
 
-export default Sidebar;
+export default SidebarComponent;
