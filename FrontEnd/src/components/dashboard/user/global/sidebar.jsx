@@ -36,7 +36,7 @@ const SidebarComponent = () => {
 
   return (
     <div style={{ display: "flex", height: "100%" }}>
-      <Sidebar className="sidebar" backgroundColor="#171821" width="350px">
+      <Sidebar className="sidebar" backgroundColor="#171821" width="20vw" border="0px solid #171821">
         <Menu
           menuItemStyles={{
             button: {
@@ -46,6 +46,7 @@ const SidebarComponent = () => {
                 borderLeft: "5px solid #f9769d",
               },
               textAlign: "left",
+              border:"0px",
             },
           }}
         >

@@ -1,13 +1,23 @@
 .dashboard-container {
   display: flex;
   height: 100vh;
-  font-family: Inria sans  ;
+  font-family: 'Inria Sans', sans-serif;
   font-weight: 700;
   font-size: 14px;
 }
 
+.main-content {
+  color: white;
+  margin: 0px !important;
+  border-left: 0px !important;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+
 .content {
   flex-grow: 1;
-  padding: 20px;
-  background-color: #f4f4f4;
+  // background-color: #171821;
+  overflow-y: auto;
 }
