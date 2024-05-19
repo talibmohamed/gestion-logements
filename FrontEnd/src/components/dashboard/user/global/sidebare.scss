@@ -1,0 +1,68 @@
+.sidebar {
+  height: 100vh;
+  background-color: #171821; 
+  color: white;
+  font-family: lato;
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 22.5px;
+  color : rgba(243, 243, 243, 0.63);
+  display: flex;
+  flex-direction: column;
+}
+
+
+.logo-sidebar {
+  margin-top: 3vh;
+  margin-bottom: 5vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.logo-sidebar p {
+  max-width: 100%;
+  height: auto;
+  margin-left: 20px;
+  margin-bottom: 0px;
+  font-weight: lighter;
+}
+
+.map-sidebar{
+  margin: 1vh;
+}
+
+.bottom{
+  position: absolute;
+  display: table-column-group;
+  flex-direction: column;
+  bottom: 0;
+  width: 100%;
+}
+
+.logo-sidebar img {
+  max-width: 100%;
+  height: auto;
+  height: 6vh;
+}
+
+.custom-hr {
+  width: 85%; 
+  margin: 0 auto; 
+  border-top: 2px solid rgba(243, 243, 243, 0.63); 
+  margin-top: 1px; 
+  margin-bottom: 1px;
+}
+
+.active {
+  color: #f9769d !important;
+  border-left: 5px solid #f9769d;
+}
+
+.tab:hover{
+ background-color: #171821;
+}
+
