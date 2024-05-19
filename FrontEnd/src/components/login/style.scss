@@ -4,29 +4,29 @@
 }
 
 .houselytics {
-  font-size: 1.25rem; 
+  font-size: 1.25rem;
   color: white;
   font-weight: bold;
-  margin-left: 1rem; 
+  margin-left: 1rem;
 }
 
 .right {
   background-color: white;
-  border-top-left-radius: 3rem; 
-  border-bottom-left-radius:  3rem; 
+  border-top-left-radius: 1.5rem;
+  border-bottom-left-radius: 1.5rem;
   position: relative;
 }
 
 .title img {
-  width: 3.125rem; 
+  width: 3.125rem;
   height: 3.125rem;
 }
 
 .title p {
   font-family: inter, sans-serif;
-  font-size: 1.5625rem; 
+  font-size: 1.5625rem;
   font-weight: 600;
-  line-height: 2.34375rem; 
+  line-height: 2.34375rem;
 }
 
 .title {
@@ -36,25 +36,20 @@
 
 .header {
   font-family: inter, sans-serif;
-  font-size: 2.5rem; 
+  font-size: 2.5rem;
   line-height: 3.75rem;
   font-weight: 700;
   text-align: center;
-  margin-bottom: 16vh;
+  margin-bottom: 8vh !important;
 }
 
 .input {
   display: flex;
   flex-direction: column;
   position: relative;
-  padding: 0 1rem; 
+  padding: 0 1rem;
 }
 
-.form-control:focus {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
 
 .form-sign {
   width: 50%;
@@ -62,12 +57,68 @@
   margin-bottom: 10vh;
 }
 
-.button-container {
-  display: flex;
-  justify-content: center;
+
+.email-input-label,
+.password-input-label {
+  padding: 0 10px 0 5px !important;
+  border: 1px !important;
+  background-color: white !important;
+  color: #545454 !important;
+  font-size: 1.4rem !important;
 }
 
-.password-group {
+.focused-border {
+  .MuiOutlinedInput-root.Mui-focused fieldset {
+    border-color: #545454;
+  }
+}
+
+.form-sign {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+
+  .username-group,
+  .password-group {
+    width: 50%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .username-group {
+    margin-bottom: 3rem;
+  }
+
+  .email-box,
+  .password-box {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+
+    .email-input,
+    .password-input {
+      width: 50ch;
+    }
+  }
+
+  .button-container {
+    display: flex;
+    justify-content: center;
+    width: 50%;
+    margin-top: 50px;
+    margin-bottom: -90px;
+  }
+}
+
+.error {
+  margin-top: -7vh;
+  margin-bottom: 3vh;
+  color: red;
+}
+
+.forgot {
+  font-size: small;
   margin-bottom: 5vh;
 }
 
@@ -75,11 +126,10 @@
   background-color: #4250be !important;
   width: 50%;
   color: white;
-  font-size: 1.2rem; 
+  font-size: 1.2rem;
   font-weight: 500;
-  line-height: 2.0625rem; 
-  padding: 0.4rem 2rem; 
-  margin-top: 5vh;
+  line-height: 2.0625rem;
+  padding: 0.4rem 2rem;
 }
 
 .full-height {
@@ -108,56 +158,121 @@
     justify-content: center;
   }
 
-  .button-container {
-    margin-top: 0;
+  .email-input-label,
+  .password-input-label {
+    padding: 0 10px 0 5px;
+    border: 1px !important;
+    backdrop-filter: blur(0.82rem);
+    background-color: #291964 !important;
+    color: #DEDEDE !important;
+
+
   }
 
-  .button-sign{
-    background: #1f2558;
-    background: -webkit-linear-gradient(124deg, #1f2558 0%, #4250be 100%);
-    background: linear-gradient(124deg, #1f2558 0%, #4250be 100%);
+  .focused-border {
+    .MuiOutlinedInput-root.Mui-focused fieldset {
+      border-image-source: linear-gradient(125deg, #fff 40%, #FBB58C 80%);
+      border-image-slice: 1%;
+      opacity: 40%;
+    }
+  }
+
+  .form-sign {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     width: 100%;
-    margin-top: 0;
-    padding: 0.5rem 2rem;
-    margin-bottom: 0;
+
+    .username-group,
+    .password-group {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .username-group {
+      margin-bottom: 2rem;
+    }
+
+    .email-box,
+    .password-box {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+
+      .email-input,
+      .password-input {
+        width: 100ch;
+      }
+    }
+
+    .button-container {
+      margin-top: 2px !important;
+
+    }
+
   }
 
-  .right {
-    margin-bottom: 0;
-  }
-
-  .form-sign{
-    margin-bottom: 4.3vh;
+  .error {
+    margin-bottom: 3vh;
+    color: red;
   }
 
   .forgot {
-    margin-bottom: 5vh;
+    font-size: small;
+    margin-top: 2vh;
+    color: #DEDEDE;
   }
 
-  .header {
+  .button-sign {
+    border: 0.3vh solid #7875AD !important;
+    background: linear-gradient(124deg, #291964 20%, #4250be 80%) !important;
+    width: 100%;
+    margin-top: 2em;
+    padding: 0.5rem 2rem;
     margin-bottom: 0;
-    font-family: inter, sans-serif;
-    font-size: 2.5rem;
-    line-height: 3.75rem;
-    font-weight: 700;
-    text-align: center;
-    margin-top: 5vh;
-    margin-bottom: 3vh;
   }
+  
+  .header {
+    font-family: inter, sans-serif;
+    font-size: 2rem;
+    line-height: 3.75rem;
+    margin-top: 5vh;
+  }
+
 
   .right {
     width: 94%;
     position: relative;
     overflow-x: hidden;
-    color: white;
+    color: #DEDEDE;
     top: -70px;
     background: rgba(221, 221, 221, 0.062);
-    border-radius: 1.6rem; 
-    box-shadow: 0 4px 3rem rgba(0, 0, 0, 0.1); 
-    backdrop-filter: blur(0.82rem); 
+    border-radius: 1.3rem;
+    box-shadow: 0 4px 3rem rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(0.5rem);
     -webkit-backdrop-filter: blur(0.82rem);
-    border: 0.01rem solid rgba(255, 255, 255, 0.99);
+
+
+    /* this is to achieve the gradient border */
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: inherit;
+      padding: 0.1rem;
+      background: linear-gradient(to right, #fff 40%, #FBB58C 80%);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: destination-out;
+      mask-composite: exclude;
+      opacity: 50%;
+      z-index: -1; // Ensure it's behind the content 
+    }
   }
+
 
   .stack-on-small {
     height: auto !important;
