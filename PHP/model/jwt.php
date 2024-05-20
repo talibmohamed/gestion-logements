@@ -11,7 +11,7 @@ class JwtHandler
     private $jwt_algo = "HS256";
 
     // Function to generate JWT token
-    public function generateJwtToken($data,$admin)
+    public function generateJwtToken($data, $admin)
     {
         $issuedAt = time();
         $expirationTime = $issuedAt + 3600; // JWT token expiration time (1 hour)
@@ -38,3 +38,4 @@ class JwtHandler
     //     }
     // }
 }
+?>

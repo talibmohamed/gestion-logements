@@ -1,42 +1,53 @@
-import React, { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import axios from "axios";
-import logo from "./logo.svg";
-import house from "./house.jpg";
-import "../style.scss";
-import { Form, Button } from "react-bootstrap";
+// src/components/Login.jsx
+import React, { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import axios from 'axios';
+import logo from './logo.svg';
+import house from './house.jpg';
+import '../style.scss';
+import { Form, Button } from 'react-bootstrap';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from '../../../session/authentication';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const response = await axios.post(
-        "http://localhost/pfe/php/api/login.php",
+        'http://localhost/pfe/php/api/login.php',
         {
           email,
           password,
         }
       );
 
-      if (response.data.status === "success") {
-        // Successful login, store the JWT token and redirect
-        console.log("JWT token:", response.data.jwt_token); // Just for testing
-        localStorage.setItem("jwt_token", response.data.jwt_token);
-        window.location.href = "/dashboard";
+      if (response.data.status === 'success') {
+        dispatch(
+          loginSuccess({
+            jwtToken: response.data.jwt_token,
+            nom: response.data.nom,
+            prenom: response.data.prenom,
+          })
+        );
+        //consol log nom et prenom 
+        console.log('Response:', response.data);
+        navigate('/dashboard');
       } else {
-        // Login failed, display error message
         setError(response.data.message);
       }
     } catch (error) {
-      console.error("Error:", error);
-      setError("An error occurred while processing your request");
+      console.error('Error:', error);
+      setError('An error occurred while processing your request');
     }
   };
 
@@ -74,7 +85,6 @@ const Login = () => {
                   noValidate
                   autoComplete="off"
                 >
-                  {/* Added email-input class */}
                   <TextField
                     label="Email"
                     type="email"
@@ -82,7 +92,7 @@ const Login = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     focused
                     InputLabelProps={{
-                      className: "email-input-label",
+                      className: 'email-input-label',
                     }}
                     className="email-input focused-border"
                   />
@@ -95,7 +105,6 @@ const Login = () => {
                   noValidate
                   autoComplete="off"
                 >
-                  {/* Added password-input class */}
                   <TextField
                     label="Password"
                     type="password"
@@ -103,7 +112,7 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     focused
                     InputLabelProps={{
-                      className: "password-input-label",
+                      className: 'password-input-label',
                     }}
                     className="password-input focused-border"
                   />

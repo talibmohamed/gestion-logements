@@ -1,9 +1,13 @@
 import React from "react";
+import { useDispatch } from "react-redux"; // Importing useDispatch
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom"; // Import useNavigate
+import { logout } from "../../../../session/authentication"; // Import logout action
 import "./sidebare.scss";
-import { ArrowBack } from "@mui/icons-material"; 
-import { FaUserCircle,  } from "react-icons/fa";
+import { ArrowBack } from "@mui/icons-material";
+import { FaUserCircle } from "react-icons/fa";
+import { useSelector } from "react-redux";
+import "leaflet/dist/leaflet.css";
 
 import {
   HomeRounded as HomeRoundedicon,
@@ -30,7 +34,19 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
   const location = useLocation();
+  const navigate = useNavigate(); // Define navigate function
+  const nom = useSelector((state) => state.auth.nom);
+  const prenom = useSelector((state) => state.auth.prenom);
+  const dispatch = useDispatch();
+
   const position = [32.375289, -6.318726];
+
+  // logout
+  const handleLogout = () => {
+    dispatch(logout());
+    localStorage.removeItem("state"); // Remove Redux state from localStorage
+    navigate("/user"); // Redirect to '/user' after logout
+  };
 
   React.useEffect(() => {
     const handleResize = () =>
@@ -58,8 +74,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
         border="0px solid #171821"
         toggled={toggled}
         customBreakPoint="800px"
-        onBreakPoi
-        nt={setBroken}
+        onBreakPoint={setBroken}
       >
         <Menu
           menuItemStyles={{
@@ -82,13 +97,15 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
                     <ArrowBack />
                   </button>
                 </div>
-                <button className="sm-logout">
+                <button className="sm-logout" onClick={handleLogout}>
                   Logout <Logouticon />
                 </button>
               </div>
               <div className="user-info">
                 <FaUserCircle className="user-icon" />
-                <p className="user-name">John Doe</p>
+                <p className="user-name">
+                  {nom} {prenom}
+                </p>
               </div>
             </div>
           )}
@@ -186,7 +203,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
                 <MenuItem
                   className="footer-sidebar"
                   icon={<Logouticon />}
-                  onClick={handleMenuItemClick}
+                  onClick={handleLogout}
                 >
                   Logout
                 </MenuItem>

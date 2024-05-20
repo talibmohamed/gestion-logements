@@ -2,17 +2,6 @@
 
 class residant
 {
-    // public $res_ID;
-    // public $log_ID;
-    // public $nom;
-    // public $prenom;
-    // public $cin;
-    // public $mot_de_passe;
-    // public $email;
-    // public $telephone;
-    // public $profession;
-    // public $date_ajout;
-
     private $db;
 
     public function __construct(Database $db)
@@ -27,20 +16,25 @@ class residant
         try {
             // Get the established connection
             $connection = $this->db->getConnection();
-            $sql = $connection->prepare('SELECT password FROM residant WHERE email = ?');
+            $sql = $connection->prepare('SELECT res_ID, password, nom, prenom FROM residant WHERE email = ?');
             $sql->execute([$email]);
             $user = $sql->fetch(PDO::FETCH_ASSOC);
 
             if ($user) {
-                // we gonna unhased the password from the db cuz the database store the password hashed
-                if ($password == $user['password']) { //compare the unhashed pass with the password we get from the request
-                    // Generate JWT token
+                // Compare the provided password with the stored password
+                if ($password == $user['password']) {
+                    // Generate JWT token with res_ID
                     $jwtHandler = new JwtHandler();
                     $admin = false;
-                    $jwt_token = $jwtHandler->generateJwtToken($user,$admin);
+                    $jwt_token = $jwtHandler->generateJwtToken($user, $admin);
 
-                    // Return success response with JWT token
-                    return array('status' => 'success', 'jwt_token' => $jwt_token);
+                    // Return success response with JWT token, nom, and prenom
+                    return array(
+                        'status' => 'success',
+                        'jwt_token' => $jwt_token,
+                        'nom' => $user['nom'],
+                        'prenom' => $user['prenom']
+                    );
                 } else {
                     // Return error response if password is incorrect
                     return array('status' => 'error', 'message' => 'Invalid password');
@@ -55,5 +49,4 @@ class residant
         }
     }
 }
-
 ?>
