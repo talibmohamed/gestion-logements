@@ -1,5 +1,5 @@
 import React from "react";
-import MenuIcon from '@mui/icons-material/Menu'; // Correct import for the MenuIcon
+import MenuIcon from '@mui/icons-material/Menu'; 
 import "./topbar.scss";
 
 const Topbar = ({ broken, toggled, setToggled }) => {

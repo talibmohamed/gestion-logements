@@ -39,8 +39,6 @@ const Login = () => {
             prenom: response.data.prenom,
           })
         );
-        //consol log nom et prenom 
-        console.log('Response:', response.data);
         navigate('/dashboard');
       } else {
         setError(response.data.message);

@@ -3,7 +3,6 @@ import authReducer from './authentication';
 
 const rootReducer = combineReducers({
   auth: authReducer,
-  // Add other reducers here...
 });
 
 // Define a root reducer function that resets the state of all slices to their initial states
