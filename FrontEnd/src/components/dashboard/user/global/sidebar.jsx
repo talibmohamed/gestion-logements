@@ -2,6 +2,9 @@ import React from "react";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Link, useLocation } from "react-router-dom";
 import "./sidebare.scss";
+import { ArrowBack } from "@mui/icons-material"; 
+import { FaUserCircle,  } from "react-icons/fa";
+
 import {
   HomeRounded as HomeRoundedicon,
   Construction as Constructionicon,
@@ -12,13 +15,8 @@ import {
 import { FaFileInvoiceDollar } from "react-icons/fa6";
 import { FaChartPie } from "react-icons/fa";
 import logo from "./logo.svg";
-// Removed the map SVG import as it will be replaced by the interactive map
-// import map from "./morocco.svg"
-
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import "leaflet/dist/leaflet.css"; // Import Leaflet CSS
-
-// Fix for missing marker icons in Leaflet
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
@@ -30,13 +28,39 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-const SidebarComponent = () => {
+const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
   const location = useLocation();
   const position = [32.375289, -6.318726];
 
+  React.useEffect(() => {
+    const handleResize = () =>
+      setBroken(window.matchMedia("(max-width: 800px)").matches);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [setBroken]);
+
+  const handleMenuItemClick = () => {
+    if (toggled) {
+      setToggled(false);
+    }
+  };
+
+  const handleToggleSidebar = () => {
+    setToggled(!toggled);
+  };
+
   return (
     <div style={{ display: "flex", height: "100%" }}>
-      <Sidebar className="sidebar" backgroundColor="#171821" width="20vw" border="0px solid #171821">
+      <Sidebar
+        className={`sidebar ${toggled ? "toggled" : ""}`}
+        backgroundColor="#171821"
+        width={toggled ? "90%" : "20vw"}
+        border="0px solid #171821"
+        toggled={toggled}
+        customBreakPoint="800px"
+        onBreakPoi
+        nt={setBroken}
+      >
         <Menu
           menuItemStyles={{
             button: {
@@ -46,112 +70,128 @@ const SidebarComponent = () => {
                 borderLeft: "5px solid #f9769d",
               },
               textAlign: "left",
-              border:"0px",
+              border: "0px",
             },
           }}
         >
+          {toggled && (
+            <div>
+              <div className="sb-top d-flex justify-content-between align-items-center">
+                <div className="back-button-container">
+                  <button className="back-button" onClick={handleToggleSidebar}>
+                    <ArrowBack />
+                  </button>
+                </div>
+                <button className="sm-logout">
+                  Logout <Logouticon />
+                </button>
+              </div>
+              <div className="user-info">
+                <FaUserCircle className="user-icon" />
+                <p className="user-name">John Doe</p>
+              </div>
+            </div>
+          )}
           <div className="logo-sidebar">
             <img src={logo} alt="logo" />
             <p className="houselytics-sidebar">Houselytics</p>
           </div>
-          <MenuItem
-            rootStyles={{
-              marginTop: "2vh",
-            }}
-            component={<Link to="/dashboard" />}
-            icon={<HomeRoundedicon />}
-            className={
-              location.pathname === "/dashboard" ? "active tab" : "tab"
-            }
-          >
-            Overview
-          </MenuItem>
-          <MenuItem
-            rootStyles={{
-              marginTop: "2vh",
-            }}
-            component={<Link to="/dashboard/statistics" />}
-            icon={<FaChartPie />}
-            className={
-              location.pathname === "/dashboard/statistics"
-                ? "active tab"
-                : "tab"
-            }
-          >
-            Statistics
-          </MenuItem>
-          <MenuItem
-            rootStyles={{
-              marginTop: "2vh",
-            }}
-            component={<Link to="/dashboard/facture" />}
-            icon={<FaFileInvoiceDollar />}
-            className={
-              location.pathname === "/dashboard/facture" ? "active tab" : "tab"
-            }
-          >
-            Facture
-          </MenuItem>
-          <MenuItem
-            rootStyles={{
-              marginTop: "2vh",
-            }}
-            component={<Link to="/dashboard/reclamation" />}
-            icon={<Constructionicon />}
-            className={
-              location.pathname === "/dashboard/reclamation"
-                ? "active tab"
-                : "tab"
-            }
-          >
-            Reclamation
-          </MenuItem>
-          <MenuItem
-            rootStyles={{
-              marginTop: "2vh",
-              marginBottom: "auto"
-            }}
-            component={<Link to="/dashboard/profile" />}
-            icon={<Person2icon />}
-            className={
-              location.pathname === "/dashboard/profile" ? "active tab" : "tab"
-            }
-          >
-            Profile
-          </MenuItem>
-          <div className="bottom">
-          <div className="map-sidebar">
-            <MapContainer
-              center={position}
-              zoom={15}
-              style={{ height: "300px" }}
+          <div className="menu">
+            <MenuItem
+              component={<Link to="/dashboard" />}
+              icon={<HomeRoundedicon />}
+              className={
+                location.pathname === "/dashboard" ? "active tab" : "tab"
+              }
+              onClick={handleMenuItemClick}
             >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <Marker position={position}></Marker>
-            </MapContainer>
+              Overview
+            </MenuItem>
+            <MenuItem
+              component={<Link to="/dashboard/statistics" />}
+              icon={<FaChartPie />}
+              className={
+                location.pathname === "/dashboard/statistics"
+                  ? "active tab"
+                  : "tab"
+              }
+              onClick={handleMenuItemClick}
+            >
+              Statistics
+            </MenuItem>
+            <MenuItem
+              component={<Link to="/dashboard/facture" />}
+              icon={<FaFileInvoiceDollar />}
+              className={
+                location.pathname === "/dashboard/facture"
+                  ? "active tab"
+                  : "tab"
+              }
+              onClick={handleMenuItemClick}
+            >
+              Facture
+            </MenuItem>
+            <MenuItem
+              component={<Link to="/dashboard/reclamation" />}
+              icon={<Constructionicon />}
+              className={
+                location.pathname === "/dashboard/reclamation"
+                  ? "active tab"
+                  : "tab"
+              }
+              onClick={handleMenuItemClick}
+            >
+              Reclamation
+            </MenuItem>
+            <MenuItem
+              component={<Link to="/dashboard/profile" />}
+              icon={<Person2icon />}
+              className={
+                location.pathname === "/dashboard/profile"
+                  ? "active tab"
+                  : "tab"
+              }
+              onClick={handleMenuItemClick}
+            >
+              Profile
+            </MenuItem>
+            <div className="map-sidebar">
+              <MapContainer
+                center={position}
+                zoom={15}
+                style={{ height: "300px" }}
+              >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <Marker position={position}></Marker>
+              </MapContainer>
+            </div>
           </div>
-          <hr className="custom-hr" />
-          <MenuItem
-            rootStyles={{
-              marginTop: "0vh",
-            }}
-            className="footer-sidebar"
-            icon={<HelpOutlineicon />}
-          >
-            Help & Getting Started
-          </MenuItem>
-          <MenuItem
-            rootStyles={{
-                marginTop: "0vh",
-            }}
-            className="footer-sidebar"
-            icon={<Logouticon />}
-          >
-            Logout
-          </MenuItem>
+          <div className="bottom">
+            {!toggled && (
+              <div>
+                <hr className="custom-hr" />
+                <MenuItem
+                  rootStyles={{
+                    size: "10px",
+                  }}
+                  className="footer-sidebar"
+                  icon={<HelpOutlineicon />}
+                  onClick={handleMenuItemClick}
+                >
+                  Help & Getting Started
+                </MenuItem>
+                <MenuItem
+                  className="footer-sidebar"
+                  icon={<Logouticon />}
+                  onClick={handleMenuItemClick}
+                >
+                  Logout
+                </MenuItem>
+              </div>
+            )}
           </div>
         </Menu>
       </Sidebar>

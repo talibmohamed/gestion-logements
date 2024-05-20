@@ -7,6 +7,10 @@
 }
 
 .main-content {
+  flex: 1;
+}
+
+.main-content {
   color: white;
   margin: 0px !important;
   border-left: 0px !important;
@@ -16,8 +20,8 @@
 }
 
 
-.content {
-  flex-grow: 1;
-  // background-color: #171821;
-  overflow-y: auto;
-}
+// .content {
+//   flex-grow: 1;
+//   // background-color: #171821;
+//   overflow-y: auto;
+// }

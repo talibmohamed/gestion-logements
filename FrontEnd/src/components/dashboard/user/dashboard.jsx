@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Topbar from "./global/topbar";
-import Sidebar from "./global/sidebar";
+import SidebarComponent from "./global/sidebar"; // Updated import
 import Overview from "./pages/Overview";
 import Statistics from "./pages/Statistics";
 import Facture from "./pages/Facture";
@@ -10,11 +10,27 @@ import Profile from "./pages/Profile";
 import "./dashboard.scss";
 
 const Dashboard = () => {
+  const [toggled, setToggled] = React.useState(false);
+  const [broken, setBroken] = React.useState(
+    window.matchMedia("(max-width: 800px)").matches
+  );
+
+  React.useEffect(() => {
+    const handleResize = () =>
+      setBroken(window.matchMedia("(max-width: 800px)").matches);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
     <div className="dashboard-container">
-      <Sidebar />
+      <SidebarComponent
+        toggled={toggled}
+        setToggled={setToggled}
+        setBroken={setBroken}
+      />
       <div className="main-content">
-        <Topbar />
+        <Topbar broken={broken} toggled={toggled} setToggled={setToggled} />
         <div className="content">
           <Routes>
             <Route path="/" element={<Overview />} />
