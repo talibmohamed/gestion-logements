@@ -105,7 +105,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               }
               onClick={handleMenuItemClick}
             >
-              Overview
+              Accueil
             </MenuItem>
             <MenuItem
               component={<Link to="/dashboard/statistics" />}
@@ -117,7 +117,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               }
               onClick={handleMenuItemClick}
             >
-              Statistics
+              Statistique
             </MenuItem>
             <MenuItem
               component={<Link to="/dashboard/facture" />}
@@ -141,7 +141,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               }
               onClick={handleMenuItemClick}
             >
-              Reclamation
+              Réclamation
             </MenuItem>
             <MenuItem
               component={<Link to="/dashboard/profile" />}
@@ -153,7 +153,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               }
               onClick={handleMenuItemClick}
             >
-              Profile
+              Profil
             </MenuItem>
             <div className="map-sidebar">
               <MapContainer
@@ -181,14 +181,14 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
                   icon={<HelpOutlineicon />}
                   onClick={handleMenuItemClick}
                 >
-                  Help & Getting Started
+                  Aide & Premiers Pas
                 </MenuItem>
                 <MenuItem
                   className="footer-sidebar"
                   icon={<Logouticon />}
                   onClick={handleMenuItemClick}
                 >
-                  Logout
+                  Déconnexion
                 </MenuItem>
               </div>
             )}

@@ -65,7 +65,7 @@ const login = () => {
             </div>
           </div>
           <div className="col-sm-12 col-md-8 d-flex justify-content-center align-items-center flex-column right">
-            <h2 className="header">Sign In Account</h2>
+            <h2 className="header">Connectez-vous à votre compte</h2>
             {error && <div className="error">{error}</div>}
             <Form className="form-sign" onSubmit={handleSubmit}>
               <Form.Group className="username-group" controlId="formUsername">
@@ -77,7 +77,7 @@ const login = () => {
                 >
                   {/* Added email-input class */}
                   <TextField
-                    label="Email"
+                    label="Adresse e-mail"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -98,7 +98,7 @@ const login = () => {
                 >
                   {/* Added password-input class */}
                   <TextField
-                    label="Password"
+                    label="Mot de passe"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -114,11 +114,11 @@ const login = () => {
                 {" "}
                 {/* Container for centering the button */}
                 <Button className="button-sign" type="submit">
-                  Sign In
+                  Se connecter
                 </Button>
               </div>
             </Form>
-            <a className="forgot" href="#">Forgot password?</a>
+            <a className="forgot" href="#">Mot de passe oublié?</a>
           </div>
         </div>
       </div>

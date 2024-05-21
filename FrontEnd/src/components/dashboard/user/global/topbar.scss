@@ -3,10 +3,39 @@
   border-left: 101px !important;
   margin: 0px;
   height: 12vh;
+  padding: 0px 30px;
+  align-items : center;
+  display: flex;
 }
 
 .sb-button{
   background-color: #f9769d;
 
 }
-  
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-grow: 1;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 25px; 
+}
+
+.user-icon, .mail-icon {
+  color: #dedede !important; 
+  font-size: 45px;
+}
+
+.user-name {
+  color: #dedede;
+  margin: 0;
+  font-size: 15px;
+  font-family: lato;
+  font-weight: 600;
+  line-height: 22.5px !important;
+}
