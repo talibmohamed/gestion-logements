@@ -1,8 +1,8 @@
 import React from "react";
-import { useDispatch } from "react-redux"; 
+import { useDispatch } from "react-redux";
 import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Link, useLocation, useNavigate } from "react-router-dom"; 
-import { logout } from "../../../../session/authentication"; 
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { logout } from "../../../../session/authentication";
 import "./sidebare.scss";
 import { ArrowBack } from "@mui/icons-material";
 import { FaUserCircle } from "react-icons/fa";
@@ -44,7 +44,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
   // logout
   const handleLogout = () => {
     dispatch(logout());
-    localStorage.removeItem("state"); 
+    localStorage.removeItem("state"); // Remove Redux state from localStorage
     navigate("/user"); // Redirect to '/user' after logout
   };
 
