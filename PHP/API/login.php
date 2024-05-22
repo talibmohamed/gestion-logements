@@ -14,9 +14,9 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Instantiate Database and residant classes
-$database = new Database();
-$residant = new residant($database);
+// Instantiate Database and residant classes with resident connection
+$residentDatabase = new Database('resident');
+$residant = new residant($residentDatabase);
 
 // Get POST data
 $data = json_decode(file_get_contents("php://input"));
