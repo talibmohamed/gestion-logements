@@ -4,17 +4,18 @@ import DataTable from "./components/table";
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import "./Overview.scss";
+import Box from '@mui/material/Box';
 
 const Overview = () => {
   const data1 = [
-    { label: "total payé", value: 42, color: "#96A7FF" },
-    { label: "total en retard", value: 20.1, color: "#5F284A" },
-    { label: "total impayé", value: 38.5, color: "#282230" },
+    { id: "total-payé", label: "total payé", value: 42, color: "#96A7FF" },
+    { id: "total-en-retard", label: "total en retard", value: 20.1, color: "#5F284A" },
+    { id: "total-impayé", label: "total impayé", value: 38.5, color: "#282230" },
   ];
 
   const data2 = [
-    { label: "Total Occupé", value: 80, color: "#F9769D" },
-    { label: "Total Vacant", value: 20, color: "#282230" },
+    { id: "total-occupé", label: "Total Occupé", value: 80, color: "#F9769D" },
+    { id: "total-vacant", label: "Total Vacant", value: 20, color: "#282230" },
   ];
 
   const rows = [
@@ -106,11 +107,11 @@ const Overview = () => {
   return (
     <div className="container-fluid">
       {isMobile ? (
-        <Carousel>
-          <div>
+        <Carousel showArrows={false} showStatus={false}>
+          <div className="carousel-item-wrapper">
             <PieChartCard title="Statistique Des Factures" data={data1} />
           </div>
-          <div>
+          <div className="carousel-item-wrapper">
             <PieChartCard title="Statistique Des Logements" data={data2} />
           </div>
         </Carousel>

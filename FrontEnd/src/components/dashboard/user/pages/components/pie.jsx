@@ -2,6 +2,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Card, CardBody } from "@nextui-org/react";
 import { PieChart } from "@mui/x-charts/PieChart";
+import Box from '@mui/material/Box';
+
 
 const PieChartCard = ({ title, data }) => {
   return (
@@ -13,24 +15,23 @@ const PieChartCard = ({ title, data }) => {
       >
         <CardBody>
           <h2 className="text-left">{title}</h2>
-          <div className="pie-chart">
-          <PieChart
-            series={[
-              {
-                data: data,
-                cx: "50%",
-                cy: "50%",
-                innerRadius: 40,
-                outerRadius: 80,
-              },
-            ]}
-            height={250}
-            width={390}
-            slotProps={{
-              legend: { hidden: true },
-            }}
-          />
-          </div>
+          <Box sx={{ width: "100%" }}>
+            <PieChart
+              series={[
+                {
+                  data: data,
+                  cx: "50%",
+                  cy: "50%",
+                  innerRadius: 90,
+                  outerRadius: 130,
+                },
+              ]}
+              height={300}
+              slotProps={{
+                legend: { hidden: true },
+              }}
+            />
+          </Box>{" "}
           <div className="custom-legend">
             {data.map((item, index) => (
               <div className="legend-item" key={index}>
