@@ -1,18 +1,29 @@
 import React from "react";
-import MenuIcon from '@mui/icons-material/Menu'; // Correct import for the MenuIcon
+import MenuIcon from "@mui/icons-material/Menu"; // Correct import for the MenuIcon
 import "./topbar.scss";
-import MailOutlineOutlinedIcon from '@mui/icons-material/MailOutlineOutlined';
-import IconButton from '@mui/material/IconButton';
+import MailOutlineOutlinedIcon from "@mui/icons-material/MailOutlineOutlined";
+import IconButton from "@mui/material/IconButton";
 import { Menu } from "react-pro-sidebar";
 import { Avatar, AvatarIcon } from "@nextui-org/react";
+import { GiHamburgerMenu } from "react-icons/gi";
+import logo from "./logo.svg";
 
 const Topbar = ({ broken, toggled, setToggled }) => {
   return (
     <div className="topbar">
       {broken && (
-        <button className="sb-button" onClick={() => setToggled(!toggled)}>
-          <MenuIcon />
-        </button>
+        <div className=" top-bar-phone d-flex justify-content-between align-items-center">
+          <div className="d-flex align-items-center gap-3 ">
+            {/* resize the img */}
+            <img src={logo} alt="logo" className="top-logo"  />
+            <p>Houselytics</p>
+          </div>
+          <div>
+            <button onClick={() => setToggled(!toggled)} className="humb-button">
+              <GiHamburgerMenu />
+            </button>
+          </div>
+        </div>
       )}
       <div className="nav justify-content-end">
         <Menu
@@ -25,7 +36,7 @@ const Topbar = ({ broken, toggled, setToggled }) => {
         >
           <div className="user-section">
             <IconButton className="mail-icon">
-              <MailOutlineOutlinedIcon style={{ fontSize: 28, }} />
+              <MailOutlineOutlinedIcon style={{ fontSize: 28 }} />
             </IconButton>
             <Avatar
               icon={<AvatarIcon />}
