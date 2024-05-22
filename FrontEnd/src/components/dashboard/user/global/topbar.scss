@@ -18,6 +18,7 @@
   align-items: center;
   justify-content: flex-end;
   flex-grow: 1;
+  
 }
 
 .user-section {
@@ -26,7 +27,7 @@
   gap: 25px; 
 }
 
-.user-icon, .mail-icon {
+.mail-icon {
   color: #dedede !important; 
   font-size: 45px;
 }
@@ -38,4 +39,10 @@
   font-family: lato;
   font-weight: 600;
   line-height: 22.5px !important;
+}
+
+@media (max-width: 600px) {
+  .user-avatar, .user-nameuser {
+    display: none; 
+  }
 }

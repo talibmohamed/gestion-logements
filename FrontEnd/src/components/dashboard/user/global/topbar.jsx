@@ -27,14 +27,16 @@ const Topbar = ({ broken, toggled, setToggled }) => {
             <IconButton className="mail-icon">
               <MailOutlineOutlinedIcon style={{ fontSize: 28, }} />
             </IconButton>
-            <Avatar
-              icon={<AvatarIcon />}
-              classNames={{
-                base: "bg-gradient-to-br from-[#737dfe] to-[#ffcac9]",
-                icon: "text-black/80",
-              }}
-            />
-            <p className="user-name">John Doe</p>
+            <div className="user-avatar">
+              <Avatar
+                icon={<AvatarIcon />}
+                classNames={{
+                  base: "bg-gradient-to-br from-[#737dfe] to-[#ffcac9]",
+                  icon: "text-black/80",
+                }}
+              />
+            </div>
+            <p className="user-nameuser">John Doe</p>
           </div>
         </Menu>
       </div>
