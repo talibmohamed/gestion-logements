@@ -124,7 +124,7 @@ const Overview = () => {
           </div>
         </div>
       )}
-      {/* <DataTable columns={columns} rows={rows} /> */}
+      <DataTable columns={columns} rows={rows} />
     </div>
   );
 };
