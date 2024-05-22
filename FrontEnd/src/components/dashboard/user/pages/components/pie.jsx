@@ -13,6 +13,7 @@ const PieChartCard = ({ title, data }) => {
       >
         <CardBody>
           <h2 className="text-left">{title}</h2>
+          <div className="pie-chart">
           <PieChart
             series={[
               {
@@ -29,6 +30,7 @@ const PieChartCard = ({ title, data }) => {
               legend: { hidden: true },
             }}
           />
+          </div>
           <div className="custom-legend">
             {data.map((item, index) => (
               <div className="legend-item" key={index}>
