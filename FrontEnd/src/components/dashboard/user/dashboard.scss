@@ -1,14 +1,12 @@
 .dashboard-container {
   display: flex;
   height: 100vh;
-  font-family: 'Inria Sans', sans-serif;
+  font-family: 'Lato', sans-serif;
   font-weight: 700;
   font-size: 14px;
 }
 
-.main-content {
-  flex: 1;
-}
+
 
 .main-content {
   color: white;
@@ -20,8 +18,12 @@
 }
 
 
+
 .content {
   flex-grow: 1;
   background-color: #171821;
-  overflow-y: auto;
+  width: 100%;
+  padding-left: 3vw;
+  padding-right: 3vw;
+  padding-top: 5vh;
 }

@@ -8,22 +8,34 @@
   gap: 40px;
   padding: 65px;
 }
+.overview-chart {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.pie-chart{
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
 
 .card-wrapper {
-  width: 100%;
-  max-width: 450px;
   color: #f3f3f3; 
   font-size: 1.2rem;
   font-family: 'Lato', sans-serif; 
   font-weight: bold;
-  background: linear-gradient(45deg, rgba(33, 34, 45, 0) 50%, rgba(249, 118, 157, 0.45) 100%);
+  background: rgb(23,24,33);
+  background: linear-gradient(45deg, rgba(23,24,33,1) 30%, rgba(249,118,157,1) 420%);
   border-radius: 15px;
+  color: #f9769d0f;
 }
 
 .stats-water,
 .stats-electricity {
   margin-bottom: 20px;
 }
+
 
 h2 {
   color: #f3f3f3;
@@ -62,4 +74,20 @@ h2 {
   font-family: 'Lato', sans-serif;
   font-size: 15px;
   font-weight: 400;
+}
+
+
+
+
+
+
+
+
+.bg-background\/15 {
+  background-color: hsl(var(--nextui-background) / 0.02) !important;
+}
+.css-1mhcdve-MuiPieArc-root {
+  stroke: #ffffff00 !important; 
+  stroke-width: 0 !important;
+  stroke-linejoin: round;
 }

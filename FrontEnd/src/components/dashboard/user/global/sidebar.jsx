@@ -50,7 +50,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
 
   React.useEffect(() => {
     const handleResize = () =>
-      setBroken(window.matchMedia("(max-width: 800px)").matches);
+      setBroken(window.matchMedia("(max-width: 768px)").matches);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [setBroken]);
@@ -73,7 +73,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
         width={toggled ? "90%" : "20vw"}
         border="0px solid #171821"
         toggled={toggled}
-        customBreakPoint="800px"
+        customBreakPoint="768px"
         onBreakPoint={setBroken}
       >
         <Menu
