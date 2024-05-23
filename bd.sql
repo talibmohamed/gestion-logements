@@ -1,3 +1,7 @@
+--
+-- Table structure for table 'Equipement'
+--
+
 create table equipement (
     equip_id  serial primary key,
     equip_nom varchar(100)
@@ -9,7 +13,7 @@ create table equipement (
 
 insert into equipement ( equip_nom ) values ( 'WiFi' ),( 'Kitchen' ),( 'TV' ),( 'Air Conditioning' ),( 'Parking' );
 
-
+-- ------------------------------------------------------------
 
 --
 -- Table structure for tble 'Logement'

@@ -7,6 +7,12 @@
   flex-wrap: wrap;
   gap: 40px;
   padding: 65px;
+
+  h2 {
+    color: #f3f3f3;
+    font-family: 'Lato', sans-serif;
+    margin-top: 10px;
+  }
 }
 
 .overview-chart {
@@ -38,12 +44,6 @@
   margin-bottom: 20px;
 }
 
-
-h2 {
-  color: #f3f3f3;
-  font-family: 'Lato', sans-serif;
-  margin-top: 10px;
-}
 
 .card-wrapper .text-left {
   color: #f3f3f3;
