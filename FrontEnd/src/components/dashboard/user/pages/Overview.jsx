@@ -4,13 +4,12 @@ import DataTable from "./components/table";
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import "./Overview.scss";
-import Box from '@mui/material/Box';
 
 const Overview = () => {
   const data1 = [
-    { id: "total-payé", label: "total payé", value: 42, color: "#96A7FF" },
-    { id: "total-en-retard", label: "total en retard", value: 20.1, color: "#5F284A" },
-    { id: "total-impayé", label: "total impayé", value: 38.5, color: "#282230" },
+    { id: "total-payé", label: "Total Payé", value: 42, color: "#96A7FF" },
+    { id: "total-en-retard", label: "Total En Retard", value: 20.1, color: "#5F284A" },
+    { id: "total-impayé", label: "Total Impayé", value: 38.5, color: "#282230" },
   ];
 
   const data2 = [
@@ -27,7 +26,7 @@ const Overview = () => {
       Type: "Eau",
       Mois: "01/2024",
       echeance: "22/02/2024",
-      etat: "pending",
+      etat: "Pending",
       ttc: "$10",
     },
     {
@@ -38,7 +37,7 @@ const Overview = () => {
       Type: "Eau",
       Mois: "01/2024",
       echeance: "22/02/2024",
-      etat: "pending",
+      etat: "Paid",
       ttc: "$10",
     },
     {
@@ -49,7 +48,7 @@ const Overview = () => {
       Type: "Eau",
       Mois: "01/2024",
       echeance: "22/02/2024",
-      etat: "pending",
+      etat: "Overdue",
       ttc: "$10",
     },
   ];
@@ -93,10 +92,10 @@ const Overview = () => {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768); // Adjust the breakpoint as needed
+      setIsMobile(window.innerWidth <= 768);
     };
 
-    handleResize(); // Initial check
+    handleResize(); 
     window.addEventListener('resize', handleResize);
 
     return () => {
@@ -125,7 +124,9 @@ const Overview = () => {
           </div>
         </div>
       )}
+      <div className="custom-table">
       <DataTable columns={columns} rows={rows} />
+      </div>
     </div>
   );
 };
