@@ -82,16 +82,15 @@
 
 
 
-
+//fixed card transparency
 
 .bg-background\/15 {
   background-color: hsl(var(--nextui-background) / 0.02) !important;
 }
 
+//Removing the stroke form the chart
 .css-1mhcdve-MuiPieArc-root {
-  stroke: #ffffff00 !important;
-  stroke-width: 0 !important;
-  stroke-linejoin: round;
+  stroke: none !important;
 }
 
 
@@ -102,22 +101,32 @@
 
 .chip-Pending {
   background-color: #A07BC8 !important;
-  // color: #fff !important;
+  color: #fff !important;
 }
 
 .chip-Overdue {
   background-color: #DE6B8F !important;
-  // color: #fff !important;
+  color: #fff !important;
 }
 
 .chip-Paid {
   background-color: #8E92DC !important;
-  // color: #fff !important;
+  color: #fff !important;
 }
 
 
 
 .table .bg-content1 {
-    --tw-bg-opacity: 1;
-    background-color: transparent(var(--nextui-content1) / var(--nextui-content1-opacity, var(--tw-bg-opacity))) !important;
-  }
+  --tw-bg-opacity: 1;
+  background-color: transparent(var(--nextui-content1) / var(--nextui-content1-opacity, var(--tw-bg-opacity))) !important;
+}
+
+.text-foreground-500 {
+  --tw-text-opacity: 1;
+  color: #f3f3f3(var(--nextui-foreground-500) / var(--nextui-foreground-500-opacity, var(--tw-text-opacity))) !important;
+}
+
+table {
+  background-color: transparent !important;
+  color: #f3f3f3 !important;
+}
