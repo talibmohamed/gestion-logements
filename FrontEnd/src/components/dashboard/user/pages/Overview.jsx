@@ -106,7 +106,7 @@ const Overview = () => {
   return (
     <div className="container-fluid">
       {isMobile ? (
-        <Carousel showArrows={false} showStatus={false}>
+        <Carousel showArrows={false} showStatus={false} showThumbs={false}>
           <div className="carousel-item-wrapper">
             <PieChartCard title="Statistique Des Factures" data={data1} />
           </div>

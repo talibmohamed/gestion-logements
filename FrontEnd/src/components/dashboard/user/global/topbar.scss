@@ -8,10 +8,6 @@
   display: flex;
 }
 
-.sb-button{
-  background-color: #f9769d;
-}
-
 .nav {
   display: flex;
   align-items: center;
@@ -40,8 +36,39 @@
   line-height: 22.5px !important;
 }
 
-@media (max-width: 600px) {
-  .user-avatar, .user-nameuser {
-    display: none; 
-  }
+
+@media (max-width: 768px) {
+.nav{
+  display: none;
 }
+.topbar{
+  align-items: center;
+  border-color: #171821;
+  height: 10vh;
+}
+
+.phone-topbar{
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.top-logo{
+  height: 3rem;
+  color: #dedede;
+}
+
+.top-bar-phone{
+  width: 100%;
+}
+
+.humb-button{
+  background-color: transparent;
+  font-size: 2rem;
+  padding: 7px;
+  padding-right: 0;
+}
+
+
+}
+
