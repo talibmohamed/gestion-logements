@@ -105,7 +105,28 @@ const Overview = () => {
 
   return (
     <div className="container-fluid">
-      <h1>resident overview</h1>
+      {isMobile ? (
+        <Carousel showArrows={false} showStatus={false} showThumbs={false}>
+          <div className="carousel-item-wrapper">
+            <PieChartCard title="Statistique Des Factures" data={data1} />
+          </div>
+          <div className="carousel-item-wrapper">
+            <PieChartCard title="Statistique Des Logements" data={data2} />
+          </div>
+        </Carousel>
+      ) : (
+        <div className="row justify-content-around">
+          <div className="col-md-6">
+            <PieChartCard title="Statistique Des Factures" data={data1} />
+          </div>
+          <div className="col-md-6">
+            <PieChartCard title="Statistique Des Logements" data={data2} />
+          </div>
+        </div>
+      )}
+      <div className="custom-table">
+      <DataTable columns={columns} rows={rows} />
+      </div>
     </div>
   );
 };

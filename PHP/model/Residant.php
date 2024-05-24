@@ -32,7 +32,8 @@ class residant
                         'status' => 'success',
                         'jwt_token' => $jwt_token,
                         'nom' => $user['nom'],
-                        'prenom' => $user['prenom']
+                        'prenom' => $user['prenom'],
+                        'role' => 'residant'
                     );
                 } else {
                     // Return error response if password is incorrect

@@ -47,7 +47,7 @@ const Topbar = ({ broken, toggled, setToggled }) => {
                 }}
               />
             </div>
-            <p className="user-nameuser">residant name</p>
+            <p className="user-nameuser">admin name</p>
           </div>
         </Menu>
       </div>

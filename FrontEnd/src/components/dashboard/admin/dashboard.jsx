@@ -1,3 +1,4 @@
+// AdminDashboard component
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Topbar from "./global/topbar";
@@ -9,7 +10,7 @@ import Reclamation from "./pages/Reclamation";
 import Profile from "./pages/Profile";
 import "./dashboard.scss";
 
-const UserDashboard = () => {
+const AdminDashboard = () => {
   const [toggled, setToggled] = React.useState(false);
   const [broken, setBroken] = React.useState(
     window.matchMedia("(max-width: 800px)").matches
@@ -45,4 +46,4 @@ const UserDashboard = () => {
   );
 };
 
-export default UserDashboard;
+export default AdminDashboard;

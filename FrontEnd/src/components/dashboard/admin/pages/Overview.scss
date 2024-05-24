@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
+.overview-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 40px;
+  padding: 65px;
+
+  h2 {
+    color: #f3f3f3;
+    font-family: 'Lato', sans-serif;
+    margin-top: 10px;
+  }
+}
+
+.overview-chart {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.pie-chart {
+  display: inline-block;
+  width: 100%;
+  height: 100%;
+}
+
+.card-wrapper {
+  color: #f3f3f3;
+  font-size: 1.2rem;
+  font-family: 'Lato', sans-serif;
+  font-weight: bold;
+  background: rgb(23, 24, 33);
+  background: linear-gradient(45deg, rgba(23, 24, 33, 1) 30%, rgba(249, 118, 157, 1) 420%);
+  border-radius: 15px;
+  color: #f9769d0f;
+  margin-bottom: 26px;
+}
+
+.stats-water,
+.stats-electricity {
+  margin-bottom: 20px;
+}
+
+
+.card-wrapper .text-left {
+  color: #f3f3f3;
+  font-family: 'Lato', sans-serif;
+}
+
+.custom-legend {
+  position: absolute;
+  top: 35%;
+  right: 30px;
+  display: flex;
+  flex-direction: column;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.legend-color {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.legend-label {
+  color: #fff;
+  font-family: 'Lato', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+
+
+
+
+//fixed card transparency
+
+.bg-background\/15 {
+  background-color: hsl(var(--nextui-background) / 0.02) !important;
+}
+
+//Removing the stroke form the chart
+.css-1mhcdve-MuiPieArc-root {
+  stroke: none !important;
+}
+
+
+
+
+
+
+
+.chip-Pending {
+  background-color: #A07BC8 !important;
+  color: #fff !important;
+}
+
+.chip-Overdue {
+  background-color: #DE6B8F !important;
+  color: #fff !important;
+}
+
+.chip-Paid {
+  background-color: #8E92DC !important;
+  color: #fff !important;
+}
+
+
+
+.table .bg-content1 {
+  --tw-bg-opacity: 1;
+  background-color: transparent(var(--nextui-content1) / var(--nextui-content1-opacity, var(--tw-bg-opacity))) !important;
+}
+
+.text-foreground-500 {
+  --tw-text-opacity: 1;
+  color: #f3f3f3(var(--nextui-foreground-500) / var(--nextui-foreground-500-opacity, var(--tw-text-opacity))) !important;
+}
+
+table {
+  background-color: transparent !important;
+  color: #f3f3f3 !important;
+}
