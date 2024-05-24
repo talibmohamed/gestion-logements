@@ -4,6 +4,7 @@ import DataTable from "./components/table";
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import "./Overview.scss";
+import {Button} from "@nextui-org/react";
 
 const Overview = () => {
   const data1 = [
@@ -95,7 +96,7 @@ const Overview = () => {
       setIsMobile(window.innerWidth <= 768);
     };
 
-    handleResize(); 
+    handleResize();
     window.addEventListener('resize', handleResize);
 
     return () => {
@@ -125,8 +126,12 @@ const Overview = () => {
         </div>
       )}
       <div className="custom-table">
-      <DataTable columns={columns} rows={rows} />
+        <DataTable columns={columns} rows={rows} />
       </div>
+      <div className="flex gap-4">
+      <Button color="primary" variant="solid">Solid</Button>
+      <Button color="primary" variant="ghost">Ghost</Button>
+    </div>
     </div>
   );
 };
