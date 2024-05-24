@@ -1,5 +1,5 @@
 <?php
-class residant
+class admin
 {
     private $db;
 
@@ -10,18 +10,18 @@ class residant
     }
 
     // API endpoint function to handle user login
-    public function loginUser($email, $password)
+    public function loginadmin($email, $password)
     {
         try {
             // Get the established connection
             $connection = $this->db->getConnection();
-            $sql = $connection->prepare('SELECT res_ID, password, nom, prenom FROM residant WHERE email = ?');
+            $sql = $connection->prepare('SELECT adm_id, mot_de_passe, nom, prenom FROM admin WHERE email = ?');
             $sql->execute([$email]);
             $user = $sql->fetch(PDO::FETCH_ASSOC);
 
             if ($user) {
-                // Compare the provided password with the stored password
-                if ($password == $user['password']) {
+                // Check if the password is correct
+                if (password_verify($password, $user['mot_de_passe'])) {
                     // Generate JWT token with res_ID
                     $jwtHandler = new JwtHandler();
                     $admin = false;
@@ -32,7 +32,8 @@ class residant
                         'status' => 'success',
                         'jwt_token' => $jwt_token,
                         'nom' => $user['nom'],
-                        'prenom' => $user['prenom']
+                        'prenom' => $user['prenom'],
+                        'role' => 'admin'
                     );
                 } else {
                     // Return error response if password is incorrect

@@ -37,6 +37,7 @@ const Login = () => {
             jwtToken: response.data.jwt_token,
             nom: response.data.nom,
             prenom: response.data.prenom,
+            role: response.data.role,
           })
         );
         navigate('/dashboard');

@@ -4,7 +4,6 @@ import DataTable from "./components/table";
 import { Carousel } from 'react-responsive-carousel';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import "./Overview.scss";
-import {Button} from "@nextui-org/react";
 
 const Overview = () => {
   const data1 = [
@@ -96,7 +95,7 @@ const Overview = () => {
       setIsMobile(window.innerWidth <= 768);
     };
 
-    handleResize();
+    handleResize(); 
     window.addEventListener('resize', handleResize);
 
     return () => {
@@ -106,7 +105,28 @@ const Overview = () => {
 
   return (
     <div className="container-fluid">
-      <h1>resident overview</h1>
+      {isMobile ? (
+        <Carousel showArrows={false} showStatus={false} showThumbs={false}>
+          <div className="carousel-item-wrapper">
+            <PieChartCard title="Statistique Des Factures" data={data1} />
+          </div>
+          <div className="carousel-item-wrapper">
+            <PieChartCard title="Statistique Des Logements" data={data2} />
+          </div>
+        </Carousel>
+      ) : (
+        <div className="row justify-content-around">
+          <div className="col-md-6">
+            <PieChartCard title="Statistique Des Factures" data={data1} />
+          </div>
+          <div className="col-md-6">
+            <PieChartCard title="Statistique Des Logements" data={data2} />
+          </div>
+        </div>
+      )}
+      <div className="custom-table">
+      <DataTable columns={columns} rows={rows} />
+      </div>
     </div>
   );
 };

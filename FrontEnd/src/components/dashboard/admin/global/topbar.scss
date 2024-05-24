@@ -1,0 +1,74 @@
+.topbar {
+  background-color: #171821;
+  border-left: 101px !important;
+  margin: 0px;
+  height: 12vh;
+  padding: 0px 30px;
+  align-items : center;
+  display: flex;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-grow: 1;
+  
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 25px; 
+}
+
+.mail-icon {
+  color: #dedede !important; 
+  font-size: 45px;
+}
+
+.user-name {
+  color: #dedede;
+  margin: 0;
+  font-size: 15px;
+  font-family: lato;
+  font-weight: 600;
+  line-height: 22.5px !important;
+}
+
+
+@media (max-width: 768px) {
+.nav{
+  display: none;
+}
+.topbar{
+  align-items: center;
+  border-color: #171821;
+  height: 10vh;
+}
+
+.phone-topbar{
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.top-logo{
+  height: 3rem;
+  color: #dedede;
+}
+
+.top-bar-phone{
+  width: 100%;
+}
+
+.humb-button{
+  background-color: transparent;
+  font-size: 2rem;
+  padding: 7px;
+  padding-right: 0;
+}
+
+
+}
+
