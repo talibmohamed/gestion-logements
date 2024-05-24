@@ -7,20 +7,24 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  getKeyValue,
   Chip,
 } from "@nextui-org/react";
 
+const statusColorMap = {
+    Pending: "primary",
+    Paid: "primary",
+    Overdue: "primary",
+  };
 
 const DataTable = ({ columns, rows }) => {
-
+  
   const getKeyValue = React.useCallback((item, columnKey) => {
     const cellValue = item[columnKey];
 
     switch (columnKey) {
       case "etat":
         return (
-          <Chip className={`chip-${item.etat}`} size="sm" variant="flat">
+          <Chip className={statusColorMap[item.etat]} size="sm" variant="flat">
             {cellValue}
           </Chip>
         );
