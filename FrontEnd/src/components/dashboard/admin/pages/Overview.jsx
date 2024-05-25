@@ -6,6 +6,8 @@ import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import "./Overview.scss";
 
 const Overview = () => {
+  
+
   const data1 = [
     { id: "total-payé", label: "Total Payé", value: 42, color: "#96A7FF" },
     { id: "total-en-retard", label: "Total En Retard", value: 20.1, color: "#5F284A" },
