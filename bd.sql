@@ -180,7 +180,124 @@ create table notification (
 --
 
 
+
+
+
+-- Inserting data into the equipement table
+INSERT INTO equipement (equip_type) VALUES ('Washer');
+INSERT INTO equipement (equip_type) VALUES ('Refrigerator');
+-- Add more equipment as needed
+
+-- Inserting data into the logement table
+INSERT INTO logement (typelog, description, mc, piece, equip_ids, etat) 
+VALUES ('Maison', 'Une belle maison', 120, 5, ARRAY[2], 'occupied');
+-- Add more logements as needed
+
+-- Inserting data into the admin table
+INSERT INTO admin (
+    nom,
+    prenom,
+    email,
+    password
+) VALUES (
+    'John',
+    'Doe',
+    'ali@example.com',
+    '$2y$10$MvbNAijhVgN284Paq5eRpORtierWy72VBnvax6nEUD9I/Bq3NhcNu' --use pwd to log in 
+);
+
+-- Inserting data into the residant table
+INSERT INTO residant (
+    log_id,
+    nom,
+    prenom,
+    cin,
+    password,
+    email,
+    telephone,
+    profession
+) VALUES (
+    1,
+    'Jane',
+    'Doe',
+    'a1234567',
+    'qadsad1',
+    'paulnyaxx@gmail.com',
+    '+33123456789',
+    'Doctor'
+);
+
+-- Inserting data into the facture table
+INSERT INTO facture (
+    fac_no,
+    fac_date,
+    fac_type,
+    fac_total,
+    fac_etat,
+    fac_echeance,
+    res_id
+) VALUES (
+    'INV-7890',
+    '2024-09-15',
+    'Water',
+    50.00,
+    'PAID',
+    '2024-09-30',
+    1
+);
+
+-- Inserting data into the consommation table
+INSERT INTO consommation (
+    cons_type,
+    cons_date,
+    cons_quota,
+    res_id,
+    log_id
+) VALUES (
+    'Water',
+    '2024-09-01',
+    3.5,
+    1,
+    1
+);
+
+-- Inserting data into the reclamation table
+INSERT INTO reclamation (
+    rec_desc,
+    rec_etat,
+    rec_date,
+    rec_response,
+    res_id,
+    log_id,
+    message
+) VALUES (
+    'Water leakage',
+    'pending',
+    '2024-09-24',
+    NULL,
+    1,
+    1,
+    'There is a water leakage in the kitchen'
+);
+
+-- Inserting data into the notification table
+INSERT INTO notification (
+    notif_titre,
+    notif_date,
+    notif_desc,
+    res_id
+) VALUES (
+    'Maintenance scheduled',
+    '2024-09-25',
+    'Maintenance has been scheduled for water leakage',
+    1
+);
+
+
+
 -- ------------------------------------------------------------
+-- IMPORTANT !!!!!!!!!!!!!!!!!!!!!!
+--if u get any conflict delete admin_user and resident_user if u did creat them before and rename the admin_role and resident_role created before the execute the following 
 
 -- admin role
 
