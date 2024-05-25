@@ -1,9 +1,9 @@
 <?php
 class Database
 {
-    private $host = 'localhost';
+    private $host = 'aws-0-eu-central-1.pooler.supabase.com';
     private $port = '5432';
-    private $dbname = 'houselytics';
+    private $dbname = 'postgres';
     private $user;
     private $password;
     private $connection = null;
@@ -11,10 +11,10 @@ class Database
     public function __construct($role)
     {
         if ($role === 'admin') {
-            $this->user = 'admin_user';
+            $this->user = 'admin_user.liykoneoszmrdmrwuras';
             $this->password = 'admin_password';
         } elseif ($role === 'resident') {
-            $this->user = 'resident_user';
+            $this->user = 'resident_user.liykoneoszmrdmrwuras';
             $this->password = 'resident_password';
         } else {
             throw new InvalidArgumentException("Invalid role specified.");
@@ -43,4 +43,3 @@ class Database
         return $this->connection;
     }
 }
-

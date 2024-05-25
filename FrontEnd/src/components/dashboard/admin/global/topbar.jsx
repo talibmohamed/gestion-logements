@@ -7,6 +7,7 @@ import { Menu } from "react-pro-sidebar";
 import { Avatar, AvatarIcon } from "@nextui-org/react";
 import { GiHamburgerMenu } from "react-icons/gi";
 import logo from "./logo.svg";
+import Notification from "./notifcation"
 
 const Topbar = ({ broken, toggled, setToggled }) => {
   return (
@@ -38,6 +39,7 @@ const Topbar = ({ broken, toggled, setToggled }) => {
             <IconButton className="mail-icon">
               <MailOutlineOutlinedIcon style={{ fontSize: 28 }} />
             </IconButton>
+            <Notification />
             <div className="user-avatar">
               <Avatar
                 icon={<AvatarIcon />}

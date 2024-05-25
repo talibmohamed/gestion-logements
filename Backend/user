@@ -4,13 +4,13 @@ class residant
     public $res_ID;
     public $log_ID;
     public $nom;
-     public $prenom;
-     public $cin;
-     public $mot_de_passe;
-     public $email;
-     public $telephone;
-     public $profession;
-     public $date_ajout;
+    public $prenom;
+    public $cin;
+    public $mot_de_passe;
+    public $email;
+    public $telephone;
+    public $profession;
+    public $date_ajout;
 
     private $db;
 
@@ -36,7 +36,7 @@ class residant
                     // Generate JWT token
                     $jwtHandler = new JwtHandler();
                     $admin = false;
-                    $jwt_token = $jwtHandler->generateJwtToken($user,$admin);
+                    $jwt_token = $jwtHandler->generateJwtToken($user, $admin);
 
                     // Return success response with JWT token
                     return array('status' => 'success', 'jwt_token' => $jwt_token);
@@ -54,7 +54,8 @@ class residant
         }
     }
     //changement de mot de passe
-    public function changePassword($currentPassword, $newPassword) {
+    public function changePassword($currentPassword, $newPassword)
+    {
         // Vérifier le mot de passe actuel
         if (!$this->checkCurrentPassword($currentPassword)) {
             throw new Exception("Le mot de passe actuel est incorrect.");
@@ -75,12 +76,13 @@ class residant
             throw new Exception("Erreur lors de la mise à jour du mot de passe.");
         }
     }
-    private function checkCurrentPassword($currentPassword) {
+    private function checkCurrentPassword($currentPassword)
+    {
         $sql = "SELECT password FROM residant WHERE res_id = :userId";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':userId', $this->$res_ID);
         $stmt->execute();
-        
+
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($result && password_verify($currentPassword, $result['password'])) {
@@ -90,7 +92,8 @@ class residant
         }
     }
     // Méthode pour mettre à jour les informations personnelles
-    public function updatePersonalInfo($email, $telephone) {
+    public function updatePersonalInfo($email, $telephone)
+    {
         $sql = "UPDATE residant SET email = :email, telephone = :telephone WHERE res_id = :res_ID";
         $stmt = $this->db->prepare($sql);
         $stmt->bindParam(':email', $email);
@@ -104,5 +107,3 @@ class residant
         }
     }
 }
-
-?>

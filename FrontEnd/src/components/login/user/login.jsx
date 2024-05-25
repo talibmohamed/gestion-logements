@@ -24,7 +24,8 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await loginuser(email, password);
+      const response = await loginuser(email, password); // Specify 'admin' user type
+
       if (response.status === "success") {
         dispatch(
           loginSuccess({
@@ -39,7 +40,9 @@ const Login = () => {
         setError(response.message);
       }
     } catch (error) {
-      console.error("Error:", error);    }
+      console.error("Error:", error);
+      setError("An error occurred while processing your request");
+    }
   };
 
   return (
