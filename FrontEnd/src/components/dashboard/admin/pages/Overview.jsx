@@ -126,9 +126,7 @@ const Overview = () => {
           </div>
         </div>
       )}
-      <div className="custom-table">
-      <DataTable columns={columns} rows={rows} />
-      </div>
+      <DataTable columns={columns} rows={rows} title="Factures récentes" />
     </div>
   );
 };

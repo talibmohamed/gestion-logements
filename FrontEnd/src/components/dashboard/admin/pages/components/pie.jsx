@@ -3,7 +3,24 @@ import PropTypes from "prop-types";
 import { Card, CardBody } from "@nextui-org/react";
 import { PieChart } from "@mui/x-charts/PieChart";
 import Box from '@mui/material/Box';
+import { useDrawingArea } from '@mui/x-charts/hooks';
+import { styled } from '@mui/material/styles';
 
+const StyledText = styled('text')(({ theme }) => ({
+  fill: '#dedede',
+  textAnchor: 'middle',
+  dominantBaseline: 'central',
+  fontSize: 20,
+}));
+
+function PieCenterLabel({ children }) {
+  const { width, height, left, top } = useDrawingArea();
+  return (
+    <StyledText x={left + width / 2} y={top + height / 2}>
+      {children}
+    </StyledText>
+  );
+}
 
 const PieChartCard = ({ title, data }) => {
   return (
@@ -29,8 +46,9 @@ const PieChartCard = ({ title, data }) => {
               height={300}
               slotProps={{
                 legend: { hidden: true },
-              }}
-            />
+              }}>
+              <PieCenterLabel>Center label</PieCenterLabel>
+            </PieChart>
           </Box>{" "}
           <div className="custom-legend">
             {data.map((item, index) => (
