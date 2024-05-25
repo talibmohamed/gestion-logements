@@ -11,6 +11,7 @@ import TextField from '@mui/material/TextField';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../../session/authentication';
 import { useNavigate } from 'react-router-dom';
+import { loginadmin } from '../../../session/services/api'; 
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -23,30 +24,23 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        'http://localhost/pfe/php/api/loginadmin.php',
-        {
-          email,
-          password,
-        }
-      );
+      const response = await loginadmin(email, password);
 
-      if (response.data.status === 'success') {
+      if (response.status === 'success') {
         dispatch(
           loginSuccess({
-            jwtToken: response.data.jwt_token,
-            nom: response.data.nom,
-            prenom: response.data.prenom,
-            role: response.data.role,
+            jwtToken: response.jwt_token,
+            nom: response.nom,
+            prenom: response.prenom,
+            role: response.role,
           })
         );
         navigate('/dashboard');
       } else {
-        setError(response.data.message);
+        setError(response.message);
       }
     } catch (error) {
       console.error('Error:', error);
-      setError('An error occurred while processing your request');
     }
   };
 

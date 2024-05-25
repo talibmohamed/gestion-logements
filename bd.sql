@@ -1,17 +1,18 @@
---
--- Table structure for table 'Equipement'
---
+-- creation of database
+
+CREATE DATABASE houselytics;
+
 
 create table equipement (
     equip_id  serial primary key,
-    equip_nom varchar(100)
+    equip_type varchar(100) not null
 );
 
 --
 -- Inserting data for table `Equipement`
 --
 
-insert into equipement ( equip_nom ) values ( 'WiFi' ),( 'Kitchen' ),( 'TV' ),( 'Air Conditioning' ),( 'Parking' );
+-- Televisions
 
 -- ------------------------------------------------------------
 
@@ -19,46 +20,22 @@ insert into equipement ( equip_nom ) values ( 'WiFi' ),( 'Kitchen' ),( 'TV' ),( 
 -- Table structure for tble 'Logement'
 --
 
-create table logement (
-    log_id      serial primary key,
-    typelog     varchar(40),
-    description varchar(250),
-    mc          int not null,
-    ville       varchar(250),
-    nbr_ppl     int not null,
-    piece       int not null,
-    equip_id    int,
-    etat        varchar(40) default 'vacant',
-    img         varchar(250),
-    foreign key ( equip_id )
-        references equipement ( equip_id )
+CREATE TABLE logement (
+    log_id      SERIAL PRIMARY KEY,
+    typelog     VARCHAR(40),
+    description VARCHAR(250),
+    mc          INT NOT NULL,
+    piece       INT NOT NULL,
+    equip_ids   INT[],
+    etat        VARCHAR(40) DEFAULT 'vacant'
 );
+
 
 --
 --  Inserting data for table 'Logement'
 --
 
-insert into logement (
-    typelog,
-    description,
-    mc,
-    ville,
-    nbr_ppl,
-    piece,
-    equip_id,
-    etat,
-    img
-) values (
-    'Riad Dar Yasaman',
-    'riad de luxe',
-    32,
-    'Marrakech',
-    2,
-    2,
-    1,
-    'vacant',
-    'a link??'
-);
+-- for the equipment we can add it later
 
 -- ------------------------------------------------------------
 
@@ -71,7 +48,7 @@ create table admin (
     nom           varchar(40),
     prenom        varchar(40),
     email         varchar(250) unique,
-    mot_de_passe  varchar(250),
+    password  varchar(250),
     date_creation timestamp default current_timestamp
 );
 
@@ -79,17 +56,7 @@ create table admin (
 --  Inserting data for table 'admin'
 --
 
-insert into admin (
-    nom,
-    prenom,
-    email,
-    mot_de_passe
-) values (
-    'Ali',
-    'Ali',
-    'ali@example.com',
-    'pwd'
-);
+
 
 
 -- ------------------------------------------------------------
@@ -109,6 +76,7 @@ create table residant (
     telephone  varchar(40),
     profession varchar(40),
     date_ajout timestamp default current_timestamp,
+    first_login boolean default true,
     foreign key ( log_id )
         references logement ( log_id )
 );
@@ -116,25 +84,7 @@ create table residant (
 --
 --  Inserting data for table 'tenants'
 --'
-insert into residant (
-    log_id,
-    nom,
-    prenom,
-    cin,
-    mot_de_passe,
-    email,
-    telephone,
-    profession
-) values (
-    1,
-    'Paul',
-    'Paul',
-    'k2160902',
-    'qadsad1',
-    'paulnyaxx@gmail.com',
-    '+2126313138',
-    'CADRE'
-);
+
 
 -- ------------------------------------------------------------
 
@@ -145,12 +95,11 @@ insert into residant (
 create table facture (
     fac_id       serial primary key,
     fac_no       varchar(100),
-    fac_mois     date,
+    fac_date     date,
     fac_type     varchar(255),
     fac_total    double precision,
     fac_etat     varchar(40),
     fac_echeance date,
-    message      varchar(250),
     res_id       int,
     foreign key ( res_id )
         references residant ( res_id )
@@ -158,27 +107,9 @@ create table facture (
 
 --
 -- Inserting data for table `invoices`
---
+--y
 
-insert into facture (
-    fac_no,
-    fac_mois,
-    fac_type,
-    fac_total,
-    fac_etat,
-    fac_echeance,
-    message,
-    res_id
-) values (
-    'INV-4657',
-    '2024-08-20',
-    'Electricity',
-    100.00,
-    'UNPAID',
-    '2022-08-30',
-    'smthing',
-    1
-);
+
     
 -- ------------------------------------------------------------
 
@@ -203,19 +134,7 @@ create table consommation (
 -- Inserting data for table `Cons_Meas`
 --
 
-insert into consommation (
-    cons_type,
-    cons_date,
-    cons_quota,
-    res_id,
-    log_id
-) values (
-    'Electricity',
-    '2024-08-01',
-    4.0,
-    1,
-    1
-);
+
 
 
 -- ------------------------------------------------------------
@@ -228,10 +147,11 @@ create table reclamation (
     rec_id         serial primary key,
     rec_desc       varchar(255),
     rec_etat       varchar(50),
-    rec_mois       date,
-    rec_completion date,
+    rec_date       timestamp default current_timestamp,
+    rec_response date,
     res_id         int,
     log_id         int,
+    message        varchar(255),
     foreign key ( res_id )
         references residant ( res_id )
 );
@@ -239,22 +159,6 @@ create table reclamation (
 --
 -- Inserting data for table `Reclamation`
 --
-
-insert into reclamation (
-    rec_desc,
-    rec_etat,
-    rec_mois,
-    rec_completion,
-    res_id,
-    log_id
-) values (
-    'Electricity not working',
-    'unsolved',
-    '2024-05-24',
-    null,
-    1,
-    1
-);
 
 
 -- ------------------------------------------------------------
@@ -266,28 +170,14 @@ insert into reclamation (
 create table notification (
     notif_id    serial primary key,
     notif_titre varchar(255),
-    notif_etat  varchar(50),
-    notif_date  date,
+    notif_date  timestamp default current_timestamp,
+    notif_desc  varchar(255),
     res_id      int,
     foreign key ( res_id )
         references residant ( res_id )
 );
 
 --
--- Inserting data for table `Notification`
---
-
-insert into notification (
-    notif_titre,
-    notif_etat,
-    notif_date,
-    res_id
-) values (
-    'Reclamation verifie',
-    'unread',
-    '2024-05-24',
-    1
-);
 
 
 -- ------------------------------------------------------------
