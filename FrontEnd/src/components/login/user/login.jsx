@@ -1,21 +1,22 @@
 // src/components/Login.jsx
-import React, { useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import axios from 'axios';
-import logo from './logo.svg';
-import house from './house.jpg';
-import '../style.scss';
-import { Form, Button } from 'react-bootstrap';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import { useDispatch } from 'react-redux';
-import { loginSuccess } from '../../../session/authentication';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
+import axios from "axios";
+import logo from "./logo.svg";
+import house from "./house.jpg";
+import "../style.scss";
+import { Form, Button } from "react-bootstrap";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../../../session/authentication";
+import { useNavigate } from "react-router-dom";
+import { loginuser } from "../../../session/services/api";
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -23,31 +24,22 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        'http://localhost/pfe/php/api/login.php',
-        {
-          email,
-          password,
-        }
-      );
-
-      if (response.data.status === 'success') {
+      const response = await loginuser(email, password);
+      if (response.status === "success") {
         dispatch(
           loginSuccess({
-            jwtToken: response.data.jwt_token,
-            nom: response.data.nom,
-            prenom: response.data.prenom,
-            role: response.data.role,
+            jwtToken: response.jwt_token,
+            nom: response.nom,
+            prenom: response.prenom,
+            role: response.role,
           })
         );
-        navigate('/dashboard');
+        navigate("/dashboard");
       } else {
-        setError(response.data.message);
+        setError(response.message);
       }
     } catch (error) {
-      console.error('Error:', error);
-      setError('An error occurred while processing your request');
-    }
+      console.error("Error:", error);    }
   };
 
   return (
@@ -91,7 +83,7 @@ const Login = () => {
                     onChange={(e) => setEmail(e.target.value)}
                     focused
                     InputLabelProps={{
-                      className: 'email-input-label',
+                      className: "email-input-label",
                     }}
                     className="email-input focused-border"
                   />
@@ -111,7 +103,7 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     focused
                     InputLabelProps={{
-                      className: 'password-input-label',
+                      className: "password-input-label",
                     }}
                     className="password-input focused-border"
                   />

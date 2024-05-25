@@ -15,13 +15,13 @@ class admin
         try {
             // Get the established connection
             $connection = $this->db->getConnection();
-            $sql = $connection->prepare('SELECT adm_id, mot_de_passe, nom, prenom FROM admin WHERE email = ?');
+            $sql = $connection->prepare('SELECT adm_id, password, nom, prenom FROM admin WHERE email = ?');
             $sql->execute([$email]);
             $user = $sql->fetch(PDO::FETCH_ASSOC);
 
             if ($user) {
                 // Check if the password is correct
-                if (password_verify($password, $user['mot_de_passe'])) {
+                if (password_verify($password, $user['password'])) {
                     // Generate JWT token with res_ID
                     $jwtHandler = new JwtHandler();
                     $admin = false;
@@ -49,4 +49,3 @@ class admin
         }
     }
 }
-?>
