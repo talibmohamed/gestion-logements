@@ -7,20 +7,20 @@ import { useDrawingArea } from '@mui/x-charts/hooks';
 import { styled } from '@mui/material/styles';
 
 const StyledText = styled('text')(({ theme }) => ({
-  fill: '#dedede',
-  textAnchor: 'middle',
-  dominantBaseline: 'central',
-  fontSize: 20,
-}));
-
-function PieCenterLabel({ children }) {
-  const { width, height, left, top } = useDrawingArea();
-  return (
-    <StyledText x={left + width / 2} y={top + height / 2}>
-      {children}
-    </StyledText>
-  );
-}
+    fill: '#dedede',
+    textAnchor: 'middle',
+    dominantBaseline: 'central',
+    fontSize: 20,
+  }));
+  
+  function PieCenterLabel({ children }) {
+    const { width, height, left, top } = useDrawingArea();
+    return (
+      <StyledText x={left + width / 2} y={top + height / 2}>
+        {children}
+      </StyledText>
+    );
+  }
 
 const PieChartCard = ({ title, data }) => {
   return (
@@ -31,7 +31,7 @@ const PieChartCard = ({ title, data }) => {
         shadow="sm"
       >
         <CardBody>
-          <h2 className="text-left">{title}</h2>
+        <h2 className="text-left">{title}</h2>
           <Box sx={{ width: "100%" }}>
             <PieChart
               series={[
@@ -67,15 +67,17 @@ const PieChartCard = ({ title, data }) => {
   );
 };
 
-PieChartCard.propTypes = {
-  title: PropTypes.string.isRequired,
-  data: PropTypes.arrayOf(
-    PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      value: PropTypes.number.isRequired,
-      color: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-};
 
-export default PieChartCard;
+PieChartCard.propTypes = {
+    title: PropTypes.string.isRequired,
+    data: PropTypes.arrayOf(
+      PropTypes.shape({
+        label: PropTypes.string.isRequired,
+        value: PropTypes.number.isRequired,
+        color: PropTypes.string.isRequired,
+      })
+    ).isRequired,
+  };
+  
+  export default PieChartCard;
+  
