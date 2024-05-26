@@ -30,28 +30,29 @@ class AdminController
     // other methods for the admin
 
 
-    public function addUserAPI($data)
-    {
-        if ($data && isset($data['email'])) {
-            $email = $data['email'];
-            $password = $data['password'];
+    // public function addUserAPI($data)
+    // {
+    //     if ($data && isset($data['email'])) {
+    //         $email = $data['email'];
+    //         $password = $data['password'];
 
-            $optionalFields = ['nom', 'prenom', '', 'telephone', 'profession', ''];
-            $userData = [];
-            foreach ($optionalFields as $field) {
-                if (isset($data[$field])) {
-                    $userData[$field] = $data[$field];
-                }
-            }
+    //         // Check which optional fields are provided
+    //         $optionalFields = ['nom', 'prenom', '', 'telephone', 'profession', ''];
+    //         $userData = [];
+    //         foreach ($optionalFields as $field) {
+    //             if (isset($data[$field])) {
+    //                 $userData[$field] = $data[$field];
+    //             }
+    //         }
 
-            // Add user
-            $response = $this->admin->addUserAndSendEmail($email, $password, $userData);
+    //         // Add user
+    //         $response = $this->admin->addUserAndSendEmail($email, $password, $userData);
 
-            http_response_code(200);
-            echo json_encode($response);
-        } else {
-            http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
-        }
-    }
+    //         http_response_code(200);
+    //         echo json_encode($response);
+    //     } else {
+    //         http_response_code(400);
+    //         echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
+    //     }
+    // }
 }
