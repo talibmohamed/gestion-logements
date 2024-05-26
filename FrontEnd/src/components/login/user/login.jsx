@@ -1,6 +1,5 @@
-// src/components/Login.jsx
 import React, { useState } from "react";
-import "../../../index.css";
+import "../../../index.css"; // Remove if not used
 import axios from "axios";
 import logo from "./logo.svg";
 import sunset from "./sunset.jpeg";
@@ -19,7 +18,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [isVisible, setIsVisible] = React.useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
@@ -48,14 +47,14 @@ const Login = () => {
   };
 
   return (
-    <div class="bg-background min-h-screen flex items-center justify-center">
+    <div className="bg-background min-h-screen flex items-center justify-center">
       {/* Login container */}
-      <div class="flex rounded-2xl shadow-lg max-w-7xl p-5 items-center">
-        {/* ---------------- form ----------------  */}
-        <div class="md:w-1/2 px-14">
-          <div class="flex mb-8 items-center">
-            <img class="currentColor logo" src={logo} alt="Logo" />
-            <p class="ml-4 font-[lato] font-extrabold text-2xl houselytics">
+      <div className="flex rounded-2xl shadow-lg max-w-7xl p-5 items-center">
+        {/* Form */}
+        <div className="md:w-1/2 px-14">
+          <div className="flex mb-8 items-center">
+            <img className="currentColor logo" src={logo} alt="Logo" />
+            <p className="ml-4 font-[lato] font-extrabold text-2xl houselytics">
               Houselytics
             </p>
           </div>
@@ -104,14 +103,14 @@ const Login = () => {
             </div>
           </form>
 
-          <div class="mt-10 grid grid-cols-3 items-center">
-            <hr class="border-currentColor "></hr>
-            <p class="text-center">Or</p>
-            <hr class="border-currentColor "></hr>
+          <div className="mt-10 grid grid-cols-3 items-center">
+            <hr className="border-currentColor"></hr>
+            <p className="text-center">Or</p>
+            <hr className="border-currentColor"></hr>
           </div>
 
           <div className="Google">
-            <Button className="mt-5 w-full ggl" type="submit" size="md">
+            <Button className="mt-5 w-full ggl" type="button" size="md">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="0.98em"
@@ -138,16 +137,16 @@ const Login = () => {
               Se connecter avec Google
             </Button>
           </div>
-          <div class="text-center">
-            <Link className="text-[#3b82f6] mt-4 text-sm " href="#">
+          <div className="text-center">
+            <Link className="text-[#3b82f6] mt-4 text-sm" href="#">
               Mot de passe oublié?
             </Link>
           </div>
         </div>
 
-        {/* ---------------- image ---------------- */}
-        <div class="md:block hidden w-1/2">
-          <img class=" rounded-2xl" src={sunset} alt="" />
+        {/* Image */}
+        <div className="md:block hidden w-1/2">
+          <img className="rounded-2xl" src={sunset} alt="Sunset" />
         </div>
       </div>
     </div>

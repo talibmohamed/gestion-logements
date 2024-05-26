@@ -45,5 +45,7 @@ class admin
             return array('status' => 'error', 'message' => $e->getMessage());
         }
     }
-}
 
+    // API endpoint function to handle admmin adding a user 
+
+}

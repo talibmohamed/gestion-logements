@@ -42,4 +42,15 @@ class Database
     {
         return $this->connection;
     }
+
+    public function executeQuery($query, $params)
+    {
+        try {
+            $stmt = $this->connection->prepare($query);
+            $stmt->execute($params);
+            return $stmt;
+        } catch (PDOException $e) {
+            throw new Exception("Query execution failed: " . $e->getMessage());
+        }
+    }
 }

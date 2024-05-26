@@ -36,6 +36,7 @@ CREATE TABLE residant (
     profession VARCHAR(40),
     date_ajout TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     first_login BOOLEAN DEFAULT TRUE,
+    reset_token varchar(255),
     FOREIGN KEY (log_id)
         REFERENCES logement (log_id)
 );
