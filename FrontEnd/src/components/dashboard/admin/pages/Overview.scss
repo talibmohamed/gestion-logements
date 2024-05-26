@@ -23,6 +23,7 @@
   width: 100%;
   height: 100%;
 }
+
 pieCenterlabel {
   font-size: 1.5rem;
   font-weight: bold;
@@ -82,47 +83,28 @@ pieCenterlabel {
 }
 
 
-//fixed card transparency
-.bg-background\/15 {
-  background-color: hsl(var(--nextui-background) / 0.02) !important;
-}
+// fixed card transparency
+// .bg-background\/15 {
+//   background-color: hsl(var(--nextui-background) / 0.02) !important;
+// }
 
 //Removing the stroke form the chart
 .css-1mhcdve-MuiPieArc-root {
   stroke: none !important;
 }
 
-//The table's Content
-.bg-content1 {
-  --tw-bg-opacity: 1;
-  --nextui-content1-opacity: 0.5;
-  background-color: hsl(var(--nextui-background) / var(--nextui-content1-opacity, var(--tw-bg-opacity))) !important;
 
-}
-
-// .text-foreground-500 {
-//   --tw-text-opacity: 1;
-//   color: #d3d3d3(var(--nextui-foreground-500) / var(--nextui-foreground-500-opacity, var(--tw-text-opacity))) !important;
-// }
-
-table {
-  background-color: transparent !important;
-  color: #d3d3d3 !important;
-}
-
-// Overriding the bootstrap styles of the table
-div.table> :not(caption)>*>* {
-  padding: 0 !important;
-  color: transparent !important;
-  background-color: transparent !important;
-  border-bottom-width: 0 !important;
-  box-shadow: none !important;
+.card-wrapper.custom-card-wrapper {
+  background-color: #1a202c;
+  padding: 15px;
+  margin-bottom: 20px;
 }
 
 .table-title {
   font-size: 1.2rem;
   font-weight: bold;
-  margin-top: -0.38rem;
+  margin-top: 0.5rem;
+  margin-bottom: 2rem;
   color: #fff;
 }
 
@@ -131,4 +113,3 @@ div.table> :not(caption)>*>* {
   justify-content: space-between;
   align-items: center;
 }
-
