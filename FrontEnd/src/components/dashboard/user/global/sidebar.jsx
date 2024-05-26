@@ -91,7 +91,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
         >
           {toggled && (
             <div>
-              <div className="sb-top d-flex justify-content-between align-items-center">
+              <div className="sb-top flex justify-between items-center m-4">
                 <div className="back-button-container">
                   <button className="back-button" onClick={handleToggleSidebar}>
                     <ArrowBack />

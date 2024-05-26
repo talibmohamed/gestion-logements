@@ -13,8 +13,8 @@ const Topbar = ({ broken, toggled, setToggled }) => {
   return (
     <div className="topbar">
       {broken && (
-        <div className=" top-bar-phone d-flex justify-content-between align-items-center">
-          <div className="d-flex align-items-center gap-3 ">
+        <div className=" top-bar-phone flex justify-between items-center">
+          <div className="flex align-items-center gap-3 ">
             {/* resize the img */}
             <img src={logo} alt="logo" className="top-logo"  />
             <p>Houselytics</p>

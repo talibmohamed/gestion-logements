@@ -8,7 +8,7 @@ import '../style.scss';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../../session/authentication';
 import { useNavigate } from 'react-router-dom';
-import { loginadmin } from '../../../session/services/api';
+import { loginuser } from '../../../session/services/api';
 import { Link, Button, Input } from "@nextui-org/react";
 import { EyeFilledIcon } from "../EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../EyeSlashFilledIcon";
@@ -27,7 +27,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await loginuser(email, password); // Specify 'admin' user type
+      const response = await loginuser(email, password);
 
       if (response.status === "success") {
         dispatch(
@@ -51,12 +51,12 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <div className="left-side align-center">
-        <div className="align-center align-item-center">
+      <div className="left-side">
+        <div className="">
           <img className="logo" src={logo} alt="Logo" />
           <p className="houselytics">Houselytics</p>
         </div>
-        <div className="col-auto p-0">
+        <div className="">
           <img className="house" src={house} alt="House" />
         </div>
       </div>

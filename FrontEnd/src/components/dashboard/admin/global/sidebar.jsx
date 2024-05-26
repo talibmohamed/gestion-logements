@@ -45,7 +45,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
   const handleLogout = () => {
     dispatch(logout());
     localStorage.removeItem("state"); // Remove Redux state from localStorage
-    navigate("/admin"); // Redirect to '/user' after logout
+    navigate("/admin"); 
   };
 
   React.useEffect(() => {
@@ -91,7 +91,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
         >
           {toggled && (
             <div>
-              <div className="sb-top d-flex justify-content-between align-items-center">
+              <div className="sb-top flex justify-between items-center m-4">
                 <div className="back-button-container">
                   <button className="back-button" onClick={handleToggleSidebar}>
                     <ArrowBack />
