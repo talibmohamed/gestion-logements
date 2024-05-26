@@ -28,7 +28,9 @@ const Login = () => {
 
     try {
       const response = await loginuser(email, password);
+      const response = await loginuser(email, password);
 
+      if (response.status === "success") {
       if (response.status === "success") {
         dispatch(
           loginSuccess({

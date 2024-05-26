@@ -9,11 +9,10 @@ class admin
         $this->db->connect();
     }
 
-    // API endpoint function to handle user login
+    // API endpoint function to handle admin login
     public function loginadmin($email, $password)
     {
         try {
-            // Get the established connection
             $connection = $this->db->getConnection();
             $sql = $connection->prepare('SELECT adm_id, password, nom, prenom FROM admin WHERE email = ?');
             $sql->execute([$email]);
@@ -22,12 +21,10 @@ class admin
             if ($user) {
                 // Check if the password is correct
                 if (password_verify($password, $user['password'])) {
-                    // Generate JWT token with res_ID
+                    // Generate JWT token with admin role
                     $jwtHandler = new JwtHandler();
-                    $admin = false;
-                    $jwt_token = $jwtHandler->generateJwtToken($user, $admin);
+                    $jwt_token = $jwtHandler->generateJwtToken($user['adm_id'], 'admin');
 
-                    // Return success response with JWT token, nom, and prenom
                     return array(
                         'status' => 'success',
                         'jwt_token' => $jwt_token,
@@ -49,3 +46,4 @@ class admin
         }
     }
 }
+

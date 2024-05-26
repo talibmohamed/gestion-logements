@@ -1,28 +1,13 @@
 -- creation of database
-
-CREATE DATABASE houselytics;
-
-
-create table equipement (
-    equip_id  serial primary key,
-    equip_type varchar(100) not null
+CREATE TABLE equipement (
+    equip_id  SERIAL PRIMARY KEY,
+    equip_type VARCHAR(100) NOT NULL
 );
-
---
--- Inserting data for table `Equipement`
---
-
--- Televisions
-
--- ------------------------------------------------------------
-
---
--- Table structure for tble 'Logement'
---
 
 CREATE TABLE logement (
     log_id      SERIAL PRIMARY KEY,
-    typelog     VARCHAR(40),
+    typelog     VARCHAR(40) NOT NULL,
+    is_ameliore BOOLEAN NOT NULL,
     description VARCHAR(250),
     mc          INT NOT NULL,
     piece       INT NOT NULL,
@@ -30,270 +15,146 @@ CREATE TABLE logement (
     etat        VARCHAR(40) DEFAULT 'vacant'
 );
 
-
---
---  Inserting data for table 'Logement'
---
-
--- for the equipment we can add it later
-
--- ------------------------------------------------------------
-
---
--- Table structure for table 'admin'
---
-
-create table admin (
-    adm_id        serial primary key,
-    nom           varchar(40),
-    prenom        varchar(40),
-    email         varchar(250) unique,
-    password  varchar(250),
-    date_creation timestamp default current_timestamp
+CREATE TABLE admin (
+    adm_id        SERIAL PRIMARY KEY,
+    nom           VARCHAR(40),
+    prenom        VARCHAR(40),
+    email         VARCHAR(250) UNIQUE,
+    password      VARCHAR(250),
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
---
---  Inserting data for table 'admin'
---
-
-
-
-
--- ------------------------------------------------------------
-
---
--- Table structure for table 'tenants'
---
-
-create table residant (
-    res_id     serial primary key,
-    log_id     int unique,
-    nom        varchar(40),
-    prenom     varchar(40),
-    cin        varchar(40),
-    password   varchar(250),
-    email      varchar(40) unique,
-    telephone  varchar(40),
-    profession varchar(40),
-    date_ajout timestamp default current_timestamp,
-    first_login boolean default true,
-    foreign key ( log_id )
-        references logement ( log_id )
+CREATE TABLE residant (
+    res_id     SERIAL PRIMARY KEY,
+    log_id     INT UNIQUE,
+    nom        VARCHAR(40),
+    prenom     VARCHAR(40),
+    cin        VARCHAR(40),
+    password   VARCHAR(250),
+    email      VARCHAR(40) UNIQUE,
+    telephone  VARCHAR(40),
+    profession VARCHAR(40),
+    date_ajout TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    first_login BOOLEAN DEFAULT TRUE,
+    FOREIGN KEY (log_id)
+        REFERENCES logement (log_id)
 );
 
---
---  Inserting data for table 'tenants'
---'
-
-
--- ------------------------------------------------------------
-
---
--- Table structure for table 'invoices'
---
-
-create table facture (
-    fac_id       serial primary key,
-    fac_no       varchar(100),
-    fac_date     date,
-    fac_type     varchar(255),
-    fac_total    double precision,
-    fac_etat     varchar(40),
-    fac_echeance date,
-    res_id       int,
-    foreign key ( res_id )
-        references residant ( res_id )
+CREATE TABLE facture (
+    fac_id       SERIAL PRIMARY KEY,
+    fac_no       VARCHAR(100),
+    fac_date     DATE,
+    fac_type     VARCHAR(255),
+    fac_total    DOUBLE PRECISION,
+    fac_etat     VARCHAR(40),
+    fac_echeance DATE,
+    res_id       INT,
+    FOREIGN KEY (res_id)
+        REFERENCES residant (res_id)
 );
 
---
--- Inserting data for table `invoices`
---y
-
-
-    
--- ------------------------------------------------------------
-
---
--- Table structure for table 'Cons_Meas'
---
-
-create table consommation (
-    cons_id    serial primary key,
-    cons_type  varchar(255),
-    cons_date  date,
-    cons_quota double precision,
-    res_id     int,
-    log_id     int,
-    foreign key ( res_id )
-        references residant ( res_id ),
-    foreign key ( log_id )
-        references residant ( log_id )
+CREATE TABLE consommation (
+    cons_id    SERIAL PRIMARY KEY,
+    cons_type  VARCHAR(255),
+    cons_date  DATE,
+    cons_quota DOUBLE PRECISION,
+    res_id     INT,
+    log_id     INT,
+    FOREIGN KEY (res_id)
+        REFERENCES residant (res_id),
+    FOREIGN KEY (log_id)
+        REFERENCES logement (log_id)
 );
 
---
--- Inserting data for table `Cons_Meas`
---
-
-
-
-
--- ------------------------------------------------------------
-
---
--- Table structure for table 'Reclamation'
---
-
-create table reclamation (
-    rec_id         serial primary key,
-    rec_desc       varchar(255),
-    rec_etat       varchar(50),
-    rec_date       timestamp default current_timestamp,
-    rec_response date,
-    res_id         int,
-    log_id         int,
-    message        varchar(255),
-    foreign key ( res_id )
-        references residant ( res_id )
+CREATE TABLE reclamation (
+    rec_id         SERIAL PRIMARY KEY,
+    rec_desc       VARCHAR(255),
+    rec_etat       VARCHAR(50),
+    rec_date       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    rec_response   DATE,
+    res_id         INT,
+    log_id         INT,
+    message        VARCHAR(255),
+    FOREIGN KEY (res_id)
+        REFERENCES residant (res_id),
+    FOREIGN KEY (log_id)
+        REFERENCES logement (log_id)
 );
 
---
--- Inserting data for table `Reclamation`
---
-
-
--- ------------------------------------------------------------
-
---
--- Table structure for table 'Notification'
---
-
-create table notification (
-    notif_id    serial primary key,
-    notif_titre varchar(255),
-    notif_date  timestamp default current_timestamp,
-    notif_desc  varchar(255),
-    res_id      int,
-    foreign key ( res_id )
-        references residant ( res_id )
-);
-
---
-
-
-
-
-
--- Inserting data into the equipement table
-INSERT INTO equipement (equip_type) VALUES ('Washer');
-INSERT INTO equipement (equip_type) VALUES ('Refrigerator');
--- Add more equipment as needed
-
--- Inserting data into the logement table
-INSERT INTO logement (typelog, description, mc, piece, equip_ids, etat) 
-VALUES ('Maison', 'Une belle maison', 120, 5, ARRAY[2], 'occupied');
--- Add more logements as needed
-
--- Inserting data into the admin table
-INSERT INTO admin (
-    nom,
-    prenom,
-    email,
-    password
-) VALUES (
-    'John',
-    'Doe',
-    'ali@example.com',
-    '$2y$10$MvbNAijhVgN284Paq5eRpORtierWy72VBnvax6nEUD9I/Bq3NhcNu' --use pwd to log in 
-);
-
--- Inserting data into the residant table
-INSERT INTO residant (
-    log_id,
-    nom,
-    prenom,
-    cin,
-    password,
-    email,
-    telephone,
-    profession
-) VALUES (
-    1,
-    'Jane',
-    'Doe',
-    'a1234567',
-    'qadsad1',
-    'paulnyaxx@gmail.com',
-    '+33123456789',
-    'Doctor'
-);
-
--- Inserting data into the facture table
-INSERT INTO facture (
-    fac_no,
-    fac_date,
-    fac_type,
-    fac_total,
-    fac_etat,
-    fac_echeance,
-    res_id
-) VALUES (
-    'INV-7890',
-    '2024-09-15',
-    'Water',
-    50.00,
-    'PAID',
-    '2024-09-30',
-    1
-);
-
--- Inserting data into the consommation table
-INSERT INTO consommation (
-    cons_type,
-    cons_date,
-    cons_quota,
-    res_id,
-    log_id
-) VALUES (
-    'Water',
-    '2024-09-01',
-    3.5,
-    1,
-    1
-);
-
--- Inserting data into the reclamation table
-INSERT INTO reclamation (
-    rec_desc,
-    rec_etat,
-    rec_date,
-    rec_response,
-    res_id,
-    log_id,
-    message
-) VALUES (
-    'Water leakage',
-    'pending',
-    '2024-09-24',
-    NULL,
-    1,
-    1,
-    'There is a water leakage in the kitchen'
-);
-
--- Inserting data into the notification table
-INSERT INTO notification (
-    notif_titre,
-    notif_date,
-    notif_desc,
-    res_id
-) VALUES (
-    'Maintenance scheduled',
-    '2024-09-25',
-    'Maintenance has been scheduled for water leakage',
-    1
+CREATE TABLE notification (
+    notif_id SERIAL PRIMARY KEY,
+    notif_titre VARCHAR(255),
+    notif_date TIMESTAMP DEFAULT current_timestamp,
+    notif_desc VARCHAR(255),
+    is_read BOOLEAN DEFAULT FALSE,
+    res_id INT,
+    FOREIGN KEY (res_id) REFERENCES residant (res_id)
 );
 
 
+-- Insert data into equipement
+INSERT INTO equipement (equip_type) VALUES 
+('Washing Machine'),
+('Air Conditioner'),
+('Refrigerator'),
+('Microwave Oven'),
+('Dishwasher');
+
+-- Insert data into logement
+INSERT INTO logement (typelog, is_ameliore, description, mc, piece, equip_ids) VALUES 
+('Studio', true, 'Cozy studio apartment', 45, 1, ARRAY[1, 3]),
+('One Bedroom', false, 'Spacious one bedroom apartment', 60, 2, ARRAY[2, 4]),
+('Two Bedroom', true, 'Modern two bedroom apartment', 85, 3, ARRAY[1, 2, 3]),
+('Penthouse', true, 'Luxury penthouse with a great view', 120, 4, ARRAY[2, 5]),
+('Duplex', false, 'Spacious duplex with garden', 150, 5, ARRAY[1, 4]);
+
+-- Insert data into admin
+INSERT INTO admin (nom, prenom, email, password) VALUES 
+('Smith', 'John', 'john.smith@example.com', 'password123'),
+('Doe', 'Jane', 'jane.doe@example.com', 'securepassword'),
+('Brown', 'Charlie', 'charlie.brown@example.com', 'mypassword'),
+('Taylor', 'Emma', 'emma.taylor@example.com', 'password456'),
+('Johnson', 'Ava', 'ava.johnson@example.com', 'strongpassword');
+
+-- Insert data into residant
+INSERT INTO residant (log_id, nom, prenom, cin, password, email, telephone, profession) VALUES 
+(1, 'Miller', 'Alex', 'CIN001', 'respass1', 'alex.miller@example.com', '1234567890', 'Engineer'),
+(2, 'Wilson', 'Blake', 'CIN002', 'respass2', 'blake.wilson@example.com', '2345678901', 'Doctor'),
+(3, 'Davis', 'Chris', 'CIN003', 'respass3', 'chris.davis@example.com', '3456789012', 'Teacher'),
+(4, 'Garcia', 'Dana', 'CIN004', 'respass4', 'dana.garcia@example.com', '4567890123', 'Designer'),
+(5, 'Martinez', 'Eli', 'CIN005', 'respass5', 'eli.martinez@example.com', '5678901234', 'Chef');
+
+-- Insert data into facture
+INSERT INTO facture (fac_no, fac_date, fac_type, fac_total, fac_etat, fac_echeance, res_id) VALUES 
+('FAC001', '2024-01-01', 'Electricity', 100.00, 'Paid', '2024-01-10', 1),
+('FAC002', '2024-01-02', 'Water', 50.00, 'Unpaid', '2024-01-15', 2),
+('FAC003', '2024-01-03', 'Gas', 75.00, 'Paid', '2024-01-20', 3),
+('FAC004', '2024-01-04', 'Internet', 60.00, 'Unpaid', '2024-01-25', 4),
+('FAC005', '2024-01-05', 'Rent', 1200.00, 'Paid', '2024-01-30', 5);
+
+-- Insert data into consommation
+INSERT INTO consommation (cons_type, cons_date, cons_quota, res_id, log_id) VALUES 
+('Electricity', '2024-01-01', 350.00, 1, 1),
+('Water', '2024-01-02', 120.00, 2, 2),
+('Gas', '2024-01-03', 200.00, 3, 3),
+('Internet', '2024-01-04', 300.00, 4, 4),
+('Rent', '2024-01-05', 1000.00, 5, 5);
+
+-- Insert data into reclamation
+INSERT INTO reclamation (rec_desc, rec_etat, rec_date, rec_response, res_id, log_id, message) VALUES 
+('No hot water', 'Pending', '2024-01-01 10:00:00', NULL, 1, 1, 'Please fix it ASAP'),
+('Power outage', 'Resolved', '2024-01-02 11:00:00', '2024-01-03', 2, 2, 'Power restored quickly'),
+('Broken window', 'In Progress', '2024-01-03 12:00:00', NULL, 3, 3, 'Scheduled for repair'),
+('Noise complaint', 'Pending', '2024-01-04 13:00:00', NULL, 4, 4, 'Ongoing issue'),
+('Pest control', 'Resolved', '2024-01-05 14:00:00', '2024-01-06', 5, 5, 'Problem solved');
+
+-- Insert data into notification
+INSERT INTO notification (notif_titre, notif_date, notif_desc, res_id) VALUES 
+('Maintenance Work', '2024-01-01 08:00:00', 'Scheduled maintenance on 2024-01-10', 1),
+('Rent Reminder', '2024-01-02 09:00:00', 'Rent due on 2024-01-15', 2),
+('Community Meeting', '2024-01-03 10:00:00', 'Meeting on 2024-01-20', 3),
+('Holiday Event', '2024-01-04 11:00:00', 'Holiday event on 2024-01-25', 4),
+('New Policy Update', '2024-01-05 12:00:00', 'New policies effective from 2024-02-01', 5);
 
 -- ------------------------------------------------------------
 -- IMPORTANT !!!!!!!!!!!!!!!!!!!!!!

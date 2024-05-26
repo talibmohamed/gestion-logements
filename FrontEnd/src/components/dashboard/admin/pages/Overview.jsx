@@ -41,7 +41,7 @@ const Overview = () => {
   }, []);
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container">
       {isMobile ? (
         <Carousel showArrows={false} showStatus={false} showThumbs={false}>
           <div className="carousel-item-wrapper">
@@ -61,7 +61,7 @@ const Overview = () => {
           </div>
         </div>
       )}
-      <DataTable columns={columns} rows={users} title="Factures récentes" />
+      <DataTable columns={columns} rows={users} title="Factures récentes" />      
     </div>
   );
 }
