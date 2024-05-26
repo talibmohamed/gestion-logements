@@ -12,12 +12,12 @@ import "./dashboard.scss";
 const UserDashboard = () => {
   const [toggled, setToggled] = React.useState(false);
   const [broken, setBroken] = React.useState(
-    window.matchMedia("(max-width: 800px)").matches
+    window.matchMedia("(max-width: 900px)").matches
   );
 
   React.useEffect(() => {
     const handleResize = () =>
-      setBroken(window.matchMedia("(max-width: 800px)").matches);
+      setBroken(window.matchMedia("(max-width: 1000px)").matches);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
