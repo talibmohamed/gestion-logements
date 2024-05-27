@@ -1,22 +1,25 @@
 import React from "react";
 import { Card, CardBody } from "@nextui-org/react";
-import { Box } from "@mui/material";  // Add this import
+import { Box } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import PropTypes from "prop-types";
 
-
-// const xLabels = ["Jan", "Fev", "Mar", "Avr", "May", "Jui"];
-const xLabels = [
-    'Page A',
-    'Page B',
-    'Page C',
-    'Page D',
-    'Page E',
-    'Page F',
-    'Page G',
-  ];
+// const xLabels = ['Jan', 'Fev', 'Mar', 'Avr', 'May', 'Jui'];
+const xLabels = ["Janvier", "Fevrier", "Mars", "Avril", "May", "Juin"];
 
 const Graph = ({ title, data }) => {
+  const getWidth = () => {
+    if (window.innerWidth <= 640) {
+      return 400; // made for mobile screens
+    } else if (window.innerWidth <= 900) {
+      return 700; // made for tablet screens
+    } else if(window.innerWidth <= 1024){
+      return 750; // I made it for larger screens
+    } else{
+      return 1200; 
+    }
+  };
+
   return (
     <div className="card-wrapper">
       <Card
@@ -26,14 +29,28 @@ const Graph = ({ title, data }) => {
       >
         <CardBody>
           <h2 className="mt-3 ml-3 text-left">{title}</h2>
-          <Box sx={{ width: "100%" }}>
+          <Box className="w-full">
             <LineChart
-              width={500}
+              width={getWidth()}
               height={300}
               series={data}
-              xAxis={[{ scaleType: "point", data: xLabels }]}
+              xAxis={[{ data: xLabels, scaleType: "point" }]}
+              slotProps={{
+                legend: { hidden: true },
+              }}
             />
           </Box>
+          <div className="gap-12 custom-legend-graph">
+            {data.map((item, index) => (
+              <div className="legend-item-graph" key={index}>
+                <div
+                  className="legend-color-graph"
+                  style={{ backgroundColor: item.color }}
+                ></div>
+                <div className="legend-label-graph">{item.label}</div>
+              </div>
+            ))}
+          </div>
         </CardBody>
       </Card>
     </div>

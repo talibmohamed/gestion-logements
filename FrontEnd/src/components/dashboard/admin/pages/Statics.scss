@@ -1,0 +1,46 @@
+// edits to the graph styles
+
+line.MuiChartsAxis-line {
+    stroke: #dedede !important;
+}
+
+.css-1k2u9zb-MuiChartsAxis-root .MuiChartsAxis-tickLabel {
+    font-family: "lato" !important;
+    fill: #fff !important;
+}
+
+.css-1k2u9zb-MuiChartsAxis-root .MuiChartsAxis-tick {
+    stroke: #dedede !important;
+}
+
+.custom-legend-graph {
+    // position: absolute;
+    bottom: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center ;
+
+    .legend-item-graph {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5vh;
+        
+      }
+      
+      .legend-color-graph {
+        width: 1.5vh;
+        height: 1.5vh;
+        border-radius: 0.8vh;
+        margin-right: 0.5vh;
+      }
+
+      .legend-label-graph {
+        color: #f3f3f3;
+        font-family: 'Lato';
+        font-size: 1.5vh;
+        font-weight: 550;
+      }
+      
+  }
+  
