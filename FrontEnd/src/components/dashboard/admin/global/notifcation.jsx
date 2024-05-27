@@ -1,23 +1,31 @@
 import React, { useState, useEffect } from "react";
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownSection, DropdownItem, Button } from "@nextui-org/react";
-import { useSelector } from 'react-redux'; // Import useSelector hook to access Redux state
+import {
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownSection,
+  DropdownItem,
+  Button,
+} from "@nextui-org/react";
+import { useSelector } from "react-redux"; // Import useSelector hook to access Redux state
 import { notification } from "../../../../session/services/api"; // Import fetchData function
+import { NotificationIcon } from "./NotificationIcon";
 
 export default function App() {
   // State to store notifications
   const [notifications, setNotifications] = useState([]);
 
   // Redux selector to get JWT token from the store
-  const jwtToken = useSelector(state => state.auth.jwtToken);
+  const jwtToken = useSelector((state) => state.auth.jwtToken);
 
   // Function to fetch notifications
   const notification = async () => {
     try {
       // Fetch notifications data using JWT token
-      const notificationData = await fetchData('notifications', jwtToken); // Adjust the endpoint according to your API route
+      const notificationData = await fetchData("notifications", jwtToken); // Adjust the endpoint according to your API route
       setNotifications(notificationData);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      console.error("Error fetching notifications:", error);
     }
   };
 
@@ -36,7 +44,9 @@ export default function App() {
       }}
     >
       <DropdownTrigger>
-        <Button variant="ghost" disableRipple>Open Menu</Button>
+        <Button radius="full" isIconOnly variant="none">
+          <NotificationIcon size={24} />
+        </Button>
       </DropdownTrigger>
       <DropdownMenu
         aria-label="Custom item styles"
@@ -57,7 +67,7 @@ export default function App() {
         }}
       >
         <DropdownSection aria-label="Notifications" showDivider>
-          {notifications.map(notification => (
+          {notifications.map((notification) => (
             <DropdownItem key={notification.notif_id}>
               {notification.notif_titre}
             </DropdownItem>
@@ -65,11 +75,9 @@ export default function App() {
         </DropdownSection>
 
         <DropdownSection aria-label="Help & Feedback">
-          <DropdownItem key="help_and_feedback">
-            Help & Feedback
-          </DropdownItem>
+          <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
           <DropdownItem key="logout">Log Out</DropdownItem>
-        </DropdownSection> 
+        </DropdownSection>
       </DropdownMenu>
     </Dropdown>
   );

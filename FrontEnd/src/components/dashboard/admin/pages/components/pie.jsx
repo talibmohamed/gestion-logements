@@ -31,7 +31,7 @@ const PieChartCard = ({ title, data }) => {
         shadow="sm"
       >
         <CardBody>
-        <h2 className="text-left">{title}</h2>
+        <h2 className="mt-3 ml-3 text-left">{title}</h2>
           <Box sx={{ width: "100%" }}>
             <PieChart
               series={[
@@ -39,8 +39,8 @@ const PieChartCard = ({ title, data }) => {
                   data: data,
                   cx: "50%",
                   cy: "50%",
-                  innerRadius: 90,
-                  outerRadius: 130,
+                  innerRadius: 93,
+                  outerRadius: 127,
                 },
               ]}
               height={300}
