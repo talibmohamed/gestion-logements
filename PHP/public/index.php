@@ -1,7 +1,10 @@
 <?php
 require_once '../vendor/autoload.php';
-require_once '../API/admincontroller.php';
-require_once '../API/residentcontoller.php';
+require '../API/admincontroller.php';
+require '../API/residentcontoller.php';
+
+// Import JwtHandler class
+require_once '../model/jwt.php';
 
 // Set headers
 header("Access-Control-Allow-Origin: *");
@@ -24,14 +27,17 @@ $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 // Remove the base path and index.php from the request URI
 $uri = preg_replace('#^' . preg_quote($basePath . '/index.php') . '#', '', $uri);
 
-
+// Debugging: log the parsed URI and method
+error_log("Parsed URI: " . $uri);
+error_log("Request Method: " . $_SERVER['REQUEST_METHOD']);
 
 // Simple router function
-function route($uri, $method) {
+function route($uri, $method)
+{
     $data = json_decode(file_get_contents('php://input'), true);
 
-    switch ($uri) {
-        // User routes
+    switch (strtolower($uri)) { // Use strtolower for case-insensitive matching
+            // User routes
         case '/api/v1/user/login':
             if ($method === 'POST') {
                 $userController = new UserController();
@@ -42,7 +48,7 @@ function route($uri, $method) {
             }
             break;
 
-        case '/api/v1/user/Allnotification':
+        case '/api/v1/user/allnotification':
             if ($method === 'POST') {
                 $userController = new UserController();
                 $userController->getAllnotifications($data);
@@ -52,9 +58,10 @@ function route($uri, $method) {
             }
             break;
 
-        // Admin routes
+            // Admin routes
         case '/api/v1/admin/login':
             if ($method === 'POST') {
+
                 $adminController = new AdminController();
                 $adminController->loginAdminAPI($data);
             } else {
@@ -62,18 +69,38 @@ function route($uri, $method) {
                 echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
             }
             break;
-        
 
+        case '/api/v1/admin/user':
+            if ($method === 'POST') {
+                $jwtHandler = new JwtHandler();
+                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                $jwt_token = str_replace('Bearer ', '', $jwt_token);
+                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
 
-        // Add more routes for user and admin actions as needed
+                if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
+                    $adminController = new AdminController();
+                    $adminController->addUserAPI($data);
+                } else {
+                    http_response_code(401); // Unauthorized sending the jwt data
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Unauthorized',
+                    ]);
+                }
+            } else {
+                http_response_code(405);
+                echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+            }
+            break;
+
+            // Add more routes for user and admin actions as needed
 
         default:
             http_response_code(404);
-            echo json_encode(['status' => 'error', 'message' => 'api not found']);
+            echo json_encode(['status' => 'error', 'message' => 'API not found']);
             break;
     }
 }
 
 // Call the router function
 route($uri, $_SERVER['REQUEST_METHOD']);
-?>

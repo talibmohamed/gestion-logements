@@ -12,7 +12,7 @@ CREATE TABLE logement (
     mc          INT NOT NULL,
     piece       INT NOT NULL,
     equip_ids   INT[],
-    etat        VARCHAR(40) DEFAULT 'vacant'
+    is_ameliore BOOLEAN default true;
 );
 
 CREATE TABLE admin (
@@ -179,6 +179,9 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE O
 -- Step 5: Create the admin user and assign the admin_role to this user
 CREATE USER admin_user WITH PASSWORD 'admin_password';
 GRANT admin_role TO admin_user;
+
+GRANT SELECT, USAGE ON SEQUENCE residant_res_id_seq TO admin_role;
+
 
 
 -- resident role
