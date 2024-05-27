@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import "../../../index.css"; // Remove if not used
 import axios from "axios";
 import logo from "./logo.svg";
 import sunset from "./sunset.jpeg";
@@ -58,7 +57,7 @@ const Login = () => {
               Houselytics
             </p>
           </div>
-          <h2 className="font-[lato] font-bold text-3xl mb-3">
+          <h2 className="font-[lato] font-bold text-3xl mb-3 text-center">
             Connectez-vous à votre compte
           </h2>
           {error && <div className="error">{error}</div>}

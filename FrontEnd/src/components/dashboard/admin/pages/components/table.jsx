@@ -10,14 +10,10 @@ import {
   Card,
   CardBody,
   Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  card,
+  Link
 } from "@nextui-org/react";
 import PropTypes from "prop-types";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+
 
 const statusColorMap = {
   overdue: "primary",
@@ -58,38 +54,16 @@ const DataTable = ({ columns, rows, title }) => {
         >
           <CardBody>
             <div className="card-header">
-              {title && <h2 className="table-title">{title}</h2>}
-              <div className="card-actions">
-                <Dropdown backdrop="opaque">
-                  <DropdownTrigger>
-                    <Button isIconOnly radius="full" size="sm" variant="light">
-                      <MoreHorizIcon className="text-default-600 border-none" />
-                    </Button>
-                  </DropdownTrigger>
-                  <DropdownMenu
-                    className="dropdown-menu-custom"
-                    variant="faded"
-                    aria-label="Static Actions"
-                  >
-                    <DropdownItem
-                      key="Edit"
-                      href="/dashboard/facture"
-                      classname="text-edit"
-                      color="default"
-                    >
-                      Modifier
-                    </DropdownItem>
-                    <DropdownItem
-                      key="fermer"
-                      href="#"
-                      className="text-danger"
-                      color="danger"
-                    >
-                      Fermer
-                    </DropdownItem>
-                  </DropdownMenu>
-                </Dropdown>
-              </div>
+              {title && <h2 className="mb-4 table-title">{title}</h2>}
+              <Button 
+              href="/dashboard/facture"
+              as={Link}
+              variant="flat" 
+              color="primary"
+              size="md" 
+              className="mb-4 mr-1 cMore">
+                See more
+              </Button>
             </div>
             <Table
               aria-label="Example table with custom cells"

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import { useSelector } from "react-redux";
 import UserLogin from "./components/login/user/login";
 import AdminLogin from "./components/login/admin/login";
+import UserForm from "./components/login/FirstTime/form";
 import AdminDashboard from "./components/dashboard/admin/dashboard";
 import UserDashboard from "./components/dashboard/user/dashboard";
 import "./App.css";
@@ -10,6 +11,7 @@ import "./App.css";
 function App() {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const userRole = useSelector((state) => state.auth.role);
+  // const isFirstTimeLogin = useSelector((state) => state.auth.isFirstTimeLogin);
 
   return (
     <Router>
@@ -30,6 +32,8 @@ function App() {
           path="/admin"
           element={isLoggedIn ? <Navigate to="/dashboard" /> : <AdminLogin />}
         />
+        <Route path="/form" element={<UserForm />} />
+
       </Routes>
     </Router>
   );
