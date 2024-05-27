@@ -23,6 +23,18 @@ const StyledText = styled('text')(({ theme }) => ({
   }
 
 const PieChartCard = ({ title, data }) => {
+  const getRadius = () => {
+    if (window.innerWidth <= 640) {
+      return { innerRadius: 68, outerRadius: 95 }; // made for tablet screens
+    } else if (window.innerWidth <= 900) {
+      return { innerRadius: 85, outerRadius: 119 }; // made for tablet screens
+    } else if(window.innerWidth <= 1024){
+      return { innerRadius: 60, outerRadius: 82 };
+    } else {
+      return { innerRadius: 93, outerRadius: 127 }; // I made it for larger screens
+    }
+  };  
+
   return (
     <div className="card-wrapper">
       <Card
@@ -39,8 +51,7 @@ const PieChartCard = ({ title, data }) => {
                   data: data,
                   cx: "50%",
                   cy: "50%",
-                  innerRadius: 93,
-                  outerRadius: 127,
+                  ...getRadius(),
                 },
               ]}
               height={300}

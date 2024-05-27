@@ -3,7 +3,7 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import PieChartCard from "./components/pie";
 import Graph from "./components/graph";
-import "./Overview.scss";
+import "./Statics.scss";
 
 const data1 = [
   { id: "total-payé", label: "Total Payé", value: 42, color: "#96A7FF" },
@@ -20,11 +20,10 @@ const data2 = [
   { id: "total-occupé", label: "Total Occupé", value: 80, color: "#F9769D" },
   { id: "total-vacant", label: "Total Vacant", value: 20, color: "#282230" },
 ];
-const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
-const pData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
+
 const sampleData = [
-  { data: pData, label: 'pv' },
-  { data: uData, label: 'uv' }
+  { label: 'vacant', data: [12, 6, 20, 4, 20,1], color: "#96A7FF" },
+  { label: 'non-vacant', data: [10, 2, 8, 16, 0,4], color:"#f9769d"}
 ];
 
 const Statistics = () => {
@@ -64,7 +63,7 @@ const Statistics = () => {
           </div>
         </div>
       )}
-      <div className="w-full">
+      <div className=" w-full ">
         <Graph title="Graphe lineaire des logements" data={sampleData}/>
       </div>
     </div>
