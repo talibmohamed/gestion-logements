@@ -30,29 +30,35 @@ class AdminController
     // other methods for the admin
 
 
-    // public function addUserAPI($data)
-    // {
-    //     if ($data && isset($data['email'])) {
-    //         $email = $data['email'];
-    //         $password = $data['password'];
-
-    //         // Check which optional fields are provided
-    //         $optionalFields = ['nom', 'prenom', '', 'telephone', 'profession', ''];
-    //         $userData = [];
-    //         foreach ($optionalFields as $field) {
-    //             if (isset($data[$field])) {
-    //                 $userData[$field] = $data[$field];
-    //             }
-    //         }
-
-    //         // Add user
-    //         $response = $this->admin->addUserAndSendEmail($email, $password, $userData);
-
-    //         http_response_code(200);
-    //         echo json_encode($response);
-    //     } else {
-    //         http_response_code(400);
-    //         echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
-    //     }
-    // }
+    public function addUserAPI($data)
+    {
+        if ($data && isset($data['email']) && isset($data['nom']) && isset($data['prenom']) && isset($data['cin']) && isset($data['profession']) && isset($data['is_ameliore'])) {
+            $email = $data['email'];
+            $userData = [
+                'email' => $email,
+                'nom' => $data['nom'],
+                'prenom' => $data['prenom'],
+                'cin' => $data['cin'],
+                'profession' => $data['profession'],
+                'is_ameliore' => $data['is_ameliore']
+            ];
+    
+            // Check which optional fields are provided
+            $optionalFields = ['telephone'];
+            foreach ($optionalFields as $field) {
+                if (isset($data[$field])) {
+                    $userData[$field] = $data[$field];
+                }
+            }
+    
+            // Add user and send email
+            $response = $this->admin->addUserAndSendEmail($userData);
+    
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Missing required fields.']);
+        }
+    }
 }

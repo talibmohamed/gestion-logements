@@ -106,12 +106,11 @@ const DataTable = ({ columns, rows, title }) => {
                   >
                     <table
                       className="w-full"
-                      hideHeader
                       aria-label="Example static collection table"
                     >
                       <tbody>
                         {columns.map((column) => (
-                          <tr classNam key={column.uid}>
+                          <tr key={column.uid}>
                             <td>{column.name}</td>
                             <td>{renderCell(item, column)}</td>
                           </tr>
