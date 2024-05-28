@@ -6,7 +6,7 @@ import "../style.scss";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../../../session/authentication";
 import { useNavigate } from "react-router-dom";
-import { loginadmin } from "../../../session/services/api";
+import { loginuser } from "../../../session/services/api";
 import { Link, Button, Input } from "@nextui-org/react";
 import { EyeFilledIcon } from "../EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../EyeSlashFilledIcon";
@@ -25,7 +25,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await loginadmin(email, password);
+      const response = await loginuser(email, password);
 
       if (response.status === "success") {
         dispatch(

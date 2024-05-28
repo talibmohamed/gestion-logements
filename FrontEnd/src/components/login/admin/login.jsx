@@ -50,7 +50,7 @@ const Login = () => {
   return (
     <div className="bg-background min-h-screen flex items-center justify-center">
       {/* Login container */}
-      <div className="flex rounded-2xl shadow-lg max-w-7xl p-5 items-center">
+      <div className="flex rounded-2xl shadow-xl max-w-7xl p-5 items-center">
         {/* Form */}
         <div className="md:w-1/2 px-14">
           <div className="flex mb-8 items-center">
