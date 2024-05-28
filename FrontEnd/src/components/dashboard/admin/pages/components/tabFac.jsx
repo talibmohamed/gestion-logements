@@ -15,14 +15,15 @@ import {
 import PropTypes from "prop-types";
 
 const statusColorMap = {
-  retard: "primary",
+  en_retard: "primary",
   attente: "warning",
   payé: "secondary",
 };
 
-const DataTable = ({ columns, rows, title }) => {
+const InvoiceTable = ({ columns, rows, title }) => {
   const renderCell = React.useCallback((item, column) => {
     const cellValue = item[column.uid];
+
     switch (column.uid) {
       case "status":
         return (
@@ -39,8 +40,8 @@ const DataTable = ({ columns, rows, title }) => {
         return <p className="text-bold text-sm capitalize">{cellValue}</p>;
     }
   }, []);
-
-  const isAbove900 = window.innerWidth > 900;
+  
+  const isAbove900 = window.innerWidth > 900; // Check if the window width is above 900px
 
   return (
     <div className="w-full">
@@ -53,7 +54,7 @@ const DataTable = ({ columns, rows, title }) => {
           <CardBody>
             <div className="card-header">
               {title && <h2 className="mb-4 table-title">{title}</h2>}
-              <Button
+              {/* <Button
                 href="/dashboard/facture"
                 as={Link}
                 variant="flat"
@@ -62,11 +63,10 @@ const DataTable = ({ columns, rows, title }) => {
                 className="mb-4 mr-1 cMore"
               >
                 See more
-              </Button>
+              </Button> */}
             </div>
-            <Table 
+            <Table
               aria-label="Example table with custom cells"
-              removeWrapper={true}
               className={{ base: "overflow-auto", wrapper: "max-h-[382px]" }}
             >
               <TableHeader columns={columns}>
@@ -94,7 +94,6 @@ const DataTable = ({ columns, rows, title }) => {
         <div className="below-900-content">
           {/* Placeholder for the component to be rendered below 900px */}
           <Card>
-            {" "}
             <CardBody>
               <h2 className="table-title">{title}</h2>
               {rows.map((item, rowIndex) => (
@@ -111,7 +110,7 @@ const DataTable = ({ columns, rows, title }) => {
                     >
                       <tbody>
                         {columns.map((column) => (
-                          <tr classNam key={column.uid}>
+                          <tr key={column.uid}>
                             <td>{column.name}</td>
                             <td>{renderCell(item, column)}</td>
                           </tr>
@@ -129,7 +128,7 @@ const DataTable = ({ columns, rows, title }) => {
   );
 };
 
-DataTable.propTypes = {
+InvoiceTable.propTypes = {
   columns: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
@@ -151,4 +150,4 @@ DataTable.propTypes = {
   title: PropTypes.string,
 };
 
-export default DataTable;
+export default InvoiceTable;

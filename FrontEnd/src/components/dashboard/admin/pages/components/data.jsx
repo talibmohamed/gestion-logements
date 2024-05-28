@@ -11,11 +11,11 @@ const columns = [
 ];
 
 const users = [
-  {id: 1,id_res: "#1313313",nom: "Tony Reichert",type: "Eau",mois: "01/2024",echeance: "22/02/2024",status: "paid",ttc: "$10",},
-  {id: 2,id_res: "#1313313",nom: "Tony Reichert",type: "Eau",mois: "01/2024",echeance: "22/02/2024",status: "overdue",ttc: "$10",},
-  {id: 3,id_res: "#1313313",nom: "Tony Reichert",type: "Eau",mois: "01/2024",echeance: "22/02/2024",status: "pending",ttc: "$10",},
-  {id: 4,id_res: "#1313313",nom: "Tony Reichert",type: "Eau",mois: "01/2024",echeance: "22/02/2024",status: "paid",ttc: "$10",},
-  {id: 5,id_res: "#1313313",nom: "Tony Reichert",type: "Eau",mois: "01/2024",echeance: "22/02/2024",status: "paid",ttc: "$10",},
+  {id: 1,id_res: "#1313313",nom: "Tony Reichert",type: "Eau",mois: "01/2024",echeance: "22/02/2024",status: "payé",ttc: "$10",},
+  {id: 2,id_res: "#1313313",nom: "Tony Reichert",type: "Eau",mois: "01/2024",echeance: "22/02/2024",status: "retard",ttc: "$10",},
+  {id: 3,id_res: "#1313313",nom: "Tony Reichert",type: "Eau",mois: "01/2024",echeance: "22/02/2024",status: "attente",ttc: "$10",},
+  {id: 4,id_res: "#1313313",nom: "Tony Reichert",type: "Eau",mois: "01/2024",echeance: "22/02/2024",status: "payé",ttc: "$10",},
+  {id: 5,id_res: "#1313313",nom: "Tony Reichert",type: "Eau",mois: "01/2024",echeance: "22/02/2024",status: "payé",ttc: "$10",},
 ];
 
 export {columns, users};
