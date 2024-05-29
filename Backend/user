@@ -54,10 +54,11 @@ class residant
         }
     }
     //changement de mot de passe
-    public function changePassword($currentPassword, $newPassword)
+    public function changePassword($currentPassword, $newPassword ,$res_ID)
     {
+        $connection = $this->db->getConnection();
         // Vérifier le mot de passe actuel
-        if (!$this->checkCurrentPassword($currentPassword)) {
+        if (!$this->checkCurrentPassword($currentPassword,$res_ID)) {
             throw new Exception("Le mot de passe actuel est incorrect.");
         }
 
@@ -66,7 +67,7 @@ class residant
 
         // Mettre à jour le mot de passe dans la base de données
         $sql = "UPDATE residant SET password = :newPassword WHERE res_id = :res_ID";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $connection->prepare($sql);
         $stmt->bindParam(':newPassword', $hashedPassword);
         $stmt->bindParam(':userId', $this->$res_ID);
 
@@ -76,10 +77,12 @@ class residant
             throw new Exception("Erreur lors de la mise à jour du mot de passe.");
         }
     }
-    private function checkCurrentPassword($currentPassword)
+    private function checkCurrentPassword($currentPassword ,$res_ID)
     {
+        $connection = $this->db->getConnection();
+
         $sql = "SELECT password FROM residant WHERE res_id = :userId";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $connection->prepare($sql);
         $stmt->bindParam(':userId', $this->$res_ID);
         $stmt->execute();
 
@@ -92,10 +95,12 @@ class residant
         }
     }
     // Méthode pour mettre à jour les informations personnelles
-    public function updatePersonalInfo($email, $telephone)
+    public function updatePersonalInfo($email, $telephone, $res_ID)
     {
+        $connection = $this->db->getConnection();
+
         $sql = "UPDATE residant SET email = :email, telephone = :telephone WHERE res_id = :res_ID";
-        $stmt = $this->db->prepare($sql);
+        $stmt = $connection->prepare($sql);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':telephone', $telephone);
         $stmt->bindParam(':userId', $this->$res_ID);
