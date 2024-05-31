@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import PieChartCard from "./components/pie";
-import DataTable from "./components/table";
+import DataTable from "./components/oveTab";
 import "./Overview.scss";
 import { columns, users } from "./components/data";
 

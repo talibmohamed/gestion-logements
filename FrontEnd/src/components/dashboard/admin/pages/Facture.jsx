@@ -1,61 +1,63 @@
-import React from "react";
-import {Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, getKeyValue} from "@nextui-org/react";
+import React, { useState, useEffect } from "react";
+import "./Overview.scss";
+import { columns, users, statusOptions } from "./components/facData";
+import InvoiceTable from "./components/facTab.jsx";
+import "./Overview.scss";
+import { Card, CardBody, Textarea, Input } from "@nextui-org/react";
 
-const rows = [
-  {
-    key: "1",
-    name: "Tony Reichert",
-    role: "CEO",
-    status: "Active",
-  },
-  {
-    key: "2",
-    name: "Zoey Lang",
-    role: "Technical Lead",
-    status: "Paused",
-  },
-  {
-    key: "3",
-    name: "Jane Fisher",
-    role: "Senior Developer",
-    status: "Active",
-  },
-  {
-    key: "4",
-    name: "William Howard",
-    role: "Community Manager",
-    status: "Vacation",
-  },
-];
-
-const columns = [
-  {
-    key: "name",
-    label: "NAME",
-  },
-  {
-    key: "role",
-    label: "ROLE",
-  },
-  {
-    key: "status",
-    label: "STATUS",
-  },
-];
-
-export default function App() {
+const Facture = () => {
   return (
-    <Table aria-label="Example table with dynamic content">
-      <TableHeader columns={columns}>
-        {(column) => <TableColumn key={column.key}>{column.label}</TableColumn>}
-      </TableHeader>
-      <TableBody items={rows} emptyContent={"No rows to display."}>
-        {(item) => (
-          <TableRow key={item.key}>
-            {(columnKey) => <TableCell>{getKeyValue(item, columnKey)}</TableCell>}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <div className="w-full">
+      <Card
+        isBlurred
+        className="border-none bg-background/15 white:bg-default-100/50 card-wrapper custom-card-wrapper w-full over"
+        shadow="sm"
+      >
+        <CardBody>
+          <InvoiceTable
+            columns={columns}
+            rows={users}
+            statusOptions={statusOptions.map((option) => option.uid)}
+            title="Factures "
+          />
+        </CardBody>
+      </Card>
+      <Card
+        isBlurred
+        className="border-none bg-background/15 white:bg-default-100/50 card-wrapper custom-card-wrapper w-full over"
+        shadow="sm"
+      >
+        <CardBody>
+          <h2 className="mx-2 mb-4 flex justify-between items-center">
+            Envoyer un Avis de Facture en Retard
+            <div className="flex gap-3">
+              <Input
+                variant="bordered"
+                type="res_id"
+                label="Id residant"
+                labelPlacement="outside-left"
+                size="sm"
+                onClear={() => console.log("input cleared")}
+                startContent={
+                  <div className="pointer-events-none flex items-center">
+                    <span className="text-default-400 text-small">#</span>
+                  </div>
+                }
+                className="custom-input max-w-xs"
+              />
+            </div>
+          </h2>
+          <div className="flex flex-col items-center justify-center">
+            <Textarea
+              variant="bordered"
+              labelPlacement="outside"
+              placeholder="Enter your description"
+              className="max-w-5xl "
+            />
+          </div>
+        </CardBody>
+      </Card>
+    </div>
   );
-}
+};
+export default Facture;
