@@ -34,6 +34,7 @@ const Login = () => {
             nom: response.nom,
             prenom: response.prenom,
             role: response.role,
+            first_login: response.first_login,
           })
         );
         navigate("/dashboard");

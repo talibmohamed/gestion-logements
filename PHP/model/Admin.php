@@ -34,7 +34,8 @@ class admin
                         'jwt_token' => $jwt_token,
                         'nom' => $user['nom'],
                         'prenom' => $user['prenom'],
-                        'role' => 'admin'
+                        'role' => 'admin',
+                        'first_login' => false,
                     );
                 } else {
                     // Return error response if password is incorrect

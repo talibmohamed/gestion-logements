@@ -13,7 +13,7 @@ class residant
     {
         try {
             $connection = $this->db->getConnection();
-            $sql = $connection->prepare('SELECT res_id, password, nom, prenom FROM residant WHERE email = ?');
+            $sql = $connection->prepare('SELECT res_id, password, nom, prenom, first_login FROM residant WHERE email = ?');
             $sql->execute([$email]);
             $user = $sql->fetch(PDO::FETCH_ASSOC);
 
@@ -27,7 +27,8 @@ class residant
                         'jwt_token' => $jwt_token,
                         'nom' => $user['nom'],
                         'prenom' => $user['prenom'],
-                        'role' => 'residant'
+                        'role' => 'residant',
+                        'first_login' => $user['first_login']
                     );
                 } else {
                     return array('status' => 'error', 'message' => 'Invalid password');
