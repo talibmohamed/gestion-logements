@@ -18,6 +18,7 @@ class residant
     {
         $this->db = $db;
         $this->db->connect();
+        $this->db->getConnection();
     }
 
     // API endpoint function to handle user login
@@ -77,7 +78,7 @@ class residant
             throw new Exception("Erreur lors de la mise à jour du mot de passe.");
         }
     }
-    private function checkCurrentPassword($currentPassword ,$res_ID)
+    public  function checkCurrentPassword($currentPassword ,$res_ID)
     {
         $connection = $this->db->getConnection();
 
@@ -86,9 +87,9 @@ class residant
         $stmt->bindParam(':userId', $this->$res_ID);
         $stmt->execute();
 
-        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($result && password_verify($currentPassword, $result['password'])) {
+        if ($user && password_verify($currentPassword, $user['password'])) {
             return true;
         } else {
             return false;
@@ -103,7 +104,7 @@ class residant
         $stmt = $connection->prepare($sql);
         $stmt->bindParam(':email', $email);
         $stmt->bindParam(':telephone', $telephone);
-        $stmt->bindParam(':userId', $this->$res_ID);
+        $stmt->bindParam(':res_id', $this->$res_ID);
 
         if ($stmt->execute()) {
             return true;
@@ -111,4 +112,56 @@ class residant
             throw new Exception("Erreur lors de la mise à jour des informations personnelles.");
         }
     }
+    public function statistic_eau($res_ID) {
+        $connection = $this->db->getConnection();
+    
+        // Prepare and execute the quota query
+        $quotaStmt = $connection->prepare("SELECT cons_quota FROM consommation WHERE res_id = :res_ID AND cons_type = 'water'");
+        $quotaStmt->bindParam(':res_ID', $res_ID, PDO::PARAM_INT);
+        $quotaStmt->execute();
+        $quota = $quotaStmt->fetchColumn();
+    
+        // Prepare and execute the actuel query
+        $actuelStmt = $connection->prepare("SELECT cons_actuel FROM consommation WHERE res_id = :res_ID AND cons_type = 'water'");
+        $actuelStmt->bindParam(':res_ID', $res_ID, PDO::PARAM_INT);
+        $actuelStmt->execute();
+        $actuel = $actuelStmt->fetchColumn();
+    
+        // Check if quota is not zero to avoid division by zero
+        if ($quota > 0) {
+            // Return the percentage
+            return ($actuel / $quota) * 100;
+        } else {
+            // Handle the case when quota is zero
+            return 0;
+        }
+    }
+    public function statistic_electricity($res_ID) {
+        $connection = $this->db->getConnection();
+    
+        // Prepare and execute the quota query
+        $quotaStmt = $connection->prepare("SELECT cons_quota FROM consommation WHERE res_id = :res_ID AND cons_type = 'Electricity'");
+        $quotaStmt->bindParam(':res_ID', $res_ID, PDO::PARAM_INT);
+        $quotaStmt->execute();
+        $quota = $quotaStmt->fetchColumn();
+    
+        // Prepare and execute the actuel query
+        $actuelStmt = $connection->prepare("SELECT cons_actuel FROM consommation WHERE res_id = :res_ID AND cons_type = 'Electricity'");
+        $actuelStmt->bindParam(':res_ID', $res_ID, PDO::PARAM_INT);
+        $actuelStmt->execute();
+        $actuel = $actuelStmt->fetchColumn();
+    
+        // Check if quota is not zero to avoid division by zero
+        if ($quota > 0) {
+            // Return the percentage
+            return ($actuel / $quota) * 100;
+        } else {
+            // Handle the case when quota is zero
+            return 0;
+        }
+    }
+
+
+    
+
 }
