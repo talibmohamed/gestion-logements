@@ -25,7 +25,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await loginadmin(email, password);
+      const response = await loginuser(email, password);
 
       if (response.status === "success") {
         dispatch(
