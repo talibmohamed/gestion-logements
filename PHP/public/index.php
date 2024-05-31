@@ -1,7 +1,7 @@
 <?php
 require_once '../vendor/autoload.php';
 require '../API/admincontroller.php';
-require '../API/residentcontoller.php';
+require '../API/residentcontroller.php';
 
 // Import JwtHandler class
 require_once '../model/jwt.php';
@@ -57,11 +57,20 @@ function route($uri, $method)
                 echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
             }
             break;
+        // case '/api/v1/user/firstloginwithtoken':
+        //     if ($method === 'POST') {
+        //         $userController = new UserController();
+        //         //am sending the token in the usrl
+        //         $data['token'] = $_GET['token'];
+        //         $userController->firstloginwithtoken($data);
+        //     } else {
+        //         http_response_code(405);
+        //         echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+        //     }
 
             // Admin routes
         case '/api/v1/admin/login':
             if ($method === 'POST') {
-
                 $adminController = new AdminController();
                 $adminController->loginAdminAPI($data);
             } else {
@@ -81,7 +90,7 @@ function route($uri, $method)
                     $adminController = new AdminController();
                     $adminController->addUserAPI($data);
                 } else {
-                    http_response_code(401); // Unauthorized sending the jwt data
+                    http_response_code(401); // Unauthorized
                     echo json_encode([
                         'status' => 'error',
                         'message' => 'Unauthorized',

@@ -4,7 +4,7 @@ import { Box } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import PropTypes from "prop-types";
 
-// const xLabels = ['Jan', 'Fev', 'Mar', 'Avr', 'May', 'Jui'];
+
 const xLabels = ["Janvier", "Fevrier", "Mars", "Avril", "May", "Juin"];
 
 const Graph = ({ title, data }) => {

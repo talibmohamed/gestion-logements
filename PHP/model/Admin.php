@@ -1,6 +1,8 @@
 <?php
 
 require_once 'Jwt.php';
+require_once 'send_email.php';
+
 class admin
 {
     private $db;
@@ -48,7 +50,7 @@ class admin
         }
     }
 
-    // API endpoint function to handle admmin adding a user 
+    // API endpoint function to handle admin adding a user 
     public function addUserAndSendEmail($userData)
     {
         try {
@@ -88,45 +90,54 @@ class admin
 
             $fields = ['email', 'password', 'nom', 'prenom', 'cin', 'telephone', 'profession', 'log_id'];
             $values = [
-                $userData['email'], 
-                $hashedPassword, 
-                $userData['nom'], 
-                $userData['prenom'], 
-                $userData['cin'], 
-                $userData['telephone'] ?? null, 
-                $userData['profession'], 
+                $userData['email'],
+                $hashedPassword,
+                $userData['nom'],
+                $userData['prenom'],
+                $userData['cin'],
+                $userData['telephone'] ?? null,
+                $userData['profession'],
                 $logement['log_id']
             ];
+
+            // Generate the login token and expiration time
             $login_token = bin2hex(random_bytes(32));
-            //add the login_token to the resisdant table 
-            array_push($fields, 'login_token');
-            array_push($values, $login_token);
+            $expiration_time = date('Y-m-d H:i:s', strtotime('+1 hour'));
 
             $placeholders = rtrim(str_repeat('?,', count($fields)), ',');
             $query = "INSERT INTO residant (" . implode(',', $fields) . ") VALUES (" . $placeholders . ")";
             $stmt = $connection->prepare($query);
             $stmt->execute($values);
 
-            //now that avartment is_vacant should become false
-            // $updateQuery = "UPDATE logement SET etat = 'occupe' WHERE log_id = ?";
-            // $stmt = $connection->prepare($updateQuery);
-            // $stmt->execute([$logement['log_id']]);
+            // Insert the token into the password_reset_tokens table
+            $tokenQuery = "INSERT INTO password_reset_tokens (email, token, expires_at) VALUES (?, ?, ?)";
+            $stmt = $connection->prepare($tokenQuery);
+            $stmt->execute([$userData['email'], $login_token, $expiration_time]);
 
+            // Mark the logement as occupied
+            $updateQuery = "UPDATE logement SET is_vacant = false WHERE log_id = ?";
+            $stmt = $connection->prepare($updateQuery);
+            $stmt->execute([$logement['log_id']]);
 
-
+            // Send email with login link and credentials
             $loginLink = "http://localhost:5173/form?login_token=$login_token";
             $subject = 'Your account information';
-            $body = 'Click on the following link to log in: ' . $loginLink . "\n\n" .
-                    'If the link does not work, you can use the following credentials to log in manually:' . "\n" .
-                    'Email: ' . $userData['email'] . "\n" .
-                    'Password: ' . $password;
+            $body = "<p>Dear {$userData['nom']} {$userData['prenom']},</p>
+                     <p>Your account has been created successfully. You can login using the following link:</p>
+                     <p><a href='$loginLink'>Log in to your account</a></p>
+                     <p>Your login credentials are:</p>
+                     <p>Email: {$userData['email']}</p>
+                     <p>Password: $password</p>
+                     <p>Make sure to change your password after logging in.</p>
+                     <p>Best regards,</p>
+                     <p>houselytics</p>";
 
-            // if (!$this->sendEmail($userData['email'], $subject, $body)) {
-            //     return [
-            //         'status' => 'error',
-            //         'message' => 'Failed to send email.'
-            //     ];
-            // }
+            if (!sendEmail($userData['email'], $userData['nom'], $userData['prenom'], $subject, $body)) {
+                return [
+                    'status' => 'error',
+                    'message' => 'Failed to send email.'
+                ];
+            }
 
             return [
                 'status' => 'success',
@@ -144,5 +155,4 @@ class admin
             ];
         }
     }
-    
 }

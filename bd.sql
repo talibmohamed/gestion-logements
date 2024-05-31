@@ -12,7 +12,7 @@ CREATE TABLE logement (
     mc          INT NOT NULL,
     piece       INT NOT NULL,
     equip_ids   INT[],
-    is_ameliore BOOLEAN default true;
+    is_vacant BOOLEAN default true;
 );
 
 CREATE TABLE admin (
@@ -36,10 +36,18 @@ CREATE TABLE residant (
     profession VARCHAR(40),
     date_ajout TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     first_login BOOLEAN DEFAULT TRUE,
-    reset_token varchar(255),
     FOREIGN KEY (log_id)
         REFERENCES logement (log_id)
 );
+
+CREATE TABLE password_reset_tokens (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (email) REFERENCES residant (email)
+);
+
 
 CREATE TABLE facture (
     fac_id       SERIAL PRIMARY KEY,
