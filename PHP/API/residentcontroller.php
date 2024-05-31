@@ -40,8 +40,44 @@ class UserController
         }
     }
 
+    //profile where we gonna
+    public function profile($jwt) {
+        if ($jwt) {
+            $response = $this->residant->profile($jwt);
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
+        }
+    }
 
+    //change password
+    public function changepassword($data) {
+        if ($data && isset($data['jwt']) && isset($data['password']) && isset($data['confirmedPassword'])) {
+            $jwt = $data['jwt'];
+            $password = $data['password'];
+            $confirmedPassword = $data['confirmedPassword'];
+            $response = $this->residant->changepassword($jwt, $password, $confirmedPassword);
 
-    //other resident methodes
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
+        }
+    }
 
+    //check token
+    public function checktoken($data) {
+        if ($data && isset($data['jwt'])) {
+            $jwt = $data['jwt'];
+            $response = $this->residant->checktoken($jwt);
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
+        }
+    }
 }

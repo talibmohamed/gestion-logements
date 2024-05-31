@@ -67,6 +67,7 @@ CREATE TABLE consommation (
     cons_type  VARCHAR(255),
     cons_date  DATE,
     cons_quota DOUBLE PRECISION,
+    cons_actuel DOUBLE PRECISION,
     res_id     INT,
     log_id     INT,
     FOREIGN KEY (res_id)

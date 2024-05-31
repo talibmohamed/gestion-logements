@@ -1,9 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  jwtToken: null,
-  nom: '',
-  prenom: '',
+  jwt_token: '',
   role: '',
   first_login: false,  // Set default value
   isLoggedIn: false,
@@ -14,17 +12,16 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     loginSuccess: (state, action) => {
-      state.jwtToken = action.payload.jwtToken;
-      state.nom = action.payload.nom;
-      state.prenom = action.payload.prenom;
+      state.jwt_token = action.payload.jwt_token;
       state.role = action.payload.role;
       state.first_login = action.payload.first_login;
       state.isLoggedIn = true;
     },
+    updateJwtToken: (state, action) => {
+      state.jwt_token = action.payload.jwt_token;
+    },
     logout: (state) => {
-      state.jwtToken = null;
-      state.nom = '';
-      state.prenom = '';
+      state.jwt_token = null;
       state.role = '';
       state.first_login = false;
       state.isLoggedIn = false;
@@ -32,6 +29,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { loginSuccess, logout } = authSlice.actions;
+
+export const { loginSuccess, updateJwtToken, logout } = authSlice.actions;
 
 export default authSlice.reducer;

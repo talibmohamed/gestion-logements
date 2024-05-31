@@ -1,17 +1,14 @@
 import React, { useState } from "react";
-import "../../../index.css"; // Remove if not used
-import axios from "axios";
+import "../../../index.css";
 import logo from "./logo.svg";
 import sunset from "./sunset.jpeg";
 import "../style.scss";
 import { useDispatch } from "react-redux";
-import { loginSuccess } from "../../../session/authentication";
 import { useNavigate } from "react-router-dom";
-import { loginadmin } from "../../../session/services/api";
+import { loginAdminThunk } from "../../../session/thunks/adminthink";
 import { Link, Button, Input } from "@nextui-org/react";
 import { EyeFilledIcon } from "../EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../EyeSlashFilledIcon";
-
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -27,23 +24,20 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await loginadmin(email, password);
-
-      if (response.status === 'success') {
-        dispatch(
-          loginSuccess({
-            jwtToken: response.jwt_token,
-            nom: response.nom,
-            prenom: response.prenom,
-            role: response.role,
-          })
-        );
+      // Dispatch the loginUserThunk with email and password
+      const action = await dispatch(loginAdminThunk({ email, password }));
+      const response = action.payload; // Extract the payload data
+      console.log("2");
+      console.log(response);
+      console.log("2");
+      if (response.status === "success") {
+        console.log(response.status);
         navigate("/dashboard");
       } else {
         setError(response.message);
       }
     } catch (error) {
-      console.error("Error:", error);
+      setError(error.message);
     }
   };
 

@@ -8,7 +8,7 @@ import {
   Button,
 } from "@nextui-org/react";
 import { useSelector } from "react-redux"; // Import useSelector hook to access Redux state
-import { notification } from "../../../../session/services/api"; // Import fetchData function
+// import { notification } from "../../../../session/services/api"; // Import fetchData function
 import { NotificationIcon } from "./NotificationIcon";
 
 export default function App() {

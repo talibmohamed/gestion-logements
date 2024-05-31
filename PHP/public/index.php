@@ -9,9 +9,11 @@ require_once '../model/jwt.php';
 // Set headers
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS, DELETE, PUT");
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -68,6 +70,57 @@ function route($uri, $method)
         //         echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
         //     }
 
+        case '/api/v1/user/profile':
+            if ($method === 'GET') {
+                $jwtHandler = new JwtHandler();
+                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                $jwt_token = str_replace('Bearer ', '', $jwt_token);
+                $userController = new UserController();
+                $userController->profile($jwt_token);
+            } else {
+                http_response_code(405);
+                echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+            }
+            break;
+        
+            //change password
+        case '/api/v1/user/change-password':
+            if ($method === 'POST') {
+                $jwtHandler = new JwtHandler();
+                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                $jwt_token = str_replace('Bearer ', '', $jwt_token);
+                $data['jwt'] = $jwt_token;
+                $userController = new UserController();
+                $userController->changepassword($data);
+            } else {
+                http_response_code(405);
+                echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+            }
+            break;
+        //check token
+        case '/api/v1/user/check-token':
+            if ($method === 'POST') {
+                $jwtHandler = new JwtHandler();
+                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                $jwt_token = str_replace('Bearer ', '', $jwt_token);
+                //check the jwt validation
+                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+                if ($token_info['valid']) {
+                    $data['jwt'] = $jwt_token;
+                    $userController = new UserController();
+                    $userController->checktoken($data);
+                } else {
+                    http_response_code(401); // Unauthorized
+                    echo json_encode([
+                        'status' => 'error1',
+                        'message' => 'Unauthorized',
+                    ]);
+                }
+            } else {
+                http_response_code(405);
+                echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+            }
+            break;
             // Admin routes
         case '/api/v1/admin/login':
             if ($method === 'POST') {

@@ -101,19 +101,23 @@ class admin
                 $logement['log_id']
             ];
 
-            // Generate the login token and expiration time
-            $login_token = bin2hex(random_bytes(32));
-            $expiration_time = date('Y-m-d H:i:s', strtotime('+1 hour'));
-
+            // Insert user data into the database
             $placeholders = rtrim(str_repeat('?,', count($fields)), ',');
             $query = "INSERT INTO residant (" . implode(',', $fields) . ") VALUES (" . $placeholders . ")";
             $stmt = $connection->prepare($query);
             $stmt->execute($values);
 
-            // Insert the token into the password_reset_tokens table
-            $tokenQuery = "INSERT INTO password_reset_tokens (email, token, expires_at) VALUES (?, ?, ?)";
-            $stmt = $connection->prepare($tokenQuery);
-            $stmt->execute([$userData['email'], $login_token, $expiration_time]);
+            // Retrieve the inserted user's ID
+            $res_id = $connection->lastInsertId();
+
+            // Generate the jwt login token and store it in login_token in residant table with user id
+            $jwtHandler = new JwtHandler();
+            $login_token = $jwtHandler->generateJwtToken($res_id, 'residant');
+
+            // Update the user's login_token in the database
+            $updateTokenQuery = "UPDATE residant SET login_token = ? WHERE res_id = ?";
+            $stmt = $connection->prepare($updateTokenQuery);
+            $stmt->execute([$login_token, $res_id]);
 
             // Mark the logement as occupied
             $updateQuery = "UPDATE logement SET is_vacant = false WHERE log_id = ?";
