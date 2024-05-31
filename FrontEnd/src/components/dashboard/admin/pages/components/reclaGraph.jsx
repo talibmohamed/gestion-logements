@@ -7,7 +7,7 @@ import PropTypes from "prop-types";
 
 const xLabels = ["Janvier", "Fevrier", "Mars", "Avril", "May", "Juin"];
 
-const Graph = ({ title, data }) => {
+const ReclaGraph = ({ title, data }) => {
   const getWidth = () => {
     if (window.innerWidth <= 640) {
       return 400; // made for mobile screens
@@ -40,11 +40,11 @@ const Graph = ({ title, data }) => {
               }}
             />
           </Box>
-          <div className="gap-12 custom-legend-graph">
+          <div className="gap-12 custom-legend-reclgraph">
             {data.map((item, index) => (
-              <div className="legend-item-graph" key={index}>
+              <div className="legend-item-reclgraph" key={index}>
                 <div
-                  className="legend-color-graph"
+                  className="legend-color-reclgraph"
                   style={{ backgroundColor: item.color }}
                 ></div>
                 <div className="legend-label-graph">{item.label}</div>
@@ -57,7 +57,7 @@ const Graph = ({ title, data }) => {
   );
 };
 
-Graph.propTypes = {
+ReclaGraph.propTypes = {
   title: PropTypes.string.isRequired,
   data: PropTypes.arrayOf(
     PropTypes.shape({
@@ -67,4 +67,4 @@ Graph.propTypes = {
   ).isRequired,
 };
 
-export default Graph;
+export default ReclaGraph;
