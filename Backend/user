@@ -78,23 +78,31 @@ class residant
             throw new Exception("Erreur lors de la mise à jour du mot de passe.");
         }
     }
-    public  function checkCurrentPassword($currentPassword ,$res_ID)
-    {
+    public function checkCurrentPassword($currentPassword, $res_ID) {
+        // Get the database connection
         $connection = $this->db->getConnection();
-
+    
+        // Prepare the SQL query to select the password for the given res_ID
         $sql = "SELECT password FROM residant WHERE res_id = :userId";
         $stmt = $connection->prepare($sql);
-        $stmt->bindParam(':userId', $this->$res_ID);
+    
+        // Bind the 'res_ID' parameter to the SQL query
+        $stmt->bindParam(':userId', $res_ID, PDO::PARAM_INT);
+    
+        // Execute the query
         $stmt->execute();
-
+    
+        // Fetch the user data
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
+    
+        // Verify the current password against the stored hash
         if ($user && password_verify($currentPassword, $user['password'])) {
             return true;
         } else {
             return false;
         }
     }
+    
     // Méthode pour mettre à jour les informations personnelles
     public function updatePersonalInfo($email, $telephone, $res_ID)
     {
@@ -160,7 +168,41 @@ class residant
             return 0;
         }
     }
-
+    public function affiche_factures($res_ID) {
+        // Get the database connection
+        $connection = $this->db->getConnection();
+    
+        // Prepare the SQL query to select all records from 'facture' where 'res_id' matches the provided parameter
+        $fac = $connection->prepare("SELECT * FROM facture WHERE res_id = :res_ID ORDER BY fac_date DESC");
+    
+        // Bind the 'res_ID' parameter to the SQL query
+        $fac->bindParam(':res_ID', $res_ID, PDO::PARAM_INT);
+    
+        // Execute the query
+        $fac->execute();
+    
+        // Fetch all results
+        $results = $fac->fetchAll(PDO::FETCH_ASSOC);
+    
+        // Return the fetched results
+        return $results;
+    }
+    public function historique_reclamations($res_ID) {
+        // Get the database connection
+        $connection = $this->db->getConnection();
+         $rec = $connection->prepare("SELECT * FROM reclamation where res_id = :res_ID ORDER BY rec_date DESC");
+         // Bind the 'res_ID' parameter to the SQL query
+        $rec->bindParam(':res_ID', $res_ID, PDO::PARAM_INT);
+        // Execute the query
+        $rec->execute();
+    
+        // Fetch all results
+        $results = $rec->fetchAll(PDO::FETCH_ASSOC);
+    
+        // Return the fetched results
+        return $results;
+    }
+    
 
     
 

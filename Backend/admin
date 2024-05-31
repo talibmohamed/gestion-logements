@@ -1,7 +1,11 @@
 <?php
-
+//require_once (Facture.php);
 class admin
 {
+    public $nom;
+    public $prenom;
+    public $adm_ID;
+    public $email;
     private $db;
 
     public function __construct(Database $db)
@@ -82,6 +86,170 @@ class admin
             'all' => $all_facture // Total invoices
         );
     }
+    public function all_factures() {
+        // Get the database connection
+        $connection = $this->db->getConnection();
+         $fac = $connection->prepare("SELECT * FROM facture  ORDER BY fac_date DESC");
+    
+        // Execute the query
+        $fac->execute();
+    
+        // Fetch all results
+        $results = $fac->fetchAll(PDO::FETCH_ASSOC);
+    
+        // Return the fetched results
+        return $results;
+    }
+    public function affiche_reclamations() {
+        // Get the database connection
+        $connection = $this->db->getConnection();
+         $rec = $connection->prepare("SELECT * FROM reclamation ORDER BY rec_date DESC");
+    
+        // Execute the query
+        $rec->execute();
+    
+        // Fetch all results
+        $results = $rec->fetchAll(PDO::FETCH_ASSOC);
+    
+        // Return the fetched results
+        return $results;
+    }
+    public function updatePersonalInfo($email, $nom, $prenom, $adm_ID) {
+        try {
+            // Get the database connection
+            $connection = $this->db->getConnection();
+    
+            // Prepare the SQL query to update the admin's personal information
+            $sql = $connection->prepare("UPDATE admin SET email = :email, nom = :nom, prenom = :prenom WHERE adm_id = :adm_ID");
+    
+            // Bind the parameters to the SQL query
+            $sql->bindParam(':email', $email, PDO::PARAM_STR);
+            $sql->bindParam(':nom', $nom, PDO::PARAM_STR);
+            $sql->bindParam(':prenom', $prenom, PDO::PARAM_STR);
+            $sql->bindParam(':adm_ID', $adm_ID, PDO::PARAM_INT);
+    
+            // Execute the query
+            if ($sql->execute()) {
+                return true;
+            } else {
+                throw new Exception("Erreur lors de la mise à jour des informations personnelles.");
+            }
+        } catch (PDOException $e) {
+            // Handle potential database errors
+            error_log("Database error: " . $e->getMessage());
+            throw new Exception("Erreur lors de la mise à jour des informations personnelles.");
+        }
+    }
+    public function checkCurrentPassword($currentPassword, $adm_ID) {
+        // Get the database connection
+        $connection = $this->db->getConnection();
+    
+        // Prepare the SQL query to select the password for the given adm_ID
+        $sql = "SELECT password FROM admin WHERE adm_id = :adm_ID";
+        $stmt = $connection->prepare($sql);
+    
+        // Bind the 'adm_ID' parameter to the SQL query
+        $stmt->bindParam(':adm_ID', $adm_ID, PDO::PARAM_INT);
+    
+        // Execute the query
+        $stmt->execute();
+    
+        // Fetch the admin data
+        $adm = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        // Verify the current password against the stored hash
+        if ($adm && password_verify($currentPassword, $adm['password'])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public function changePassword($currentPassword, $newPassword, $adm_ID)
+    {
+        $connection = $this->db->getConnection();
+        
+        // Vérifier le mot de passe actuel
+        if (!$this->checkCurrentPassword($currentPassword, $adm_ID)) {
+            throw new Exception("Le mot de passe actuel est incorrect.");
+        }
+    
+        // Hacher le nouveau mot de passe
+        $hashedPassword = password_hash($newPassword, PASSWORD_BCRYPT);
+    
+        // Mettre à jour le mot de passe dans la base de données
+        $sql = "UPDATE admin SET password = :newPassword WHERE adm_id = :adm_ID";
+        $stmt = $connection->prepare($sql);
+        $stmt->bindParam(':newPassword', $hashedPassword);
+        $stmt->bindParam(':adm_ID', $adm_ID); // Corrected the parameter name
+    
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            throw new Exception("Erreur lors de la mise à jour du mot de passe.");
+        }
+    }
+    public function all_users(){
+        $connection = $this->db->getConnection();
+        $users= $connection->prepare ("SELECT * FROM residant ");
+        // Execute the query
+        $users->execute();
+    
+        // Fetch all results
+        $results = $users->fetchAll(PDO::FETCH_ASSOC);
+        return $results;
+    }
+    public function searchuser($nom, $prenom) {
+        $connection = $this->db->getConnection();
+        $query = $connection->prepare("SELECT res_id FROM residant WHERE nom = :nom AND prenom = :prenom");
+    
+        // Liaison des valeurs aux paramètres
+        $query->bindParam(':nom', $nom);
+        $query->bindParam(':prenom', $prenom);
+    
+        // Exécution de la requête
+        $query->execute();
+    
+        // Récupération du résultat
+        $result = $query->fetch(PDO::FETCH_ASSOC);
+    
+        return $result; // Retourne le résultat de la recherche
+    }
+    
+    
+    // ajouter une nouvelle facture 
+    public function newfacture(facture $newfac ,$nom,$prenom) {
+        $connection = $this->db->getConnection();
+        $res_ID = $this->searchuser($nom, $prenom); // Correction de l'appel de la méthode searchuser
+    
+        // Vérification si l'utilisateur existe
+        if (!$res_ID) {
+            return false; // L'utilisateur n'existe pas, la facture ne peut pas être créée
+        }
+    
+        $query = $connection->prepare("INSERT INTO facture (fac_no, fac_date, fac_total, fac_type, fac_etat, fac_echeance, res_id) VALUES (:fac_no, :fac_date, :fac_total, :fac_type, :fac_etat, :fac_echeance, :res_id)");
+    
+        // Liaison des valeurs aux paramètres
+        $query->bindParam(':fac_no', $newfac->fac_no);
+        $query->bindParam(':fac_date', $newfac->fac_date);
+        $query->bindParam(':fac_total', $newfac->fac_total);
+        $query->bindParam(':fac_type', $newfac->fac_type);
+        $query->bindParam(':fac_etat', $newfac->fac_etat);
+        $query->bindParam(':fac_echeance', $newfac->fac_echeance);
+        $query->bindParam(':res_id', $res_ID['res_id']); // Récupération de l'ID de l'utilisateur
+    
+        // Exécution de la requête
+        if ($query->execute()) {
+            return true; // La facture a été ajoutée avec succès
+        } else {
+            return false; // Une erreur s'est produite lors de l'ajout de la facture
+        }
+    }
+    
+
+
+    
+   
     
 
 }    
