@@ -48,7 +48,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
     direction: "ascending",
   });
   const [page, setPage] = React.useState(1);
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
 
   const pages = Math.ceil(rows.length / rowsPerPage);
 
