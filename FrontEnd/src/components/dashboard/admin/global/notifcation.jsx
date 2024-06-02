@@ -51,7 +51,9 @@ export default function App() {
       <DropdownMenu
         aria-label="Custom item styles"
         disabledKeys={["profile"]}
-        className="p-3"
+        classNames={{
+          base: "bg-[#171821] dark:bg-[#171821] text-[white]",
+        }}
         itemClasses={{
           base: [
             "rounded-md",

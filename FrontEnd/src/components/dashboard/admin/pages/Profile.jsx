@@ -117,22 +117,27 @@ const Profile = () => {
                         labelPlacement="outside"
                       />
                     </div>
+                    <div className="flex flex-col items-center">
+                      <Button
+                        onPress={onOpen}
+                        label="Password"
+                        color="transparent"
+                        size="lg"
+                        className=" mb-4 max-w-md border-solid border-2 border-zinc-700 mt-6 w-full justify-start"
+                      >
+                        Changer Le Mot De Passe
+                      </Button>
+                    </div>
                     <div className="mb-4 max-w-md btn-pwd">
                       <>
-                        <Button
-                          onPress={onOpen}
-                          label="Password"
-                          color="transparent"
-                          size="lg"
-                          className="border-solid border-2 border-zinc-700 mt-6 w-full justify-start"
-                        >
-                          Changer Le Mot De Passe
-                        </Button>
                         <Modal
-                          backdrop="opaque"
+                          backdrop="blur"
                           isOpen={isOpen}
                           onOpenChange={onOpenChange}
-                          placement="top-center"
+                          placement="center"
+                          classNames={{
+                            base: "bg-[#171821] dark:bg-[#171821] text-[white]",
+                          }}
                         >
                           <ModalContent>
                             {(onClose) => (
@@ -193,12 +198,10 @@ const Profile = () => {
                   </div>
                 </CardBody>
               </Card>
-              
+
               {/*--------------- ADRESSE SECTION -------------------*/}
               <CardBody>
-                <h3 className="mt-3 ml-3 text-left mb-2">
-                  Adresse
-                </h3>
+                <h3 className="mt-3 ml-3 text-left mb-2">Adresse</h3>
               </CardBody>
             </CardBody>
           </CardBody>
