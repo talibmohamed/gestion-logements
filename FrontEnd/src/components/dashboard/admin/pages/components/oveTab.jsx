@@ -56,7 +56,7 @@ const DataTable = ({ columns, rows, title }) => {
               <Button
                 href="/dashboard/facture"
                 as={Link}
-                variant="flat"
+                variant="light"
                 color="primary"
                 size="md"
                 className="mb-4 mr-1 cMore"
