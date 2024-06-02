@@ -54,3 +54,10 @@ class Database
         }
     }
 }
+
+
+
+
+
+// index the colums to apply decotomic seach 
+// salt

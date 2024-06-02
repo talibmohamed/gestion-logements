@@ -42,7 +42,7 @@ class AdminController
                 'profession' => $data['profession'],
                 'is_ameliore' => $data['is_ameliore']
             ];
-    
+
             // Check which optional fields are provided
             $optionalFields = ['telephone'];
             foreach ($optionalFields as $field) {
@@ -50,10 +50,10 @@ class AdminController
                     $userData[$field] = $data[$field];
                 }
             }
-    
+
             // Add user and send email
             $response = $this->admin->addUserAndSendEmail($userData);
-    
+
             http_response_code(200);
             echo json_encode($response);
         } else {

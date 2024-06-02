@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import axios from "axios";
+import "../../../index.css";
 import logo from "./logo.svg";
 import sunset from "./sunset.jpeg";
 import "../style.scss";
 import { useDispatch } from "react-redux";
-import { loginSuccess } from "../../../session/authentication";
 import { useNavigate } from "react-router-dom";
-import { loginadmin } from "../../../session/services/api";
+import { loginUserThunk } from "../../../session/thunks/userthunks";
 import { Link, Button, Input } from "@nextui-org/react";
 import { EyeFilledIcon } from "../EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../EyeSlashFilledIcon";
@@ -21,34 +20,36 @@ const Login = () => {
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
+  //get the massage send in the url
+  const urlParams = new URLSearchParams(window.location.search);
+  const myParam = urlParams.get("message");
+
+  //set the massage in error 
+  if (myParam) {
+    setError(myParam);
+  }
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
-      const response = await loginuser(email, password);
-
+      const action = await dispatch(loginUserThunk({ email, password }));
+      const response = action.payload; // Extract the payload data
       if (response.status === "success") {
-        dispatch(
-          loginSuccess({
-            jwtToken: response.jwt_token,
-            nom: response.nom,
-            prenom: response.prenom,
-            role: response.role,
-          })
-        );
         navigate("/dashboard");
       } else {
         setError(response.message);
       }
     } catch (error) {
-      console.error("Error:", error);
+      setError(error.message);
     }
   };
+  
 
   return (
     <div className="bg-background min-h-screen flex items-center justify-center">
       {/* Login container */}
-      <div className="flex rounded-2xl shadow-lg max-w-7xl p-5 items-center">
+      <div className="flex rounded-2xl shadow-xl max-w-7xl p-5 items-center">
         {/* Form */}
         <div className="md:w-1/2 px-14">
           <div className="flex mb-8 items-center">
@@ -57,7 +58,7 @@ const Login = () => {
               Houselytics
             </p>
           </div>
-          <h2 className="font-[lato] font-bold text-3xl mb-3 text-center">
+          <h2 className="font-[lato] font-bold text-3xl mb-3">
             Connectez-vous à votre compte
           </h2>
           {error && <div className="error">{error}</div>}

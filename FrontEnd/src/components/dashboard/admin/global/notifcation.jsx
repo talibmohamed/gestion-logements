@@ -8,7 +8,7 @@ import {
   Button,
 } from "@nextui-org/react";
 import { useSelector } from "react-redux"; // Import useSelector hook to access Redux state
-import { notification } from "../../../../session/services/api"; // Import fetchData function
+// import { notification } from "../../../../session/services/api"; // Import fetchData function
 import { NotificationIcon } from "./NotificationIcon";
 
 export default function App() {
@@ -51,7 +51,9 @@ export default function App() {
       <DropdownMenu
         aria-label="Custom item styles"
         disabledKeys={["profile"]}
-        className="p-3"
+        classNames={{
+          base: "bg-[#171821] dark:bg-[#171821] text-[white]",
+        }}
         itemClasses={{
           base: [
             "rounded-md",
