@@ -19,6 +19,9 @@ import {
   useDisclosure,
   Autocomplete,
   AutocompleteItem,
+  Select,
+  SelectItem,
+  DateInput,
 } from "@nextui-org/react";
 import { PlusIcon } from "../Icons/PlusIcon";
 import { SearchIcon } from "../Icons/SearchIcon";
@@ -26,6 +29,7 @@ import { EditIcon } from "../Icons/EditIcon";
 import { DeleteIcon } from "../Icons/DeleteIcon";
 import { EyeIcon } from "../Icons/EyeIcon";
 import PropTypes from "prop-types";
+import { CalendarDate, parseDate } from "@internationalized/date";
 
 const INITIAL_VISIBLE_COLUMNS = [
   // "id",
@@ -45,7 +49,7 @@ const statusColorMap = {
   attente: "warning",
 };
 
-const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
+const InvoiceTable = ({ columns, rows, statusOptions, title, users }) => {
   const [filterValue, setFilterValue] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [visibleColumns, setVisibleColumns] = React.useState(
@@ -167,7 +171,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
-        {title && <h2 className=" table-title">{title}</h2>}
+        {title && <h2 className="table-title">{title}</h2>}
         <div className="flex justify-between gap-3 items-end">
           <Input
             isClearable
@@ -188,7 +192,9 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
               >
                 Ajout
               </Button>
-              <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+              <Modal 
+              size="lg"
+              isOpen={isOpen} onOpenChange={onOpenChange}>
                 <ModalContent>
                   {(onClose) => (
                     <>
@@ -196,19 +202,73 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                         Ajouter Une Facture
                       </ModalHeader>
                       <ModalBody>
-                        {/* ------------ Fetching the residant ---------------- */}
-                        <Autocomplete
-                          defaultItems={rows}
-                          label="Residant"
-                          placeholder="Chercher un residant"
-                          className="max-w-xs"
-                        >
-                          {(user) => (
-                            <AutocompleteItem key={user.id}>
-                              {user.nom}
-                            </AutocompleteItem>
-                          )}
-                        </Autocomplete>
+                        <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                          <Autocomplete
+                            defaultItems={rows}
+                            label="Résidant"
+                            placeholder="Chercher un résidant"
+                            className="max-w-xs"
+                          >
+                            {(user) => (
+                              <AutocompleteItem key={user.id}>
+                                {user.nom}
+                              </AutocompleteItem>
+                            )}
+                          </Autocomplete>
+
+                          <Select
+                            label="Type de Facture"
+                            placeholder="Choisir le type de facture"
+                            className="max-w-xs"
+                          >
+                            <SelectItem key="eau" value="eau">
+                              Eau
+                            </SelectItem>
+                            <SelectItem key="electricite" value="electricite">
+                              Electricite
+                            </SelectItem>
+                          </Select>
+                        </div>
+
+                        <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                          <Input
+                            type="price"
+                            label="Montant TTC"
+                            placeholder="Entrer le montant TTC"
+                            startContent={
+                              <div className="pointer-events-none flex items-center">
+                                <span className="text-default-400 text-small">
+                                  $
+                                </span>
+                              </div>
+                            }
+                          />
+
+                          <Select
+                            isDisabled
+                            label="Status"
+                            defaultSelectedKeys={["Attente"]}
+                            className="max-w-xs"
+                            color="warning"
+                          >
+                            <SelectItem key="Attente" value="attente">
+                              Attente
+                            </SelectItem>
+                          </Select>
+                        </div>
+
+                        <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                          <DateInput
+                            label="Mois de consommation "
+                            defaultValue={parseDate("2024-04-04")}
+                            placeholderValue={new CalendarDate(1995, 11, 6)}
+                          />
+                          <DateInput
+                            label="Echeance"
+                            defaultValue={parseDate("2024-04-04")}
+                            placeholderValue={new CalendarDate(1995, 11, 6)}
+                          />
+                        </div>
                       </ModalBody>
                       <ModalFooter>
                         <Button
