@@ -1,0 +1,13 @@
+<?php 
+class logement{
+    public  $log_id;
+    public $type_log;
+    public $is_ameliore;
+    public $desc;
+    public $mc;
+    public $piece;
+    public $equip_id;
+    public $is_vacant;
+
+
+}
