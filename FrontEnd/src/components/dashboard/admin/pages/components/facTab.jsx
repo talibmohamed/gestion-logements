@@ -11,6 +11,14 @@ import {
   Chip,
   Pagination,
   Tooltip,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+  Autocomplete,
+  AutocompleteItem,
 } from "@nextui-org/react";
 import { PlusIcon } from "../Icons/PlusIcon";
 import { SearchIcon } from "../Icons/SearchIcon";
@@ -20,7 +28,7 @@ import { EyeIcon } from "../Icons/EyeIcon";
 import PropTypes from "prop-types";
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id",
+  // "id",
   "id_res",
   "nom",
   "type",
@@ -61,6 +69,8 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
       Array.from(visibleColumns).includes(column.uid)
     );
   }, [visibleColumns]);
+
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const filteredItems = React.useMemo(() => {
     let filteredUsers = [...rows];
@@ -169,18 +179,59 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
             onValueChange={onSearchChange}
           />
           <div className="flex gap-3">
-            <Button
-              className="bg-foreground text-background"
-              endContent={<PlusIcon />}
-              size="sm"
-            >
-              Add New
-            </Button>
+            <>
+              <Button
+                onPress={onOpen}
+                className="bg-foreground text-background"
+                endContent={<PlusIcon />}
+                size="sm"
+              >
+                Ajout
+              </Button>
+              <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+                <ModalContent>
+                  {(onClose) => (
+                    <>
+                      <ModalHeader className="flex flex-col gap-1">
+                        Ajouter Une Facture
+                      </ModalHeader>
+                      <ModalBody>
+                        {/* ------------ Fetching the residant ---------------- */}
+                        <Autocomplete
+                          defaultItems={rows}
+                          label="Residant"
+                          placeholder="Chercher un residant"
+                          className="max-w-xs"
+                        >
+                          {(user) => (
+                            <AutocompleteItem key={user.id}>
+                              {user.nom}
+                            </AutocompleteItem>
+                          )}
+                        </Autocomplete>
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button
+                          color="danger"
+                          variant="light"
+                          onPress={onClose}
+                        >
+                          Close
+                        </Button>
+                        <Button color="primary" onPress={onClose}>
+                          Enregistrer
+                        </Button>
+                      </ModalFooter>
+                    </>
+                  )}
+                </ModalContent>
+              </Modal>
+            </>
           </div>
         </div>
       </div>
     );
-  }, [filterValue, onSearchChange]);
+  }, [filterValue, onSearchChange, onOpen, isOpen, onOpenChange, title, rows]);
 
   const bottomContent = React.useMemo(() => {
     return (

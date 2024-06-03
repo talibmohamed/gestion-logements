@@ -7,17 +7,22 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-  Checkbox,
-  Link,
 } from "@nextui-org/react";
 import profData from "./components/profData";
 import "./Overview.scss";
+import { EyeFilledIcon } from "./Icons/EyeFilledIcon";
+import { EyeSlashFilledIcon } from "./Icons/EyeSlashFilledIcon";
 
 const Profile = () => {
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isVisibleNew, setIsVisibleNew] = useState(false);
+  const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
+  
+  const toggleVisibilityNew = () => setIsVisibleNew(!isVisibleNew);
+  const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
 
   const handleChangePassword = () => {
     if (newPassword !== confirmPassword) {
@@ -136,7 +141,7 @@ const Profile = () => {
                           onOpenChange={onOpenChange}
                           placement="center"
                           classNames={{
-                            base: "bg-[#171821] dark:bg-[#171821] text-[white]",
+                            base: "bg-[#171821] dark:bg-[#171821] text-[white] ",
                           }}
                         >
                           <ModalContent>
@@ -145,25 +150,53 @@ const Profile = () => {
                                 <ModalHeader className="flex flex-col gap-1">
                                   Changer Votre Mot De Passe
                                 </ModalHeader>
-                                <ModalBody>
+                                <ModalBody className="modal-body-custom">
                                   <Input
                                     autoFocus
                                     label="Nouveau Mot De Passe"
-                                    type="password"
+                                    // type="Password"
                                     variant="bordered"
                                     value={newPassword}
                                     onChange={(e) =>
                                       setNewPassword(e.target.value)
                                     }
+                                    endContent={
+                                      <button
+                                        className="visibility-toggle"
+                                        type="button"
+                                        onClick={toggleVisibilityNew}
+                                      >
+                                        {isVisibleNew ? (
+                                          <EyeSlashFilledIcon className="icon" />
+                                        ) : (
+                                          <EyeFilledIcon className="icon" />
+                                        )}
+                                      </button>
+                                    }
+                                    type={isVisibleNew ? "text" : "password"}
                                   />
                                   <Input
                                     label="Confirmer Votre Mot de Passe"
-                                    type="password"
+                                    // type="Password"
                                     variant="bordered"
                                     value={confirmPassword}
                                     onChange={(e) =>
                                       setConfirmPassword(e.target.value)
                                     }
+                                    endContent={
+                                      <button
+                                        className="visibility-toggle"
+                                        type="button"
+                                        onClick={toggleVisibilityConfirm}
+                                      >
+                                        {isVisibleConfirm ? (
+                                          <EyeSlashFilledIcon className="icon" />
+                                        ) : (
+                                          <EyeFilledIcon className="icon" />
+                                        )}
+                                      </button>
+                                    }
+                                    type={isVisibleConfirm ? "text" : "password"}
                                   />
                                   <p className="text-base text-justify font-normal mt-3">
                                     Le mot de passe doit se composer d'au moins
