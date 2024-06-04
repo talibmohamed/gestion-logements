@@ -52,7 +52,7 @@ const Facture = () => {
               variant="bordered"
               labelPlacement="outside"
               placeholder="Enter your description"
-              className="max-w-5xl "
+              className="max-w-5xl mb-4 "
             />
           </div>
         </CardBody>
