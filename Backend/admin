@@ -199,7 +199,7 @@ class admin
         $results = $users->fetchAll(PDO::FETCH_ASSOC);
         return $results;
     }
-    public function searchuser($nom, $prenom) {
+    public function searchUser($nom, $prenom) {
         $connection = $this->db->getConnection();
         $query = $connection->prepare("SELECT res_id FROM residant WHERE nom = :nom AND prenom = :prenom");
     
@@ -245,11 +245,82 @@ class admin
             return false; // Une erreur s'est produite lors de l'ajout de la facture
         }
     }
+    public function update_user(residant $user){
+        $connection = $this->db->getConnection();
+        $query=$connection->prepare("UPDATE admin SET nom =:nom ,prenom =:prnom ,email =:email ,cin =:cin ,telephone = :telephone,proffession =:profession WHERE res_id = :res_ID");
+        $query->bindParam(':nom', $user->nom);
+        $query->bindParam(':prenom', $user->prenom);
+        $query->bindParam(':email', $user->email);
+        $query->bindParam(':cin', $user->cin);
+        $query->bindParam(':telephone', $user->telephone);
+        $query->bindParam(':profession', $user->profession);
+         // Exécution de la requête
+         if ($query->execute()) {
+            return true; // les informations du residant mis ajours avec succes
+        } else {
+            return false; // Une erreur s'est produite lors de la mis ajours des informations 
+        }
+    }
+    public function supprimer_residant($user_id) {
+        // Connexion à la base de données
+        $connection = $this->db->getConnection();
+        
+        // Préparation de la requête de suppression
+        $query = $connection->prepare("DELETE FROM users WHERE user_id = :user_id");
+        
+        // Liaison du paramètre
+        $query->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+        
+        // Exécution de la requête
+        if ($query->execute()) {
+            return true; // Utilisateur supprimé avec succès
+        } else {
+            return false; // Une erreur s'est produite lors de la suppression de l'utilisateur
+        }
+    }
+    //l'admin peut mis ajours l'atat dune reclamation non annulé 
+    public function update_rec($rec_ID, $new_status) {
+        try {
+            $connection = $this->db->getConnection();
     
+            // Préparer et exécuter la requête pour obtenir l'état de la réclamation
+            $etat = $connection->prepare("SELECT rec_etat FROM reclamation WHERE rec_id = :rec_ID");
+            $etat->bindParam(':rec_ID', $rec_ID, PDO::PARAM_INT);
+            $etat->execute();
+    
+            // Récupérer le résultat
+            $result = $etat->fetch(PDO::FETCH_ASSOC);
+    
+            // Vérifier si la réclamation est résolue ou annulée
+            if ($result && ($result['rec_etat'] == 'resolu' || $result['rec_etat'] == 'annulé')) {
+                return false;
+            } else {
+                // Préparer et exécuter la requête pour mettre à jour l'état de la réclamation
+                $sql = $connection->prepare("UPDATE reclamation SET rec_etat = :new_status WHERE rec_id = :rec_ID");
+                $sql->bindParam(':rec_ID', $rec_ID, PDO::PARAM_INT);
+                $sql->bindParam(':new_status', $new_status);
+                $sql->execute();
+                return true;
+            }
+        } catch (PDOException $e) {
+            // Gérer les exceptions en cas d'erreur
+            echo "Erreur : " . $e->getMessage();
+            return false;
+        } finally {
+            // Fermer la connexion à la base de données
+            $connection = null;
+        }
+    }
+    //statistics reclamation 
+   
+
+
+
+
+    }
+                                                                                                                 
 
 
     
    
     
-
-}    

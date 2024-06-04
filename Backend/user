@@ -202,6 +202,48 @@ class residant
         // Return the fetched results
         return $results;
     }
+    public function reclamer(reclamation $reclamation){
+        $connection = $this->db->getConnection();
+        $query = $connection->prepare("INSERT INTO reclamation (rec_desc, rec_etat, rec_date, rec_response, res_id, log_id, message) VALUES (:rec_desc, :rec_etat, :rec_date, :rec_response, :res_id, :log_id, :message)");
+        
+        $query->bindParam(':rec_desc', $reclamation->rec_desc);
+        $query->bindParam(':rec_etat', $reclamation->rec_etat);
+        $query->bindParam(':rec_date', $reclamation->rec_date);
+        $query->bindParam(':rec_response', $reclamation->rec_response);
+        $query->bindParam(':res_id', $reclamation->res_ID);
+        $query->bindParam(':log_id', $reclamation->log_ID);
+        $query->bindParam(':message', $reclamation->message);
+        
+        if ($query->execute()) {
+            return true; // succes
+        } else {
+            return false; // Une erreur s'est produite 
+        }
+    }
+    //les residant peut just ajouter une reclamation ou l'annuller
+    public function annuller_rec($rec_ID) {
+        $connection = $this->db->getConnection();
+        
+        // Préparer et exécuter la requête pour obtenir l'état de la réclamation
+        $etat = $connection->prepare("SELECT rec_etat FROM reclamation WHERE rec_id = :rec_ID");
+        $etat->bindParam(':rec_ID', $rec_ID, PDO::PARAM_INT);
+        $etat->execute();
+        
+        // Récupérer le résultat
+        $result = $etat->fetch(PDO::FETCH_ASSOC);
+        
+        // Vérifier si la réclamation est résolue
+        if ($result && $result['rec_etat'] == 'resolu') {
+            return false;
+        } else {
+            // Préparer et exécuter la requête pour mettre à jour l'état de la réclamation
+            $sql = $connection->prepare("UPDATE reclamation SET rec_etat = 'annulé' WHERE rec_id = :rec_ID");
+            $sql->bindParam(':rec_ID', $rec_ID, PDO::PARAM_INT);
+            $sql->execute();
+            return true;
+        }
+    }
+    
     
 
     

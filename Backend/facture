@@ -1,0 +1,12 @@
+<?php
+class Facture {
+    public $fac_ID;
+    public $fac_no;
+    public $fac_date;
+    public $fac_total;
+    public $fac_type ;
+    public $fac_etat;
+    public $fac_echeance;
+    public $res_ID;
+
+}
