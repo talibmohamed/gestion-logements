@@ -12,7 +12,6 @@ import {
   Pagination,
   Tooltip,
 } from "@nextui-org/react";
-import { PlusIcon } from "../Icons/PlusIcon";
 import { SearchIcon } from "../Icons/SearchIcon";
 import { EditIcon } from "../Icons/EditIcon";
 import { DeleteIcon } from "../Icons/DeleteIcon";
@@ -144,7 +143,7 @@ const LogTable = ({ columns, rows, title }) => {
           <div className="flex gap-3">
             <Button
               className="bg-foreground text-background"
-              endContent={<PlusIcon />}
+
               size="sm"
             >
               Ajouter
