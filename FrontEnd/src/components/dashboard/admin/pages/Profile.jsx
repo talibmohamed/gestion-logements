@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Card, CardBody, Input, Button } from "@nextui-org/react";
+import React, { useState, useEffect } from "react";
+import { Card, CardBody, Input, Button, Checkbox } from "@nextui-org/react";
 import {
   Modal,
   ModalContent,
@@ -20,19 +20,49 @@ const Profile = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isVisibleNew, setIsVisibleNew] = useState(false);
   const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
-  
+
+  const [hasUpperCase, setHasUpperCase] = useState(false);
+  const [hasNumber, setHasNumber] = useState(false);
+  const [hasSpecialChar, setHasSpecialChar] = useState(false);
+  const [hasMinLength, setHasMinLength] = useState(false);
+
   const toggleVisibilityNew = () => setIsVisibleNew(!isVisibleNew);
   const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
+
+  useEffect(() => {
+    validatePassword(newPassword);
+  }, [newPassword]);
+
+  const validatePassword = (password) => {
+    const upperCase = /[A-Z]/.test(password);
+    const number = /[0-9]/.test(password);
+    const specialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const minLength = password.length >= 12;
+
+    setHasUpperCase(upperCase);
+    setHasNumber(number);
+    setHasSpecialChar(specialChar);
+    setHasMinLength(minLength);
+
+    return upperCase && number && specialChar && minLength;
+  };
+
+  //chech the password confirmation while typing it
+  const validateConfirmation = (confirmationPassword) => {
+    if (confirmationPassword !== newPassword) {
+      setErrorMessage("Les mots de passe ne correspondent pas.");
+    } else {
+      setErrorMessage("");
+    }
+  };
 
   const handleChangePassword = () => {
     if (newPassword !== confirmPassword) {
       setErrorMessage("Les nouveaux mots de passe ne correspondent pas.");
       return;
     }
-    if (newPassword.length < 6) {
-      setErrorMessage(
-        "Le nouveau mot de passe doit comporter au moins 6 caractères."
-      );
+    if (!validatePassword(newPassword)) {
+      setErrorMessage("Le nouveau mot de passe ne répond pas aux critères.");
       return;
     }
 
@@ -154,7 +184,6 @@ const Profile = () => {
                                   <Input
                                     autoFocus
                                     label="Nouveau Mot De Passe"
-                                    // type="Password"
                                     variant="bordered"
                                     value={newPassword}
                                     onChange={(e) =>
@@ -177,12 +206,12 @@ const Profile = () => {
                                   />
                                   <Input
                                     label="Confirmer Votre Mot de Passe"
-                                    // type="Password"
                                     variant="bordered"
                                     value={confirmPassword}
-                                    onChange={(e) =>
-                                      setConfirmPassword(e.target.value)
-                                    }
+                                    onChange={(e) => {
+                                      setConfirmPassword(e.target.value);
+                                      validateConfirmation(e.target.value);
+                                    }}
                                     endContent={
                                       <button
                                         className="visibility-toggle"
@@ -196,16 +225,60 @@ const Profile = () => {
                                         )}
                                       </button>
                                     }
-                                    type={isVisibleConfirm ? "text" : "password"}
+                                    type={
+                                      isVisibleConfirm ? "text" : "password"
+                                    }
                                   />
+                                  <div className="password-requirements">
+                                    <label className="flex items-center mb-2">
+                                      <Checkbox
+                                        isSelected={hasUpperCase}
+                                        isReadOnly
+                                      />
+                                      <span className="mr-2">
+                                        1 Lettre majuscule
+                                      </span>
+                                    </label>
+                                    <label className="flex items-center mb-2">
+                                      <Checkbox
+                                        isSelected={hasNumber}
+                                        isReadOnly
+                                      />
+                                      <span className="mr-2">1 Nombre</span>
+                                    </label>
+                                    <label className="flex items-center mb-2">
+                                      <Checkbox
+                                        isSelected={hasSpecialChar}
+                                        isReadOnly
+                                      />
+                                      <span className="mr-2">
+                                        Au moins 1 caractère spécial
+                                      </span>
+                                    </label>
+                                    <label className="flex items-center mb-2">
+                                      <Checkbox
+                                        isSelected={hasMinLength}
+                                        isReadOnly
+                                      />
+                                      <span className="mr-2">
+                                        Au moins 12 caractères
+                                      </span>
+                                    </label>
+                                  </div>
+
                                   <p className="text-base text-justify font-normal mt-3">
                                     Le mot de passe doit se composer d'au moins
-                                    6 charactères.
+                                    12 charactères.
                                     <br />
                                     Votre nouveau mot de passe ne doit pas être
                                     similaire a vos derniers mot de passes
                                     utilisés.
                                   </p>
+                                  {errorMessage && (
+                                    <p className="text-red-500">
+                                      {errorMessage}
+                                    </p>
+                                  )}
                                 </ModalBody>
                                 <ModalFooter>
                                   <Button
@@ -217,7 +290,10 @@ const Profile = () => {
                                   </Button>
                                   <Button
                                     className="bg-blue-500 text-zinc-50"
-                                    onPress={onClose}
+                                    onPress={() => {
+                                      handleChangePassword();
+                                      // onClose(); it sshoudnt close the module cuz we need to see it the is any errors or the password changer
+                                    }}
                                   >
                                     Enregistrer
                                   </Button>
