@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Card, CardBody, Input, Button, Checkbox } from "@nextui-org/react";
 import {
   Modal,
@@ -8,15 +9,17 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
-import profData from "./components/profData";
-import "./Overview.scss";
+import { changePasswordThunk } from "../../../../session/thunks/adminthunk";
+import { fetchAdminProfileThunk } from "../../../../session/thunks/adminthunk";
 import { EyeFilledIcon } from "./Icons/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "./Icons/EyeSlashFilledIcon";
+import "./Overview.scss";
 
 const Profile = () => {
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const dispatch = useDispatch();
+
+  const [password, setpassword] = useState("");
+  const [confirmPassword, setconfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [isVisibleNew, setIsVisibleNew] = useState(false);
   const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
@@ -30,8 +33,8 @@ const Profile = () => {
   const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
 
   useEffect(() => {
-    validatePassword(newPassword);
-  }, [newPassword]);
+    validatePassword(password);
+  }, [password]);
 
   const validatePassword = (password) => {
     const upperCase = /[A-Z]/.test(password);
@@ -47,9 +50,8 @@ const Profile = () => {
     return upperCase && number && specialChar && minLength;
   };
 
-  //chech the password confirmation while typing it
   const validateConfirmation = (confirmationPassword) => {
-    if (confirmationPassword !== newPassword) {
+    if (confirmationPassword !== password) {
       setErrorMessage("Les mots de passe ne correspondent pas.");
     } else {
       setErrorMessage("");
@@ -57,20 +59,39 @@ const Profile = () => {
   };
 
   const handleChangePassword = () => {
-    if (newPassword !== confirmPassword) {
+    if (password !== confirmPassword) {
       setErrorMessage("Les nouveaux mots de passe ne correspondent pas.");
       return;
     }
-    if (!validatePassword(newPassword)) {
+    if (!validatePassword(password)) {
       setErrorMessage("Le nouveau mot de passe ne répond pas aux critères.");
       return;
     }
 
-    console.log("Mot de passe changé avec succès!");
-    setErrorMessage("");
+    // Call the API function to change the password
+    dispatch(changePasswordThunk({ password, confirmedPassword }));
+    const response = action.payload;
+    console.log(response);
+
+    setError(response.message);
   };
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  //calling the api profile
+  useEffect(() => {
+    dispatch(fetchAdminProfileThunk());
+  }, [dispatch]);
+
+  console.log("1111");
+  const profData = useSelector((state) => state.admin); // Adjust based on your state shape
+
+  console.log(profData);
+  console.log("1111");
+
+  if (!profData || !profData.nom) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="container mx-auto">
@@ -82,8 +103,6 @@ const Profile = () => {
         >
           <CardBody>
             <h2 className="mt-3 ml-3 text-left">Profile</h2>
-
-            {/*------------  INFO SECTION ------------- */}
 
             <CardBody>
               <h3 className="mt-3 ml-3 text-left mb-2">
@@ -146,7 +165,7 @@ const Profile = () => {
                         type="text"
                         label="Date d'ajout"
                         variant="bordered"
-                        defaultValue={profData.dateAjout}
+                        defaultValue={profData.date_creation}
                         className="mb-4 max-w-md"
                         size="lg"
                         labelPlacement="outside"
@@ -171,7 +190,7 @@ const Profile = () => {
                           onOpenChange={onOpenChange}
                           placement="center"
                           classNames={{
-                            base: "bg-[#171821] dark:bg-[#171821] text-[white] ",
+                            base: "bg-[#171821] dark:bg-[#171821] text-[white]",
                           }}
                         >
                           <ModalContent>
@@ -185,9 +204,10 @@ const Profile = () => {
                                     autoFocus
                                     label="Nouveau Mot De Passe"
                                     variant="bordered"
-                                    value={newPassword}
+                                    value={password}
                                     onChange={(e) =>
-                                      setNewPassword(e.target.value)
+                                      setpassword(e.target.value)
+                                    
                                     }
                                     endContent={
                                       <button
@@ -209,7 +229,7 @@ const Profile = () => {
                                     variant="bordered"
                                     value={confirmPassword}
                                     onChange={(e) => {
-                                      setConfirmPassword(e.target.value);
+                                      setconfirmPassword(e.target.value);
                                       validateConfirmation(e.target.value);
                                     }}
                                     endContent={
@@ -292,7 +312,6 @@ const Profile = () => {
                                     className="bg-blue-500 text-zinc-50"
                                     onPress={() => {
                                       handleChangePassword();
-                                      // onClose(); it sshoudnt close the module cuz we need to see it the is any errors or the password changer
                                     }}
                                   >
                                     Enregistrer
@@ -308,7 +327,6 @@ const Profile = () => {
                 </CardBody>
               </Card>
 
-              {/*--------------- ADRESSE SECTION -------------------*/}
               <CardBody>
                 <h3 className="mt-3 ml-3 text-left mb-2">Adresse</h3>
               </CardBody>

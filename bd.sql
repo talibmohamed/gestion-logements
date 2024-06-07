@@ -20,6 +20,7 @@ CREATE TABLE admin (
     nom           VARCHAR(40),
     prenom        VARCHAR(40),
     email         VARCHAR(250) UNIQUE,
+    telephone     VARCHAR(15),
     password      VARCHAR(250),
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

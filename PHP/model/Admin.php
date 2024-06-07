@@ -5,6 +5,55 @@ require_once 'send_email.php';
 
 class admin
 {
+
+    private $nom;
+    private $prenom;
+    private $email;
+    private $password;
+    private $date_creation;
+
+    //setters and getters
+    public function getNom()
+    {
+        return $this->nom;
+    }
+    public function setNom($nom)
+    {
+        $this->nom = $nom;
+    }
+    public function getPrenom()
+    {
+        return $this->prenom;
+    }
+    public function setPrenom($prenom)
+    {
+        $this->prenom = $prenom;
+    }
+    public function getEmail()
+    {
+        return $this->email;
+    }
+    public function setEmail($email)
+    {
+        $this->email = $email;
+    }
+    public function getPassword()
+    {
+        return $this->password;
+    }
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+    public function getDate_creation()
+    {
+        return $this->date_creation;
+    }
+    public function setDate_creation($date_creation)
+    {
+        $this->date_creation = $date_creation;
+    }
+
     private $db;
 
     public function __construct(Database $db)
@@ -47,6 +96,76 @@ class admin
             }
         } catch (PDOException $e) {
             // Return error response if an exception occurs
+            return array('status' => 'error', 'message' => $e->getMessage());
+        }
+    }
+
+    // API endpoint function to handle admin profile
+    public function profile($jwt)
+    {
+        try {
+            $jwtHandler = new JwtHandler();
+            $token_info = $jwtHandler->verifyJwtToken($jwt);
+
+            if ($token_info['valid']) {
+                $connection = $this->db->getConnection();
+                $sql = $connection->prepare('SELECT nom, prenom, email,telephone, date_creation FROM admin WHERE adm_id = ?');
+                $sql->execute([$token_info['data']['id']]);
+                $admin = $sql->fetch(PDO::FETCH_ASSOC);
+
+                if ($admin) {
+                    return array(
+                        'status' => 'success',
+                        'admin' => $admin
+                    );
+                } else {
+                    return array('status' => 'error', 'message' => 'Admin not found');
+                }
+            } else {
+                return array('status' => 'error', 'message' => 'Invalid token');
+            }
+        } catch (PDOException $e) {
+            return array('status' => 'error', 'message' => $e->getMessage());
+        }
+    }
+
+    // API endpoint function to handle admin changing password
+    public function changePassword($jwt, $password, $confirmedPassword)
+    {
+        try {
+            $jwtHandler = new JwtHandler();
+            $token_info = $jwtHandler->verifyJwtToken($jwt);
+
+            if ($token_info['valid']) {
+                $connection = $this->db->getConnection();
+                $sql = $connection->prepare('SELECT password FROM admin WHERE adm_id = ?');
+                $sql->execute([$token_info['data']['id']]);
+                $admin = $sql->fetch(PDO::FETCH_ASSOC);
+
+                if ($admin) {
+                    if ($password !== $confirmedPassword) {
+                        return array('status' => 'error', 'message' => 'Passwords do not match');
+                    }
+
+                    
+                    if (password_verify($password, $admin['password'])) {
+                        return array('status' => 'error', 'message' => 'New password cannot be the same as the old password');
+                    }
+
+
+                    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                    $updateQuery = "UPDATE admin SET password = ? WHERE adm_id = ?";
+                    $stmt = $connection->prepare($updateQuery);
+                    $stmt->execute([$hashedPassword, $token_info['data']['id']]);
+
+                    return array('status' => 'success', 'message' => 'Password changed successfully');
+                } else {
+                    return array('status' => 'error', 'message' => 'Admin not found');
+                }
+            } else {
+                return array('status' => 'error', 'message' => 'Invalid token');
+            }
+        } catch (PDOException $e) {
             return array('status' => 'error', 'message' => $e->getMessage());
         }
     }
