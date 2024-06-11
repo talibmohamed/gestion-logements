@@ -7,7 +7,7 @@ import Graph from "./components/graph";
 import "./Statics.scss";
 import { Card, CardBody, Textarea, Input } from "@nextui-org/react";
 
-import { columns, users} from "./components/statsData";
+import { columns, users } from "./components/statsData";
 
 // const data1 = [
 //   { id: "total-payé", label: "Total Payé", value: 42, color: "#96A7FF" },
@@ -26,8 +26,8 @@ import { columns, users} from "./components/statsData";
 // ];
 
 const sampleData = [
-  { label: 'vacant', data: [12, 6, 20, 4, 20,1], color: "#96A7FF" },
-  { label: 'non-vacant', data: [10, 2, 8, 16, 0,4], color:"#f9769d"}
+  { label: "vacant", data: [12, 6, 20, 4, 20, 1], color: "#96A7FF" },
+  { label: "non-vacant", data: [10, 2, 8, 16, 0, 4], color: "#f9769d" },
 ];
 
 const Statistics = () => {
@@ -48,48 +48,18 @@ const Statistics = () => {
 
   return (
     <div className="container mx-auto">
-      {/* {isMobile ? (
-        <Carousel showArrows={false} showStatus={false} showThumbs={false}>
-          <div className="carousel-item-wrapper">
-            <PieChartCard title="Statistique Des Factures" data={data1} />
-          </div>
-          <div className="carousel-item-wrapper">
-            <PieChartCard title="Statistique Des Logements" data={data2} />
-          </div>
-        </Carousel>
-      ) : (
-        <div className="flex flex-wrap justify-around">
-          <div className="w-full md:w-1/2 p-2">
-            <PieChartCard title="Statistique Des Factures" data={data1} />
-          </div>
-          <div className="w-full md:w-1/2 p-2">
-            <PieChartCard title="Statistique Des Logements" data={data2} />
-          </div>
-        </div>
-      )} */}
-
-
-
-      
       <div className=" w-full ">
+        <Card
+          isBlurred
+          className="border-none bg-background/15 white:bg-default-100/50 card-wrapper custom-card-wrapper w-full over"
+          shadow="sm"
+        >
+          <CardBody>
+            <LogTable columns={columns} rows={users} title="Factures " />
+          </CardBody>
+        </Card>
 
-
-      <Card
-        isBlurred
-        className="border-none bg-background/15 white:bg-default-100/50 card-wrapper custom-card-wrapper w-full over"
-        shadow="sm"
-      >
-        <CardBody>
-          <LogTable
-            columns={columns}
-            rows={users}
-            title="Factures "
-          />
-        </CardBody>
-      </Card>
-
-
-        <Graph title="Graphe lineaire des logements" data={sampleData}/>
+        <Graph title="Graphe lineaire des logements" data={sampleData} />
       </div>
     </div>
   );

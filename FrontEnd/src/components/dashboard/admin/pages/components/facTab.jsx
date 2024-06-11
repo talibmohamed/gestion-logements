@@ -304,7 +304,6 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                       <ModalFooter>
                         <Button
                           color="danger"
-                          variant="light"
                           onPress={onClose}
                         >
                           Close
