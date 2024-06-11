@@ -1,5 +1,7 @@
-import React, { useState } from "react";
-import { Card, CardBody, Input, Button } from "@nextui-org/react";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Card, CardBody, Input, Button, Checkbox } from "@nextui-org/react";
+import Alert from "@mui/material/Alert";
 import {
   Modal,
   ModalContent,
@@ -8,39 +10,105 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
-import profData from "./components/profData";
-import "./Overview.scss";
+import { changePasswordThunk } from "../../../../session/thunks/adminthunk";
+import { fetchAdminProfileThunk } from "../../../../session/thunks/adminthunk";
 import { EyeFilledIcon } from "./Icons/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "./Icons/EyeSlashFilledIcon";
+import "./Overview.scss";
 
 const Profile = () => {
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const dispatch = useDispatch();
+
+  const [password, setpassword] = useState("");
+  const [confirmedPassword, setconfirmedPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [success, setsuccess] = useState("");
   const [isVisibleNew, setIsVisibleNew] = useState(false);
   const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
-  
+
+  const [hasUpperCase, setHasUpperCase] = useState(false);
+  const [hasNumber, setHasNumber] = useState(false);
+  const [hasSpecialChar, setHasSpecialChar] = useState(false);
+  const [hasMinLength, setHasMinLength] = useState(false);
+
   const toggleVisibilityNew = () => setIsVisibleNew(!isVisibleNew);
   const toggleVisibilityConfirm = () => setIsVisibleConfirm(!isVisibleConfirm);
 
-  const handleChangePassword = () => {
-    if (newPassword !== confirmPassword) {
+  useEffect(() => {
+    validatePassword(password);
+  }, [password]);
+
+  const validatePassword = (password) => {
+    const upperCase = /[A-Z]/.test(password);
+    const number = /[0-9]/.test(password);
+    const specialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const minLength = password.length >= 12;
+
+    setHasUpperCase(upperCase);
+    setHasNumber(number);
+    setHasSpecialChar(specialChar);
+    setHasMinLength(minLength);
+
+    return upperCase && number && specialChar && minLength;
+  };
+
+  const validateConfirmation = (confirmationPassword) => {
+    if (confirmationPassword !== password) {
+      setErrorMessage("Les mots de passe ne correspondent pas.");
+    } else {
+      setErrorMessage("");
+    }
+  };
+
+  const handleChangePassword = async () => {
+    if (password !== confirmedPassword) {
       setErrorMessage("Les nouveaux mots de passe ne correspondent pas.");
       return;
+    }else{
+      setErrorMessage("");
     }
-    if (newPassword.length < 6) {
-      setErrorMessage(
-        "Le nouveau mot de passe doit comporter au moins 6 caractères."
-      );
+    if (!validatePassword(password)) {
+      setErrorMessage("Le nouveau mot de passe ne répond pas aux critères.");
       return;
     }
 
-    console.log("Mot de passe changé avec succès!");
-    setErrorMessage("");
+    try {
+      // Call the API function to change the password
+      const response = await dispatch(
+        changePasswordThunk({ password, confirmedPassword })
+      ).unwrap();
+
+      if (response.status === "success") {
+        setsuccess("Mot de passe changé avec succès.");
+      } else {
+        setErrorMessage(response.message);
+      }
+
+      console.log(response.message);
+    } catch (error) {
+      console.error("Error changing password:", error);
+      setErrorMessage(
+        "Une erreur s'est produite lors du changement de mot de passe."
+      );
+    }
   };
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  //calling the api profile
+  useEffect(() => {
+    dispatch(fetchAdminProfileThunk());
+  }, [dispatch]);
+
+  console.log("1111");
+  const profData = useSelector((state) => state.admin);
+
+  console.log(profData);
+  console.log("1111");
+
+  if (!profData || !profData.nom) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="container mx-auto">
@@ -52,8 +120,6 @@ const Profile = () => {
         >
           <CardBody>
             <h2 className="mt-3 ml-3 text-left">Profile</h2>
-
-            {/*------------  INFO SECTION ------------- */}
 
             <CardBody>
               <h3 className="mt-3 ml-3 text-left mb-2">
@@ -116,7 +182,7 @@ const Profile = () => {
                         type="text"
                         label="Date d'ajout"
                         variant="bordered"
-                        defaultValue={profData.dateAjout}
+                        defaultValue={profData.date_creation}
                         className="mb-4 max-w-md"
                         size="lg"
                         labelPlacement="outside"
@@ -140,9 +206,6 @@ const Profile = () => {
                           isOpen={isOpen}
                           onOpenChange={onOpenChange}
                           placement="center"
-                          classNames={{
-                            base: "bg-[#171821] dark:bg-[#171821] text-[white] ",
-                          }}
                         >
                           <ModalContent>
                             {(onClose) => (
@@ -154,11 +217,10 @@ const Profile = () => {
                                   <Input
                                     autoFocus
                                     label="Nouveau Mot De Passe"
-                                    // type="Password"
                                     variant="bordered"
-                                    value={newPassword}
+                                    value={password}
                                     onChange={(e) =>
-                                      setNewPassword(e.target.value)
+                                      setpassword(e.target.value)
                                     }
                                     endContent={
                                       <button
@@ -177,12 +239,12 @@ const Profile = () => {
                                   />
                                   <Input
                                     label="Confirmer Votre Mot de Passe"
-                                    // type="Password"
                                     variant="bordered"
-                                    value={confirmPassword}
-                                    onChange={(e) =>
-                                      setConfirmPassword(e.target.value)
-                                    }
+                                    value={confirmedPassword}
+                                    onChange={(e) => {
+                                      setconfirmedPassword(e.target.value);
+                                      validateConfirmation(e.target.value);
+                                    }}
                                     endContent={
                                       <button
                                         className="visibility-toggle"
@@ -196,16 +258,60 @@ const Profile = () => {
                                         )}
                                       </button>
                                     }
-                                    type={isVisibleConfirm ? "text" : "password"}
+                                    type={
+                                      isVisibleConfirm ? "text" : "password"
+                                    }
                                   />
-                                  <p className="text-base text-justify font-normal mt-3">
-                                    Le mot de passe doit se composer d'au moins
-                                    6 charactères.
-                                    <br />
-                                    Votre nouveau mot de passe ne doit pas être
-                                    similaire a vos derniers mot de passes
-                                    utilisés.
-                                  </p>
+                                  <div className="password-requirements">
+                                    <label className="flex items-center mb-2">
+                                      <Checkbox
+                                        isSelected={hasUpperCase}
+                                        isReadOnly
+                                      />
+                                      <span className="mr-2">
+                                        1 Lettre majuscule
+                                      </span>
+                                    </label>
+                                    <label className="flex items-center mb-2">
+                                      <Checkbox
+                                        isSelected={hasNumber}
+                                        isReadOnly
+                                      />
+                                      <span className="mr-2">1 Nombre</span>
+                                    </label>
+                                    <label className="flex items-center mb-2">
+                                      <Checkbox
+                                        isSelected={hasSpecialChar}
+                                        isReadOnly
+                                      />
+                                      <span className="mr-2">
+                                        Au moins 1 caractère spécial
+                                      </span>
+                                    </label>
+                                    <label className="flex items-center mb-2">
+                                      <Checkbox
+                                        isSelected={hasMinLength}
+                                        isReadOnly
+                                      />
+                                      <span className="mr-2">
+                                        Au moins 12 caractères
+                                      </span>
+                                    </label>
+                                  </div>
+                                   {/*alerts for tha password change using MUI*/}
+                                  {success && (
+                                    <Alert
+                                      variant="outlined"
+                                      severity="success"
+                                    >
+                                      {success}
+                                    </Alert>
+                                  )}
+                                  {errorMessage && (
+                                    <Alert variant="outlined" severity="error">
+                                      {errorMessage}
+                                    </Alert>
+                                  )}
                                 </ModalBody>
                                 <ModalFooter>
                                   <Button
@@ -217,7 +323,9 @@ const Profile = () => {
                                   </Button>
                                   <Button
                                     className="bg-blue-500 text-zinc-50"
-                                    onPress={onClose}
+                                    onPress={() => {
+                                      handleChangePassword();
+                                    }}
                                   >
                                     Enregistrer
                                   </Button>
@@ -232,7 +340,6 @@ const Profile = () => {
                 </CardBody>
               </Card>
 
-              {/*--------------- ADRESSE SECTION -------------------*/}
               <CardBody>
                 <h3 className="mt-3 ml-3 text-left mb-2">Adresse</h3>
               </CardBody>
