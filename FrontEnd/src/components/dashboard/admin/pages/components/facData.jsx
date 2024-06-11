@@ -1,11 +1,10 @@
-import React from "react";
 const columns = [
   { name: "No", uid: "id", sortable: true },
-    { name: "Id Residant", uid: "id_res"},
-    { name: "Nom du Residant", uid: "nom" , sortable: true},
+    { name: "Id Résidant", uid: "id_res"},
+    { name: "Nom du Résidant", uid: "nom" , sortable: true},
     { name: "Type de Facture", uid: "type", sortable: true },
     { name: "Mois Consommation", uid: "mois"},
-    { name: "Echeance", uid: "echeance" },
+    { name: "Echéance", uid: "echeance" },
     { name: "Status", uid: "status", sortable: true },
     { name: "Montant TTC", uid: "ttc" },
     {name: "actions", uid: "actions"}

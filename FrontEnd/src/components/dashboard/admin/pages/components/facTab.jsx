@@ -30,7 +30,6 @@ import { EyeIcon } from "../Icons/EyeIcon";
 import PropTypes from "prop-types";
 
 const INITIAL_VISIBLE_COLUMNS = [
-  // "id",
   "id_res",
   "nom",
   "type",

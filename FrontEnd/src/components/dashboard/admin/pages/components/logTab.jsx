@@ -8,7 +8,6 @@ import {
   TableCell,
   Input,
   Button,
-  Chip,
   Pagination,
   Tooltip,
   Modal,
@@ -33,6 +32,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "num_de_log",
   "nom",
   "type_log",
+  "ameliored",
   "equip",
   "actions",
 ];
@@ -257,37 +257,50 @@ const LogTable = ({ columns, rows, title }) => {
                   />
                   <Input isDisabled type="text" label="Occupe Par" />
                 </div>
-                <Select
-                  type="text"
-                  label="Profession/Type de Logement"
-                  placeholder="Entrer type de logement"
-                  defaultValue={currentLogement?.type_log}
-                  onChange={(e) =>
-                    setCurrentLogement({
-                      ...currentLogement,
-                      type_log: e.target.value,
-                    })
-                  }
-                >
-                  <SelectItem key="ouvrierNa" value="ouvrierNa">
-                    Ouvrier Non ameliore
-                  </SelectItem>
-                  <SelectItem key="ouvrierA" value="ouvrierA">
-                    Ouvrier Ameliore
-                  </SelectItem>
-                  <SelectItem key="cadreNa" value="cadreNa">
-                    Cadre Non ameliore
-                  </SelectItem>
-                  <SelectItem key="cadreA" value="cadreA">
-                    Cadre Ameliore
-                  </SelectItem>
-                  <SelectItem key="agentNa" value="agentNa">
-                    Agent de maitrise Non ameliore
-                  </SelectItem>
-                  <SelectItem key="agentA" value="agentA">
-                    Agent de maitrise Ameliore
-                  </SelectItem>
-                </Select>
+                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                  <Select
+                    type="text"
+                    label="Profession/Type de Logement"
+                    placeholder="Choisir le type de logement"
+                    defaultValue={currentLogement?.type_log}
+                    onChange={(e) =>
+                      setCurrentLogement({
+                        ...currentLogement,
+                        type_log: e.target.value,
+                      })
+                    }
+                  >
+                    <SelectItem key="ouvrier" value="ouvrier">
+                      Ouvrier
+                    </SelectItem>
+                    <SelectItem key="cadre" value="cadre">
+                      Cadre
+                    </SelectItem>
+                    <SelectItem key="agent" value="agent">
+                      Agent de maitrise
+                    </SelectItem>
+                  </Select>
+
+                  <Select
+                    type="text"
+                    label="Amelioré"
+                    placeholder="Choisir le type de logement"
+                    defaultValue={currentLogement?.type_log}
+                    onChange={(e) =>
+                      setCurrentLogement({
+                        ...currentLogement,
+                        type_log: e.target.value,
+                      })
+                    }
+                  >
+                    <SelectItem key="ouvrier" value="ouvrier">
+                      Oui
+                    </SelectItem>
+                    <SelectItem key="cadre" value="cadre">
+                      Non
+                    </SelectItem>
+                  </Select>
+                </div>
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="flat" onPress={onClose}>
@@ -340,10 +353,10 @@ const LogTable = ({ columns, rows, title }) => {
                 </div>
 
                 <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                  <Select
+                <Select
                     type="text"
                     label="Profession/Type de Logement"
-                    placeholder="Entrer type de logement"
+                    placeholder="Choisir le type de logement"
                     defaultValue={currentLogement?.type_log}
                     onChange={(e) =>
                       setCurrentLogement({
@@ -352,23 +365,34 @@ const LogTable = ({ columns, rows, title }) => {
                       })
                     }
                   >
-                    <SelectItem key="ouvrierNa" value="ouvrierNa">
-                      Ouvrier Non ameliore
+                    <SelectItem key="ouvrier" value="ouvrier">
+                      Ouvrier
                     </SelectItem>
-                    <SelectItem key="ouvrierA" value="ouvrierA">
-                      Ouvrier ameliore
+                    <SelectItem key="cadre" value="cadre">
+                      Cadre
                     </SelectItem>
-                    <SelectItem key="cadreNa" value="cadreNa">
-                      Cadre Non ameliore
+                    <SelectItem key="agent" value="agent">
+                      Agent de maitrise
                     </SelectItem>
-                    <SelectItem key="cadreA" value="cadreA">
-                      Cadre ameliore
+                  </Select>
+
+                  <Select
+                    type="text"
+                    label="Amelioré"
+                    placeholder="Oui / Non"
+                    defaultValue={currentLogement?.ameliored}
+                    onChange={(e) =>
+                      setCurrentLogement({
+                        ...currentLogement,
+                        ameliored: e.target.value,
+                      })
+                    }
+                  >
+                    <SelectItem key="ouvrier" value="ouvrier">
+                      Oui
                     </SelectItem>
-                    <SelectItem key="agentNa" value="agentNa">
-                      Agent de maitrise Non ameliore
-                    </SelectItem>
-                    <SelectItem key="agentA" value="agentA">
-                      Agent de maitrise ameliore
+                    <SelectItem key="cadre" value="cadre">
+                      Non
                     </SelectItem>
                   </Select>
                 </div>

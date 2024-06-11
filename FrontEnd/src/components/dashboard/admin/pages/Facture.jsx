@@ -29,12 +29,12 @@ const Facture = () => {
       >
         <CardBody>
           <h2 className="mx-2 mb-4 flex justify-between items-center">
-            Envoyer un Avis de Facture en Retard
+            Envoyer un avis de facture en retard
             <div className="flex gap-3">
               <Input
                 variant="bordered"
                 type="res_id"
-                label="Id residant"
+                label="Id résidant"
                 labelPlacement="outside-left"
                 size="sm"
                 onClear={() => console.log("input cleared")}
@@ -51,7 +51,7 @@ const Facture = () => {
             <Textarea
               variant="bordered"
               labelPlacement="outside"
-              placeholder="Enter your description"
+              placeholder="Entrer votre description"
               className="max-w-5xl mb-4 "
             />
           </div>

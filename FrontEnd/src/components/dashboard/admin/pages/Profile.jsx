@@ -265,6 +265,7 @@ const Profile = () => {
                                   <div className="password-requirements">
                                     <label className="flex items-center mb-2">
                                       <Checkbox
+                                        size="sm"
                                         isSelected={hasUpperCase}
                                         isReadOnly
                                       />
@@ -274,6 +275,7 @@ const Profile = () => {
                                     </label>
                                     <label className="flex items-center mb-2">
                                       <Checkbox
+                                        size="sm"
                                         isSelected={hasNumber}
                                         isReadOnly
                                       />
@@ -281,6 +283,7 @@ const Profile = () => {
                                     </label>
                                     <label className="flex items-center mb-2">
                                       <Checkbox
+                                        size="sm"
                                         isSelected={hasSpecialChar}
                                         isReadOnly
                                       />
@@ -290,6 +293,7 @@ const Profile = () => {
                                     </label>
                                     <label className="flex items-center mb-2">
                                       <Checkbox
+                                        size="sm"
                                         isSelected={hasMinLength}
                                         isReadOnly
                                       />
@@ -298,7 +302,7 @@ const Profile = () => {
                                       </span>
                                     </label>
                                   </div>
-                                   {/*alerts for tha password change using MUI*/}
+                                   {/*alerts for the password change using MUI*/}
                                   {success && (
                                     <Alert
                                       variant="outlined"
@@ -308,7 +312,9 @@ const Profile = () => {
                                     </Alert>
                                   )}
                                   {errorMessage && (
-                                    <Alert variant="outlined" severity="error">
+                                    <Alert 
+                                      // variant="outlined" 
+                                      severity="error">
                                       {errorMessage}
                                     </Alert>
                                   )}
@@ -341,7 +347,7 @@ const Profile = () => {
               </Card>
 
               <CardBody>
-                <h3 className="mt-3 ml-3 text-left mb-2">Adresse</h3>
+                <h3 className="mt-3 ml-3 text-left mb-2">Adresse</h3>             
               </CardBody>
             </CardBody>
           </CardBody>

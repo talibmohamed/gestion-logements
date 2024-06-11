@@ -125,16 +125,16 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               Accueil
             </MenuItem>
             <MenuItem
-              component={<Link to="/dashboard/statistics" />}
+              component={<Link to="/dashboard/logement" />}
               icon={<FaChartPie />}
               className={
-                location.pathname === "/dashboard/statistics"
+                location.pathname === "/dashboard/logement"
                   ? "active tab"
                   : "tab"
               }
               onClick={handleMenuItemClick}
             >
-              Statistique
+              Logement
             </MenuItem>
             <MenuItem
               component={<Link to="/dashboard/facture" />}
