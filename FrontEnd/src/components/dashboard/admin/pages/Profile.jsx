@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, CardBody, Input, Button, Checkbox } from "@nextui-org/react";
+import Alert from "@mui/material/Alert";
 import {
   Modal,
   ModalContent,
@@ -19,8 +20,9 @@ const Profile = () => {
   const dispatch = useDispatch();
 
   const [password, setpassword] = useState("");
-  const [confirmPassword, setconfirmPassword] = useState("");
+  const [confirmedPassword, setconfirmedPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [success, setsuccess] = useState("");
   const [isVisibleNew, setIsVisibleNew] = useState(false);
   const [isVisibleConfirm, setIsVisibleConfirm] = useState(false);
 
@@ -58,22 +60,37 @@ const Profile = () => {
     }
   };
 
-  const handleChangePassword = () => {
-    if (password !== confirmPassword) {
+  const handleChangePassword = async () => {
+    if (password !== confirmedPassword) {
       setErrorMessage("Les nouveaux mots de passe ne correspondent pas.");
       return;
+    }else{
+      setErrorMessage("");
     }
     if (!validatePassword(password)) {
       setErrorMessage("Le nouveau mot de passe ne répond pas aux critères.");
       return;
     }
 
-    // Call the API function to change the password
-    dispatch(changePasswordThunk({ password, confirmedPassword }));
-    const response = action.payload;
-    console.log(response);
+    try {
+      // Call the API function to change the password
+      const response = await dispatch(
+        changePasswordThunk({ password, confirmedPassword })
+      ).unwrap();
 
-    setError(response.message);
+      if (response.status === "success") {
+        setsuccess("Mot de passe changé avec succès.");
+      } else {
+        setErrorMessage(response.message);
+      }
+
+      console.log(response.message);
+    } catch (error) {
+      console.error("Error changing password:", error);
+      setErrorMessage(
+        "Une erreur s'est produite lors du changement de mot de passe."
+      );
+    }
   };
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -84,7 +101,7 @@ const Profile = () => {
   }, [dispatch]);
 
   console.log("1111");
-  const profData = useSelector((state) => state.admin); // Adjust based on your state shape
+  const profData = useSelector((state) => state.admin);
 
   console.log(profData);
   console.log("1111");
@@ -189,9 +206,6 @@ const Profile = () => {
                           isOpen={isOpen}
                           onOpenChange={onOpenChange}
                           placement="center"
-                          classNames={{
-                            base: "bg-[#171821] dark:bg-[#171821] text-[white]",
-                          }}
                         >
                           <ModalContent>
                             {(onClose) => (
@@ -207,7 +221,6 @@ const Profile = () => {
                                     value={password}
                                     onChange={(e) =>
                                       setpassword(e.target.value)
-                                    
                                     }
                                     endContent={
                                       <button
@@ -227,9 +240,9 @@ const Profile = () => {
                                   <Input
                                     label="Confirmer Votre Mot de Passe"
                                     variant="bordered"
-                                    value={confirmPassword}
+                                    value={confirmedPassword}
                                     onChange={(e) => {
-                                      setconfirmPassword(e.target.value);
+                                      setconfirmedPassword(e.target.value);
                                       validateConfirmation(e.target.value);
                                     }}
                                     endContent={
@@ -285,19 +298,19 @@ const Profile = () => {
                                       </span>
                                     </label>
                                   </div>
-
-                                  <p className="text-base text-justify font-normal mt-3">
-                                    Le mot de passe doit se composer d'au moins
-                                    12 charactères.
-                                    <br />
-                                    Votre nouveau mot de passe ne doit pas être
-                                    similaire a vos derniers mot de passes
-                                    utilisés.
-                                  </p>
+                                   {/*alerts for tha password change using MUI*/}
+                                  {success && (
+                                    <Alert
+                                      variant="outlined"
+                                      severity="success"
+                                    >
+                                      {success}
+                                    </Alert>
+                                  )}
                                   {errorMessage && (
-                                    <p className="text-red-500">
+                                    <Alert variant="outlined" severity="error">
                                       {errorMessage}
-                                    </p>
+                                    </Alert>
                                   )}
                                 </ModalBody>
                                 <ModalFooter>

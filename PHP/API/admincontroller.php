@@ -41,7 +41,7 @@ class AdminController
     }
 
     public function changepassword($data) {
-        if ($data && isset($data['jwt']) && isset($data['password']) && isset($data['confirmedPassword'])) {
+        if ($data && isset($data['password']) && isset($data['confirmedPassword'])) {
             $jwt = $data['jwt'];
             $password = $data['password'];
             $confirmedPassword = $data['confirmedPassword'];

@@ -1,8 +1,9 @@
 // features/admin/adminThunks.js
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { loginadmin, fetchAdminProfile } from "../services/adminapi";
+import { loginadmin, fetchAdminProfile, changePassword } from "../services/adminapi";
 import { loginSuccess } from "../authentication";
 import { setAdmin } from "../adminslice";
+
 
 // Thunk for admin login
 export const loginAdminThunk = createAsyncThunk(
@@ -56,7 +57,6 @@ export const changePasswordThunk = createAsyncThunk(
   async ({ password, confirmedPassword }, { getState }) => {
     const state = getState();
     const jwt = state.auth.jwt_token;
-    console.log(jwt);
     try {
       const response = await changePassword(jwt, password, confirmedPassword );
       return response;

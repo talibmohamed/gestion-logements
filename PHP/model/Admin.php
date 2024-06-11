@@ -106,13 +106,13 @@ class admin
         try {
             $jwtHandler = new JwtHandler();
             $token_info = $jwtHandler->verifyJwtToken($jwt);
-
+    
             if ($token_info['valid']) {
                 $connection = $this->db->getConnection();
-                $sql = $connection->prepare('SELECT nom, prenom, email,telephone, date_creation FROM admin WHERE adm_id = ?');
+                $sql = $connection->prepare('SELECT nom, prenom, email, telephone, TO_CHAR(date_creation, \'DD-MM-YYYY\') as date_creation FROM admin WHERE adm_id = ?');
                 $sql->execute([$token_info['data']['id']]);
                 $admin = $sql->fetch(PDO::FETCH_ASSOC);
-
+    
                 if ($admin) {
                     return array(
                         'status' => 'success',
@@ -128,6 +128,8 @@ class admin
             return array('status' => 'error', 'message' => $e->getMessage());
         }
     }
+    
+    
 
     // API endpoint function to handle admin changing password
     public function changePassword($jwt, $password, $confirmedPassword)
@@ -147,7 +149,7 @@ class admin
                         return array('status' => 'error', 'message' => 'Passwords do not match');
                     }
 
-                    
+
                     if (password_verify($password, $admin['password'])) {
                         return array('status' => 'error', 'message' => 'New password cannot be the same as the old password');
                     }
