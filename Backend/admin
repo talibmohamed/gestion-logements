@@ -218,7 +218,7 @@ class admin
     
     
     // ajouter une nouvelle facture 
-    public function newfacture(facture $newfac ,$nom,$prenom) {
+    public function addfacture(facture $newfac ,$nom,$prenom) {
         $connection = $this->db->getConnection();
         $res_ID = $this->searchuser($nom, $prenom); // Correction de l'appel de la méthode searchuser
     
@@ -312,12 +312,123 @@ class admin
         }
     }
     //statistics reclamation 
-   
+   public function graphe_rec (){}
 
 
+   //ajouter , modifier et supprimer un logement 
+   public function add_log(logement $newlogement) {
+    try {
+        // Obtenir la connexion à la base de données
+        $connection = $this->db->getConnection();
+        
+        // Préparer la requête SQL
+        $sql = "INSERT INTO logements (type_log, is_ameliore, description, mc, piece, equip_id, is_vacant) 
+                VALUES (:type_log, :is_ameliore, :description, :mc, :piece, :equip_id, :is_vacant)";
+        $stmt = $connection->prepare($sql);
 
+        // Liaison des paramètres
+        $stmt->bindParam(':type_log', $newlogement->type_log);
+        $stmt->bindParam(':is_ameliore', $newlogement->is_ameliore);
+        $stmt->bindParam(':description', $newlogement->desc);
+        $stmt->bindParam(':mc', $newlogement->mc);
+        $stmt->bindParam(':piece', $newlogement->piece);
+        $stmt->bindParam(':equip_id', $newlogement->equip_id);
+        $stmt->bindParam(':is_vacant', $newlogement->is_vacant);
 
+        // Exécuter la requête
+        if ($stmt->execute()) {
+            return true; // Nouveau logement ajouté avec succès
+        } else {
+            return false; // Échec de l'ajout du logement
+        }
+    } catch (PDOException $e) {
+        // Gestion des erreurs PDO
+        error_log("Erreur PDO : " . $e->getMessage());
+        return false;
     }
+}
+public function update_log(logement $logement) {
+    try {
+        // Obtenir la connexion à la base de données
+        $connection = $this->db->getConnection();
+        
+        // Préparer la requête SQL
+        $sql = "UPDATE logements 
+                SET type_log = :type_log, 
+                    is_ameliore = :is_ameliore, 
+                    description = :description, 
+                    mc = :mc, 
+                    piece = :piece, 
+                    equip_id = :equip_id, 
+                    is_vacant = :is_vacant 
+                WHERE log_id = :log_id";
+        $stmt = $connection->prepare($sql);
+
+        // Liaison des paramètres
+        $stmt->bindParam(':type_log', $logement->type_log);
+        $stmt->bindParam(':is_ameliore', $logement->is_ameliore);
+        $stmt->bindParam(':description', $logement->desc);
+        $stmt->bindParam(':mc', $logement->mc);
+        $stmt->bindParam(':piece', $logement->piece);
+        $stmt->bindParam(':equip_id', $logement->equip_id);
+        $stmt->bindParam(':is_vacant', $logement->is_vacant);
+        $stmt->bindParam(':log_id', $logement->log_id);
+
+        // Exécuter la requête
+        if ($stmt->execute()) {
+            return true; // Logement mis à jour avec succès
+        } else {
+            return false; // Échec de la mise à jour du logement
+        }
+    } catch (PDOException $e) {
+        // Gestion des erreurs PDO
+        error_log("Erreur PDO : " . $e->getMessage());
+        return false;
+    }
+}
+public function supprimer_log($log_id) {
+    try {
+        // Connexion à la base de données
+        $connection = $this->db->getConnection();
+
+        // Vérifier si le logement existe
+        $query = $connection->prepare("SELECT 1 FROM logement WHERE log_id = :log_id");
+        $query->bindParam(':log_id', $log_id, PDO::PARAM_INT);
+        $query->execute();
+
+        // Si le logement n'existe pas, lancer une exception
+        if ($query->rowCount() == 0) {
+            throw new Exception("Le logement avec l'ID $log_id n'existe pas.");
+        }
+
+        // Préparation de la requête de suppression
+        $query = $connection->prepare("DELETE FROM logement WHERE log_id = :log_id");
+        $query->bindParam(':log_id', $log_id, PDO::PARAM_INT);
+
+        // Exécution de la requête
+        if ($query->execute()) {
+            return true; // Logement supprimé avec succès
+        } else {
+            // Gérer l'erreur de suppression en lançant une exception
+            throw new Exception("Erreur lors de la suppression du logement: " . $query->errorInfo()[2]);
+        }
+    } catch (Exception $e) {
+        // Gestion des erreurs et retour de faux en cas d'erreur
+        error_log($e->getMessage()); // Log l'erreur pour le debugging
+        return false; // Retourner false en cas d'erreur
+    }
+}
+
+
+
+}
+
+
+
+
+
+
+
                                                                                                                  
 
 
