@@ -12,7 +12,7 @@ CREATE TABLE logement (
     mc          INT NOT NULL,
     piece       INT NOT NULL,
     equip_ids   INT[],
-    is_vacant BOOLEAN default true;
+    is_vacant BOOLEAN DEFAULT true
 );
 
 CREATE TABLE admin (
@@ -20,6 +20,7 @@ CREATE TABLE admin (
     nom           VARCHAR(40),
     prenom        VARCHAR(40),
     email         VARCHAR(250) UNIQUE,
+    telephone     VARCHAR(15),
     password      VARCHAR(250),
     date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -98,7 +99,9 @@ CREATE TABLE notification (
     notif_desc VARCHAR(255),
     is_read BOOLEAN DEFAULT FALSE,
     res_id INT,
-    FOREIGN KEY (res_id) REFERENCES residant (res_id)
+    adm_id INT,
+    FOREIGN KEY (res_id) REFERENCES residant (res_id),
+    FOREIGN KEY (adm_id) REFERENCES admin (adm_id)
 );
 
 

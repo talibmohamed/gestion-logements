@@ -312,8 +312,56 @@ class admin
         }
     }
     //statistics reclamation 
-   public function graphe_rec (){}
+    function getReclamationsStats() {
+       
+        try {
+            $connection = $this->db->getConnection();
 
+            // Préparer le tableau des résultats
+            $stats = [];
+            // Obtenir la date actuelle
+            $currentDate = new DateTime();
+            
+            // Boucle pour les 6 derniers mois
+            for ($i = 0; $i < 6; $i++) {
+                // Calculer le début et la fin du mois
+                $startDate = clone $currentDate;
+                $startDate->modify('first day of this month');
+                $startDate->modify("-$i month");
+                $endDate = clone $startDate;
+                $endDate->modify('last day of this month');
+                
+                // Formater les dates pour la requête SQL
+                $startDateStr = $startDate->format('Y-m-d');
+                $endDateStr = $endDate->format('Y-m-d');
+                
+                // Préparer la requête SQL
+                $sql = "SELECT COUNT(*) as count FROM reclamations WHERE date_reclamation BETWEEN :start_date AND :end_date";
+                $stmt = $connection->prepare($sql);
+                
+                // Exécuter la requête avec les paramètres
+                $stmt->execute([
+                    ':start_date' => $startDateStr,
+                    ':end_date' => $endDateStr
+                ]);
+                
+                // Obtenir le résultat
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                // Ajouter le résultat au tableau des statistiques
+                $stats[] = [
+                    'month' => $startDate->format('F Y'),
+                    'count' => $result['count']
+                ];
+            }
+            
+            return $stats;
+        } catch (PDOException $e) {
+            echo "Erreur de connexion : " . $e->getMessage();
+            return [];
+        }
+    }
+    
 
    //ajouter , modifier et supprimer un logement 
    public function add_log(logement $newlogement) {

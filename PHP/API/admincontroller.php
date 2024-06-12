@@ -29,6 +29,43 @@ class AdminController
 
     // other methods for the admin
 
+    public function profile($jwt) {
+        if ($jwt) {
+            $response = $this->admin->profile($jwt);
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
+        }
+    }
+
+    public function changepassword($data) {
+        if ($data && isset($data['password']) && isset($data['confirmedPassword'])) {
+            $jwt = $data['jwt'];
+            $password = $data['password'];
+            $confirmedPassword = $data['confirmedPassword'];
+            $response = $this->admin->changePassword($jwt, $password, $confirmedPassword);
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
+        }
+    }
+    
+        // get all admin notifications
+        public function getAllnotificationsAPI($jwt){
+            if ($jwt) {
+                $response = $this->admin->getAllnotifications($jwt);
+                http_response_code(200);
+                echo json_encode($response);
+            } else {
+                http_response_code(400);
+                echo json_encode(array('status' => 'error1111', 'message' => 'Invalid JSON data'));
+            }
+        }
+
 
     public function addUserAPI($data)
     {
@@ -61,4 +98,6 @@ class AdminController
             echo json_encode(['status' => 'error', 'message' => 'Missing required fields.']);
         }
     }
+
+
 }

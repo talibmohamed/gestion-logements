@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Table,
   TableHeader,
@@ -21,18 +21,15 @@ import {
   AutocompleteItem,
   Select,
   SelectItem,
-  DateInput,
+  DatePicker,
 } from "@nextui-org/react";
-import { PlusIcon } from "../Icons/PlusIcon";
 import { SearchIcon } from "../Icons/SearchIcon";
 import { EditIcon } from "../Icons/EditIcon";
 import { DeleteIcon } from "../Icons/DeleteIcon";
 import { EyeIcon } from "../Icons/EyeIcon";
 import PropTypes from "prop-types";
-import { CalendarDate, parseDate } from "@internationalized/date";
 
 const INITIAL_VISIBLE_COLUMNS = [
-  // "id",
   "id_res",
   "nom",
   "type",
@@ -49,7 +46,7 @@ const statusColorMap = {
   attente: "warning",
 };
 
-const InvoiceTable = ({ columns, rows, statusOptions, title, users }) => {
+const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
   const [filterValue, setFilterValue] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [visibleColumns, setVisibleColumns] = React.useState(
@@ -62,6 +59,23 @@ const InvoiceTable = ({ columns, rows, statusOptions, title, users }) => {
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 10;
 
+  const [currentInvoice, setCurrentInvoice] = useState(null);
+  const {
+    isOpen: isAddModalOpen,
+    onOpen: openAddModal,
+    onOpenChange: setAddModalOpen,
+  } = useDisclosure();
+  const {
+    isOpen: isDetailsModalOpen,
+    onOpen: openDetailsModal,
+    onOpenChange: setDetailsModalOpen,
+  } = useDisclosure();
+  const {
+    isOpen: isEditModalOpen,
+    onOpen: openEditModal,
+    onOpenChange: setEditModalOpen,
+  } = useDisclosure();
+
   const pages = Math.ceil(rows.length / rowsPerPage);
 
   const hasSearchFilter = Boolean(filterValue);
@@ -73,8 +87,6 @@ const InvoiceTable = ({ columns, rows, statusOptions, title, users }) => {
       Array.from(visibleColumns).includes(column.uid)
     );
   }, [visibleColumns]);
-
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const filteredItems = React.useMemo(() => {
     let filteredUsers = [...rows];
@@ -113,6 +125,23 @@ const InvoiceTable = ({ columns, rows, statusOptions, title, users }) => {
     });
   }, [sortDescriptor, items]);
 
+  const handleDetailsIconClick = (invoice) => {
+    setCurrentInvoice(invoice);
+    openDetailsModal(true);
+  };
+  const handleEditIconClick = (invoice) => {
+    setCurrentInvoice(invoice);
+    openEditModal();
+  };
+  const handleStatusChange = (status) => {
+    setCurrentInvoice({ ...currentInvoice, status });
+  };
+  const handleSave = () => {
+    // to handle saving the updated data
+    console.log("Updated Invoice:", currentInvoice);
+    setEditModalOpen(false);
+  };
+
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
 
@@ -138,16 +167,24 @@ const InvoiceTable = ({ columns, rows, statusOptions, title, users }) => {
         return (
           <div className="relative flex items-center gap-2">
             <Tooltip content="Details">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+              <span
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                onClick={() => handleDetailsIconClick(user)}
+              >
                 <EyeIcon />
               </span>
             </Tooltip>
-            <Tooltip content="Edit user">
-              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+
+            <Tooltip content="Modifier">
+              <span
+                className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                onClick={() => handleEditIconClick(user)}
+              >
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip color="danger" content="Delete user">
+
+            <Tooltip color="danger" content="Supprimer">
               <span className="text-lg text-danger cursor-pointer active:opacity-50">
                 <DeleteIcon />
               </span>
@@ -176,7 +213,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title, users }) => {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Search by name..."
+            placeholder="Chercher par nom..."
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => onSearchChange("")}
@@ -185,16 +222,17 @@ const InvoiceTable = ({ columns, rows, statusOptions, title, users }) => {
           <div className="flex gap-3">
             <>
               <Button
-                onPress={onOpen}
-                className="bg-foreground text-background"
-                endContent={<PlusIcon />}
+                onPress={openAddModal}
+                className="bg-foreground text-background text-sm"
                 size="sm"
               >
-                Ajout
+                Ajouter une Facture
               </Button>
-              <Modal 
-              size="lg"
-              isOpen={isOpen} onOpenChange={onOpenChange}>
+              <Modal
+                size="lg"
+                isOpen={isAddModalOpen}
+                onOpenChange={setAddModalOpen}
+              >
                 <ModalContent>
                   {(onClose) => (
                     <>
@@ -258,22 +296,13 @@ const InvoiceTable = ({ columns, rows, statusOptions, title, users }) => {
                         </div>
 
                         <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                          <DateInput
-                            label="Mois de consommation "
-                            defaultValue={parseDate("2024-04-04")}
-                            placeholderValue={new CalendarDate(1995, 11, 6)}
-                          />
-                          <DateInput
-                            label="Echeance"
-                            defaultValue={parseDate("2024-04-04")}
-                            placeholderValue={new CalendarDate(1995, 11, 6)}
-                          />
+                          <DatePicker label="Mois de consommation " />
+                          <DatePicker label="Echeance" />
                         </div>
                       </ModalBody>
                       <ModalFooter>
                         <Button
                           color="danger"
-                          variant="light"
                           onPress={onClose}
                         >
                           Close
@@ -291,7 +320,14 @@ const InvoiceTable = ({ columns, rows, statusOptions, title, users }) => {
         </div>
       </div>
     );
-  }, [filterValue, onSearchChange, onOpen, isOpen, onOpenChange, title, rows]);
+  }, [
+    filterValue,
+    onSearchChange,
+    openAddModal,
+    isAddModalOpen,
+    setAddModalOpen,
+    title,
+  ]);
 
   const bottomContent = React.useMemo(() => {
     return (
@@ -313,42 +349,212 @@ const InvoiceTable = ({ columns, rows, statusOptions, title, users }) => {
   }, [page, pages, hasSearchFilter]);
 
   return (
-    <Table
-      isCompact
-      removeWrapper
-      isHeaderSticky
-      aria-label="Example table with custom cells, pagination and sorting"
-      bottomContent={bottomContent}
-      classNames={{
-        wrapper: "max-h-[382px]",
-      }}
-      bottomContentPlacement="outside"
-      sortDescriptor={sortDescriptor}
-      topContent={topContent}
-      topContentPlacement="outside"
-      onSortChange={setSortDescriptor}
-    >
-      <TableHeader columns={headerColumns}>
-        {(column) => (
-          <TableColumn
-            key={column.uid}
-            align={column.uid === "actions" ? "center" : "start"}
-            allowsSorting={column.sortable}
-          >
-            {column.name}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody emptyContent={"No users found"} items={sortedItems}>
-        {(item) => (
-          <TableRow key={item.id}>
-            {(columnKey) => (
-              <TableCell>{renderCell(item, columnKey)}</TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <>
+      <Table
+        isCompact
+        removeWrapper
+        isHeaderSticky
+        aria-label="Example table with custom cells, pagination and sorting"
+        bottomContent={bottomContent}
+        classNames={{
+          wrapper: "max-h-[382px]",
+        }}
+        bottomContentPlacement="outside"
+        sortDescriptor={sortDescriptor}
+        topContent={topContent}
+        topContentPlacement="outside"
+        onSortChange={setSortDescriptor}
+      >
+        <TableHeader columns={headerColumns}>
+          {(column) => (
+            <TableColumn
+              key={column.uid}
+              align={column.uid === "actions" ? "center" : "start"}
+              allowsSorting={column.sortable}
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody emptyContent={"No users found"} items={sortedItems}>
+          {(item) => (
+            <TableRow key={item.id}>
+              {(columnKey) => (
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+
+      <Modal
+        size="lg"
+        isOpen={isDetailsModalOpen}
+        onOpenChange={() => setDetailsModalOpen(false)}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Détails de la Facture
+              </ModalHeader>
+              <ModalBody>
+                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                  <Input
+                    isReadOnly
+                    type="text"
+                    label="Résidant:"
+                    variant="bordered"
+                    defaultValue={currentInvoice.nom}
+                    className="max-w-xs"
+                  />
+
+                  <Input
+                    isReadOnly
+                    type="text"
+                    label="Profession:"
+                    variant="bordered"
+                    defaultValue={currentInvoice.profession}
+                    className="max-w-xs"
+                  />
+                </div>
+
+                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                  <Input
+                    isReadOnly
+                    type="text"
+                    label="ID Logement:"
+                    variant="bordered"
+                    defaultValue={currentInvoice.id_logement}
+                    className="max-w-xs"
+                  />
+
+                  <Input
+                    isReadOnly
+                    type="text"
+                    label="Type du logement:"
+                    variant="bordered"
+                    defaultValue={currentInvoice.type_log}
+                    className="max-w-xs"
+                  />
+                  <Input
+                    isReadOnly
+                    type="text"
+                    label="Amélioré:"
+                    variant="bordered"
+                    defaultValue={currentInvoice.ameliored ? "Oui" : "Non"}
+                    className="max-w-xs"
+                  />
+                </div>
+
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="flat" onClick={onClose}>
+                  Fermer
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      <Modal size="lg" isOpen={isEditModalOpen} onOpenChange={setEditModalOpen}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Modifier la Facture
+              </ModalHeader>
+              <ModalBody>
+                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                  <Input
+                    isDisabled
+                    type="text"
+                    label="Résidant"
+                    className="max-w-xs"
+                    defaultValue={currentInvoice?.nom}
+                    onChange={(e) =>
+                      setCurrentInvoice({
+                        ...currentInvoice,
+                        nom: e.target.value,
+                      })
+                    }
+                  />
+                  <Select
+                    label="Type de Facture"
+                    placeholder="Choisir le type de facture"
+                    className="max-w-xs"
+                    defaultValue={currentInvoice?.typeFacture}
+                    onChange={(value) =>
+                      setCurrentInvoice({
+                        ...currentInvoice,
+                        typeFacture: value,
+                      })
+                    }
+                  >
+                    <SelectItem key="eau" value="eau">
+                      Eau
+                    </SelectItem>
+                    <SelectItem key="electricite" value="electricite">
+                      Electricite
+                    </SelectItem>
+                  </Select>
+                </div>
+
+                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                  <Select
+                    label="Status"
+                    placeholder="Choisir le statut"
+                    className="max-w-xs text-black"
+                    color="warning"
+                    defaultValue={currentInvoice?.status}
+                    onSelectionChange={(keys) =>
+                      handleStatusChange(keys.currentKey)
+                    }
+                  >
+                    <SelectItem key="payé" textValue="payé">
+                      payé
+                    </SelectItem>
+                    <SelectItem key="retard" textValue="retard">
+                      retard
+                    </SelectItem>
+                    <SelectItem key="attente" textValue="attente">
+                      attente
+                    </SelectItem>
+                  </Select>
+
+                  <Input
+                    type="price"
+                    label="Montant TTC"
+                    placeholder="Entrer le montant TTC"
+                    startContent={
+                      <div className="pointer-events-none flex items-center">
+                        <span className="text-default-400 text-small">$</span>
+                      </div>
+                    }
+                    defaultValue={currentInvoice?.ttc}
+                    onChange={(e) =>
+                      setCurrentInvoice({
+                        ...currentInvoice,
+                        ttc: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="flat" onClick={onClose}>
+                  Fermer
+                </Button>
+                <Button color="primary" onClick={handleSave}>
+                  Sauvegarder
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
 

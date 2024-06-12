@@ -1,14 +1,13 @@
 import React, { useState } from "react";
 import {
-  Button,
-  Input,
   Table,
   TableHeader,
   TableColumn,
   TableBody,
   TableRow,
   TableCell,
-  Chip,
+  Input,
+  Button,
   Pagination,
   Tooltip,
   Modal,
@@ -16,13 +15,13 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Select,
+  SelectItem,
   useDisclosure,
   Autocomplete,
   AutocompleteItem,
-  Select,
-  SelectItem,
-  DatePicker,
 } from "@nextui-org/react";
+import { SearchIcon } from "../Icons/SearchIcon";
 import { EditIcon } from "../Icons/EditIcon";
 import { DeleteIcon } from "../Icons/DeleteIcon";
 import { EyeIcon } from "../Icons/EyeIcon";
@@ -30,45 +29,37 @@ import PropTypes from "prop-types";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id_res",
+  "num_de_log",
   "nom",
-  "desc",
-  "date",
-  "sol",
-  "status",
+  "type_log",
+  "ameliored",
+  "equip",
   "actions",
 ];
 
-const statusColorMap = {
-  résolu: "secondary",
-  inachevé: "primary",
-  attente: "warning",
-};
-
-const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
-  const [statusFilter, setStatusFilter] = React.useState("all");
+const LogTable = ({ columns, rows, title }) => {
+  const [filterValue, setFilterValue] = React.useState("");
   const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
   const [sortDescriptor, setSortDescriptor] = React.useState({
-    column: "status",
+    column: "nom",
     direction: "ascending",
   });
   const [page, setPage] = React.useState(1);
-  const rowsPerPage = 5;
+  const rowsPerPage = 10;
+
+  const {
+    isOpen: isAddModalOpen,
+    onOpen: openAddModal,
+    onOpenChange: setAddModalOpen,
+  } = useDisclosure();
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [currentLogement, setCurrentLogement] = useState(null);
 
   const pages = Math.ceil(rows.length / rowsPerPage);
 
-  const [currentReclamation, setCurrentReclamation] = useState(null);
-  const {
-    isOpen: isDetailsModalOpen,
-    onOpen: openDetailsModal,
-    onOpenChange: setDetailsModalOpen,
-  } = useDisclosure();
-  const {
-    isOpen: isEditModalOpen,
-    onOpen: openEditModal,
-    onOpenChange: setEditModalOpen,
-  } = useDisclosure();
+  const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = React.useMemo(() => {
     if (visibleColumns === "all") return columns;
@@ -81,17 +72,14 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
   const filteredItems = React.useMemo(() => {
     let filteredUsers = [...rows];
 
-    if (
-      statusFilter !== "all" &&
-      Array.from(statusFilter).length !== statusReclOptions.length
-    ) {
+    if (hasSearchFilter) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.status)
+        user.nom.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
 
     return filteredUsers;
-  }, [rows, statusFilter]);
+  }, [rows, filterValue]);
 
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -110,20 +98,14 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     });
   }, [sortDescriptor, items]);
 
-  const handleDetailsIconClick = (reclamation) => {
-    setCurrentReclamation(reclamation);
-    openDetailsModal(true);
+  const handleEditIconClick = (logement) => {
+    setCurrentLogement(logement);
+    setEditModalOpen(true);
   };
-  const handleEditIconClick = (reclamation) => {
-    setCurrentReclamation(reclamation);
-    openEditModal();
-  };
-  const handleStatusChange = (status) => {
-    setCurrentReclamation({ ...currentReclamation, status });
-  };
+
   const handleSave = () => {
     // to handle saving the updated data
-    console.log("Updated Status:", currentReclamation);
+    console.log("Updated Logement:", currentLogement);
     setEditModalOpen(false);
   };
 
@@ -131,35 +113,19 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     const cellValue = user[columnKey];
 
     switch (columnKey) {
-      case "role":
+      case "equip":
         return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
+          <div className="flex items-center">
+            <Tooltip content="Details">
+              <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
+                <EyeIcon />
+              </span>
+            </Tooltip>
           </div>
-        );
-      case "status":
-        return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[user.status]}
-            size="sm"
-            variant="flat"
-          >
-            {cellValue}
-          </Chip>
         );
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Details">
-              <span
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                onClick={() => handleDetailsIconClick(user)}
-              >
-                <EyeIcon />
-              </span>
-            </Tooltip>
-
             <Tooltip content="Modifier">
               <span
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
@@ -168,8 +134,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                 <EditIcon />
               </span>
             </Tooltip>
-
-            <Tooltip color="danger" content="Supprimer">
+            <Tooltip color="danger" variant="light" content="Supprimer">
               <span className="text-lg text-danger cursor-pointer active:opacity-50">
                 <DeleteIcon />
               </span>
@@ -181,13 +146,42 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     }
   }, []);
 
+  const onSearchChange = React.useCallback((value) => {
+    if (value) {
+      setFilterValue(value);
+      setPage(1);
+    } else {
+      setFilterValue("");
+    }
+  }, []);
+
   const topContent = React.useMemo(() => {
     return (
       <div className="flex flex-col gap-4">
         {title && <h2 className=" table-title">{title}</h2>}
+        <div className="flex justify-between gap-3 items-end">
+          <Input
+            isClearable
+            className="w-full sm:max-w-[44%]"
+            placeholder="Search by name..."
+            startContent={<SearchIcon />}
+            value={filterValue}
+            onClear={() => onSearchChange("")}
+            onValueChange={onSearchChange}
+          />
+          <div className="flex gap-3">
+            <Button
+              className="bg-foreground text-background"
+              size="sm"
+              onPress={openAddModal}
+            >
+              Ajouter
+            </Button>
+          </div>
+        </div>
       </div>
     );
-  }, [title]);
+  }, [filterValue, onSearchChange]);
 
   const bottomContent = React.useMemo(() => {
     return (
@@ -198,6 +192,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
             cursor: "bg-foreground text-background",
           }}
           color="default"
+          isDisabled={hasSearchFilter}
           page={page}
           total={pages}
           variant="light"
@@ -205,7 +200,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
         />
       </div>
     );
-  }, [page, pages]);
+  }, [page, pages, hasSearchFilter]);
 
   return (
     <>
@@ -246,69 +241,73 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
         </TableBody>
       </Table>
 
-      <Modal
-        size="lg"
-        isOpen={isDetailsModalOpen}
-        onOpenChange={() => setDetailsModalOpen(false)}
-      >
+      <Modal size="lg" isOpen={isAddModalOpen} onOpenChange={setAddModalOpen}>
         <ModalContent>
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Détails de la Facture
+                Ajouter Un Logement
               </ModalHeader>
               <ModalBody>
                 <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
                   <Input
-                    isReadOnly
                     type="text"
-                    label="Résidant:"
-                    variant="bordered"
-                    defaultValue={currentReclamation.nom}
-                    className="max-w-xs"
+                    label="No logement"
+                    placeholder="Entrer le no du logement"
                   />
-
-                  <Input
-                    isReadOnly
-                    type="text"
-                    label="Profession:"
-                    variant="bordered"
-                    defaultValue={currentReclamation.profession}
-                    className="max-w-xs"
-                  />
+                  <Input isDisabled type="text" label="Occupe Par" />
                 </div>
-
                 <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                  <Input
-                    isReadOnly
+                  <Select
                     type="text"
-                    label="ID Logement:"
-                    variant="bordered"
-                    defaultValue={currentReclamation.id_logement}
-                    className="max-w-xs"
-                  />
+                    label="Profession/Type de Logement"
+                    placeholder="Choisir le type de logement"
+                    defaultValue={currentLogement?.type_log}
+                    onChange={(e) =>
+                      setCurrentLogement({
+                        ...currentLogement,
+                        type_log: e.target.value,
+                      })
+                    }
+                  >
+                    <SelectItem key="ouvrier" value="ouvrier">
+                      Ouvrier
+                    </SelectItem>
+                    <SelectItem key="cadre" value="cadre">
+                      Cadre
+                    </SelectItem>
+                    <SelectItem key="agent" value="agent">
+                      Agent de maitrise
+                    </SelectItem>
+                  </Select>
 
-                  <Input
-                    isReadOnly
+                  <Select
                     type="text"
-                    label="Type du logement:"
-                    variant="bordered"
-                    defaultValue={currentReclamation.type_log}
-                    className="max-w-xs"
-                  />
-                  <Input
-                    isReadOnly
-                    type="text"
-                    label="Amélioré:"
-                    variant="bordered"
-                    defaultValue={currentReclamation.ameliored ? "Oui" : "Non"}
-                    className="max-w-xs"
-                  />
+                    label="Amelioré"
+                    placeholder="Choisir le type de logement"
+                    defaultValue={currentLogement?.type_log}
+                    onChange={(e) =>
+                      setCurrentLogement({
+                        ...currentLogement,
+                        type_log: e.target.value,
+                      })
+                    }
+                  >
+                    <SelectItem key="ouvrier" value="ouvrier">
+                      Oui
+                    </SelectItem>
+                    <SelectItem key="cadre" value="cadre">
+                      Non
+                    </SelectItem>
+                  </Select>
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="flat" onClick={onClose}>
-                  Fermer
+                <Button color="danger" variant="flat" onPress={onClose}>
+                  Close
+                </Button>
+                <Button color="primary" onPress={onClose}>
+                  Enregistrer
                 </Button>
               </ModalFooter>
             </>
@@ -321,7 +320,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Modifier le status de la réclamation
+                Modifier la Facture
               </ModalHeader>
               <ModalBody>
                 <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
@@ -330,61 +329,70 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     type="text"
                     label="Résidant"
                     className="max-w-xs"
-                    defaultValue={currentReclamation?.nom}
+                    defaultValue={currentLogement?.nom}
                     onChange={(e) =>
-                      setCurrentReclamation({
-                        ...currentReclamation,
+                      setCurrentLogement({
+                        ...currentLogement,
                         nom: e.target.value,
                       })
                     }
                   />
 
                   <Input
-                    isDisabled
                     type="text"
-                    label="Description"
-                    className="max-w-xs"
-                    defaultValue={currentReclamation?.desc}
+                    label="No du logement"
+                    placeholder="Entrer No du logement"
+                    defaultValue={currentLogement?.num_de_log}
                     onChange={(e) =>
-                      setCurrentReclamation({
-                        ...currentReclamation,
-                        nom: e.target.value,
+                      setCurrentLogement({
+                        ...currentLogement,
+                        num_de_log: e.target.value,
                       })
                     }
                   />
                 </div>
 
                 <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                  <Input
-                    isDisabled
+                <Select
                     type="text"
-                    label="Date de Réclamation"
-                    className="max-w-xs"
-                    defaultValue={currentReclamation?.date}
+                    label="Profession/Type de Logement"
+                    placeholder="Choisir le type de logement"
+                    defaultValue={currentLogement?.type_log}
                     onChange={(e) =>
-                      setCurrentReclamation({
-                        ...currentReclamation,
-                        nom: e.target.value,
+                      setCurrentLogement({
+                        ...currentLogement,
+                        type_log: e.target.value,
                       })
                     }
-                  />
+                  >
+                    <SelectItem key="ouvrier" value="ouvrier">
+                      Ouvrier
+                    </SelectItem>
+                    <SelectItem key="cadre" value="cadre">
+                      Cadre
+                    </SelectItem>
+                    <SelectItem key="agent" value="agent">
+                      Agent de maitrise
+                    </SelectItem>
+                  </Select>
+
                   <Select
-                    label="Status"
-                    placeholder="Choisir le statut"
-                    className="max-w-xs text-black"
-                    defaultValue={currentReclamation?.status}
-                    onSelectionChange={(keys) =>
-                      handleStatusChange(keys.currentKey)
+                    type="text"
+                    label="Amelioré"
+                    placeholder="Oui / Non"
+                    defaultValue={currentLogement?.ameliored}
+                    onChange={(e) =>
+                      setCurrentLogement({
+                        ...currentLogement,
+                        ameliored: e.target.value,
+                      })
                     }
                   >
-                    <SelectItem key="resolu" textValue="Résolu">
-                      Résolu
+                    <SelectItem key="ouvrier" value="ouvrier">
+                      Oui
                     </SelectItem>
-                    <SelectItem key="inacheve" textValue="Inachevé">
-                      Inachevé
-                    </SelectItem>
-                    <SelectItem key="attente" textValue="Attente">
-                      Attente
+                    <SelectItem key="cadre" value="cadre">
+                      Non
                     </SelectItem>
                   </Select>
                 </div>
@@ -405,7 +413,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
   );
 };
 
-ReclamationTable.propTypes = {
+LogTable.propTypes = {
   columns: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
@@ -415,16 +423,13 @@ ReclamationTable.propTypes = {
   rows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      id_res: PropTypes.string.isRequired,
+      num_de_log: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
       nom: PropTypes.string.isRequired,
-      desc: PropTypes.string.isRequired,
-      date: PropTypes.string.isRequired,
-      status: PropTypes.string.isRequired,
-      sol: PropTypes.string.isRequired,
+      type_log: PropTypes.string.isRequired,
     })
   ).isRequired,
-  statusReclaOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
   title: PropTypes.string,
 };
 
-export default ReclamationTable;
+export default LogTable;
