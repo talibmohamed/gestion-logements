@@ -3,11 +3,13 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { loginadmin, fetchAdminProfile, changePassword } from "../services/adminapi";
 import { loginSuccess } from "../authentication";
 import { setAdmin } from "../adminslice";
+import { fetchNotifications } from "../services/adminapi";
+import {setNotifications } from "../notificationSlice"
 
 
 // Thunk for admin login
 export const loginAdminThunk = createAsyncThunk(
-  "user/loginUser",
+  "admin/loginAdmin",
   async ({ email, password }, { dispatch }) => {
     try {
       // Call the API function to log in the user
@@ -17,6 +19,7 @@ export const loginAdminThunk = createAsyncThunk(
         // Dispatch loginSuccess action if login is successful
         dispatch(loginSuccess(userData));
       }
+      
       return userData;
     } catch (error) {
       console.error("Error logging in:", error);
@@ -27,7 +30,7 @@ export const loginAdminThunk = createAsyncThunk(
 
 // Thunk to fetch admin profile data where the jwt in in the authentication slice
 export const fetchAdminProfileThunk = createAsyncThunk(
-  'user/fetchUserProfile',
+  'admin/fetchAdminProfile',
   async (_, { dispatch, getState }) => {
     try {
       // Extract the JWT token from the state
@@ -37,7 +40,6 @@ export const fetchAdminProfileThunk = createAsyncThunk(
       const userProfileData = await fetchAdminProfile(jwt);
 
       // Dispatch setUser action to update user profile in the store
-      console.log(userProfileData.admin);
 
       dispatch(setAdmin(userProfileData.admin));
 
@@ -53,7 +55,7 @@ export const fetchAdminProfileThunk = createAsyncThunk(
 
 // Thunk to handle change passwrod
 export const changePasswordThunk = createAsyncThunk(
-  "user/changePassword",
+  "admin/changePassword",
   async ({ password, confirmedPassword }, { getState }) => {
     const state = getState();
     const jwt = state.auth.jwt_token;
@@ -62,6 +64,23 @@ export const changePasswordThunk = createAsyncThunk(
       return response;
     } catch (error) {
       console.error("Error changing password:", error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to fetch all notifications 
+export const fetchNotificationsThunk = createAsyncThunk(
+  "notifications/fetchNotifications",
+  async (_, { getState, dispatch }) => { // Destructure `dispatch` from the thunk's second argument
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+    try {
+      const response = await fetchNotifications(jwt);
+      dispatch(setNotifications(response.notifications)); // Dispatch the action to set notifications in the state
+      return response; // Return the entire response if needed
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
       throw error;
     }
   }

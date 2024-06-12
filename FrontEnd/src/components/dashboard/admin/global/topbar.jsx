@@ -36,9 +36,6 @@ const Topbar = ({ broken, toggled, setToggled }) => {
           }}
         >
           <div className="user-section">
-            <IconButton className="mail-icon">
-              <MailOutlineOutlinedIcon style={{ fontSize: 28 }} />
-            </IconButton>
             <Notification />
             <div className="user-avatar">
               <Avatar

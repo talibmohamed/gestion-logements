@@ -65,3 +65,26 @@ export const changePassword = async (jwt, password, confirmedPassword) => {
   }
 };
 
+// Function to fetch all notifications
+
+export const fetchNotifications = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/admin/allnotification`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
+    console.log(response.data)
+    return response.data;
+  }
+  catch (error) {
+    console.error(
+      "Error in fetchNotifications:",
+      error.response || error.message || error
+    );
+    throw error;
+  }
+}
+
+

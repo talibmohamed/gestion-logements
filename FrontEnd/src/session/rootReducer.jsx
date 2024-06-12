@@ -9,6 +9,7 @@ const rootReducer = combineReducers({
   notifications: notificationReducer,
   user: userReducer,
   admin: adminReducer, 
+
 });
 
 export const resetStateReducer = (state, action) => {

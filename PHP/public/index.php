@@ -201,7 +201,7 @@ function route($uri, $method)
             break;
         
         case '/api/v1/admin/allnotification':
-            if ($method === 'POST') {
+            if ($method === 'GET') {
                 $jwtHandler = new JwtHandler();
                 $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
                 $jwt_token = str_replace('Bearer ', '', $jwt_token);
