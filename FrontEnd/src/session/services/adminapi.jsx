@@ -11,6 +11,9 @@ export const loginadmin = async (email, password) => {
       email,
       password,
     });
+
+    //calling all facture thunk on login and consol log them 
+    
     return response.data;
   } catch (error) {
     console.error(
@@ -65,3 +68,43 @@ export const changePassword = async (jwt, password, confirmedPassword) => {
   }
 };
 
+// Function to fetch all notifications
+
+export const fetchNotifications = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/admin/allnotification`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+
+    console.log(response.data)
+    return response.data;
+  }
+  catch (error) {
+    console.error(
+      "Error in fetchNotifications:",
+      error.response || error.message || error
+    );
+    throw error;
+  }
+}
+
+// Function to fetch all facture from /allfacture when passing a jwt
+export const fetchFacture = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/admin/allfacture`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  }
+  catch (error) {
+    console.error(
+      "Error in fetchFacture:",
+      error.response || error.message || error
+    );
+    throw error;
+  }
+}

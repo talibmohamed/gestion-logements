@@ -312,4 +312,82 @@ class admin
             ];
         }
     }
+
+    //getAllreclamation
+    public function getAllreclamation($jwt)
+    {
+        try {
+            $jwtHandler = new JwtHandler();
+            $token_info = $jwtHandler->verifyJwtToken($jwt);
+
+            if ($token_info['valid']) {
+                $connection = $this->db->getConnection();
+                $sql = $connection->prepare('SELECT * FROM reclamation');
+                $sql->execute();
+                $reclamations = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+                return [
+                    'status' => 'success',
+                    'reclamations' => $reclamations
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Invalid token'
+                ];
+            }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    //get all facture 
+    public function getAllfacture($jwt)
+    {
+        try {
+            $jwtHandler = new JwtHandler();
+            $token_info = $jwtHandler->verifyJwtToken($jwt);
+
+            if ($token_info['valid']) {
+                $connection = $this->db->getConnection();
+                $sql = $connection->prepare("
+                    SELECT 
+                        f.fac_id, 
+                        f.res_id, 
+                        (r.nom || ' ' || r.prenom) AS nom,
+                        f.fac_type, 
+                        f.fac_date, 
+                        f.fac_echeance, 
+                        f.fac_etat, 
+                        f.fac_total 
+                    FROM 
+                        facture f
+                    JOIN 
+                        residant r 
+                    ON 
+                        f.res_id = r.res_id
+                ");
+                $sql->execute();
+                $factures = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+                return [
+                    'status' => 'success',
+                    'factures' => $factures
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Invalid token'
+                ];
+            }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 }

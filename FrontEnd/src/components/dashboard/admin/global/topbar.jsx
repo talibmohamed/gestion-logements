@@ -19,8 +19,10 @@ const Topbar = ({ broken, toggled, setToggled }) => {
             <img src={logo} alt="logo" className="top-logo"  />
             <p>Houselytics</p>
           </div>
+
           <div>
-            <button onClick={() => setToggled(!toggled)} className="humb-button">
+          <Notification />
+            <button onClick={() => setToggled(!toggled)} className="pl-5 humb-button">
               <GiHamburgerMenu />
             </button>
           </div>
@@ -36,9 +38,6 @@ const Topbar = ({ broken, toggled, setToggled }) => {
           }}
         >
           <div className="user-section">
-            <IconButton className="mail-icon">
-              <MailOutlineOutlinedIcon style={{ fontSize: 28 }} />
-            </IconButton>
             <Notification />
             <div className="user-avatar">
               <Avatar

@@ -1,4 +1,5 @@
 // src/store/notificationSlice.js
+
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
@@ -9,19 +10,27 @@ const notificationSlice = createSlice({
   name: 'notifications',
   initialState,
   reducers: {
-    addNotification: (state, action) => {
+    setNotifications(state, action) {
+      state.notifications = action.payload;
+    },
+    addNotification(state, action) {
       state.notifications.push(action.payload);
     },
-    markAsRead: (state, action) => {
-      const { notifId } = action.payload;
-      const notification = state.notifications.find(notif => notif.notif_id === notifId);
+    markAsRead(state, action) {
+      const { notificationId } = action.payload;
+      const notification = state.notifications.find(
+        (notif) => notif.notif_id === notificationId
+      );
       if (notification) {
-        notification.is_read = true;
+        notification.is_read = 1;
       }
     },
   },
 });
 
-export const { addNotification, markAsRead } = notificationSlice.actions;
+export const { setNotifications, addNotification, markAsRead } =
+  notificationSlice.actions;
+
+export const selectNotifications = (state) => state.notifications.notifications;
 
 export default notificationSlice.reducer;

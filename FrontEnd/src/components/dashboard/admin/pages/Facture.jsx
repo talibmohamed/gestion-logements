@@ -1,11 +1,41 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import "./Overview.scss";
-import { columns, users, statusOptions } from "./components/facData";
+import { columns, statusOptions } from "./components/facData";
 import InvoiceTable from "./components/facTab.jsx";
-import "./Overview.scss";
 import { Card, CardBody, Textarea, Input } from "@nextui-org/react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchFactureThunk } from "../../../../session/thunks/adminthunk";
 
 const Facture = () => {
+  const dispatch = useDispatch();
+  const factures = useSelector((state) => state.facture.factures); 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await dispatch(fetchFactureThunk()).unwrap(); 
+        console.log(response);
+      } catch (error) {
+        console.error("Error fetching factures:", error);
+      }
+    };
+
+    fetchData();
+  }, [dispatch]);
+
+  console.log(factures);
+
+  // Transform factures data to match the table's expected structure
+  const transformedFactures = factures.map((facture) => ({
+    id: facture.fac_id,
+    id_res: facture.res_id,
+    nom: facture.nom,
+    type: facture.fac_type,
+    mois: facture.fac_date,
+    echeance: facture.fac_echeance,
+    status: facture.fac_etat,
+    ttc: facture.fac_total,
+  }));
+
   return (
     <div className="w-full">
       <Card
@@ -16,9 +46,9 @@ const Facture = () => {
         <CardBody>
           <InvoiceTable
             columns={columns}
-            rows={users}
+            rows={transformedFactures}
             statusOptions={statusOptions.map((option) => option.uid)}
-            title="Factures "
+            title="Factures"
           />
         </CardBody>
       </Card>
@@ -52,7 +82,7 @@ const Facture = () => {
               variant="bordered"
               labelPlacement="outside"
               placeholder="Entrer votre description"
-              className="max-w-5xl mb-4 "
+              className="max-w-5xl mb-4"
             />
           </div>
         </CardBody>
@@ -60,4 +90,5 @@ const Facture = () => {
     </div>
   );
 };
+
 export default Facture;

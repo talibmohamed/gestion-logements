@@ -29,7 +29,8 @@ class AdminController
 
     // other methods for the admin
 
-    public function profile($jwt) {
+    public function profile($jwt)
+    {
         if ($jwt) {
             $response = $this->admin->profile($jwt);
             http_response_code(200);
@@ -40,7 +41,8 @@ class AdminController
         }
     }
 
-    public function changepassword($data) {
+    public function changepassword($data)
+    {
         if ($data && isset($data['password']) && isset($data['confirmedPassword'])) {
             $jwt = $data['jwt'];
             $password = $data['password'];
@@ -53,18 +55,19 @@ class AdminController
             echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
         }
     }
-    
-        // get all admin notifications
-        public function getAllnotificationsAPI($jwt){
-            if ($jwt) {
-                $response = $this->admin->getAllnotifications($jwt);
-                http_response_code(200);
-                echo json_encode($response);
-            } else {
-                http_response_code(400);
-                echo json_encode(array('status' => 'error1111', 'message' => 'Invalid JSON data'));
-            }
+
+    // get all admin notifications
+    public function getAllnotificationsAPI($jwt)
+    {
+        if ($jwt) {
+            $response = $this->admin->getAllnotifications($jwt);
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(array('status' => 'error1111', 'message' => 'Invalid JSON data'));
         }
+    }
 
 
     public function addUserAPI($data)
@@ -99,5 +102,45 @@ class AdminController
         }
     }
 
+    //all getAllreclamationAPI
+    public function getAllreclamationAPI($jwt)
+    {
+        if ($jwt) {
+            $response = $this->admin->getAllreclamation($jwt);
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
+        }
+    }
 
+    //get all facture 
+    public function getAllfactureAPI($jwt)
+    {
+        if ($jwt) {
+            $response = $this->admin->getAllfacture($jwt);
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
+        }
+    }
+
+
+    //the web socket controller 
+    // public function broadcastMessage($message)
+    // {
+    //     // Connect to the WebSocket server and broadcast the message
+    //     $host = '127.0.0.1';
+    //     $port = 8080;
+    //     $socket = fsockopen($host, $port, $errno, $errstr, 30);
+    //     if (!$socket) {
+    //         echo "$errstr ($errno)<br />\n";
+    //     } else {
+    //         fwrite($socket, $message);
+    //         fclose($socket);
+    //     }
+    // }
 }
