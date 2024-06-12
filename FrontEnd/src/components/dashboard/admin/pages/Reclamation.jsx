@@ -1,14 +1,14 @@
 import React from "react";
 import "./Statics.scss";
 import { columns, users, statusReclOptions } from "./components/reclaData.jsx";
-import InvoiceTable from "./components/reclaTab.jsx";
+import ReclamationTable from "./components/reclaTab.jsx";
 import ReclaGraph from "./components/reclaGraph";
 import { Card, CardBody } from "@nextui-org/react";
 
 const Reclamation = () => {
   const sampleData = [
     {
-      label: "totat des reclamations par mois",
+      label: "total des réclamations par mois",
       data: [20, 10, 10, 3, 6, 11],
       color: "#96A7FF",
     },
@@ -22,16 +22,16 @@ const Reclamation = () => {
         shadow="sm"
       >
         <CardBody>
-          <InvoiceTable
+          <ReclamationTable
             columns={columns}
             rows={users}
             statusReclOptions={statusReclOptions.map((option) => option.uid)}
-            title="Historique des Reclamations"
+            title="Historique des Réclamations"
           />
         </CardBody>
       </Card>
       <div className=" w-full reclGraph">
-        <ReclaGraph title="Graphe lineaire des logements" data={sampleData} />
+        <ReclaGraph title="Graphe linéaire des logements" data={sampleData} />
       </div>
     </div>
   );

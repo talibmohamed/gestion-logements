@@ -1,5 +1,5 @@
 <?php
-class Facture {
+class facture {
     public $fac_ID;
     public $fac_no;
     public $fac_date;

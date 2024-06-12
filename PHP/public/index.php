@@ -59,16 +59,16 @@ function route($uri, $method)
                 echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
             }
             break;
-        // case '/api/v1/user/firstloginwithtoken':
-        //     if ($method === 'POST') {
-        //         $userController = new UserController();
-        //         //am sending the token in the usrl
-        //         $data['token'] = $_GET['token'];
-        //         $userController->firstloginwithtoken($data);
-        //     } else {
-        //         http_response_code(405);
-        //         echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
-        //     }
+            // case '/api/v1/user/firstloginwithtoken':
+            //     if ($method === 'POST') {
+            //         $userController = new UserController();
+            //         //am sending the token in the usrl
+            //         $data['token'] = $_GET['token'];
+            //         $userController->firstloginwithtoken($data);
+            //     } else {
+            //         http_response_code(405);
+            //         echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+            //     }
 
         case '/api/v1/user/profile':
             if ($method === 'GET') {
@@ -82,7 +82,7 @@ function route($uri, $method)
                 echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
             }
             break;
-        
+
             //change password
         case '/api/v1/user/change-password':
             if ($method === 'POST') {
@@ -97,7 +97,7 @@ function route($uri, $method)
                 echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
             }
             break;
-        //check token
+            //check token
         case '/api/v1/user/check-token':
             if ($method === 'POST') {
                 $jwtHandler = new JwtHandler();
@@ -126,6 +126,51 @@ function route($uri, $method)
             if ($method === 'POST') {
                 $adminController = new AdminController();
                 $adminController->loginAdminAPI($data);
+            } else {
+                http_response_code(405);
+                echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+            }
+            break;
+
+        case '/api/v1/admin/profile':
+            if ($method === 'GET') {
+                $jwtHandler = new JwtHandler();
+                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                $jwt_token = str_replace('Bearer ', '', $jwt_token);
+                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+                if ($token_info['valid']) {
+                    $adminController = new AdminController();
+                    $adminController->profile($jwt_token);
+                } else {
+                    http_response_code(401); // Unauthorized
+                    echo json_encode([
+                        'status' => 'error111',
+                        'message' => 'Unauthorized',
+                    ]);
+                }
+            } else {
+                http_response_code(405);
+                echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+            }
+            break;
+            //admin change password 
+        case '/api/v1/admin/change-password':
+            if ($method === 'POST') {
+                $jwtHandler = new JwtHandler();
+                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                $jwt_token = str_replace('Bearer ', '', $jwt_token);
+                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+                if ($token_info['valid']) {
+                    $data['jwt'] = $jwt_token;
+                    $adminController = new AdminController();
+                    $adminController->changepassword($data);
+                } else {
+                    http_response_code(401); // Unauthorized
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Unauthorized',
+                    ]);
+                }
             } else {
                 http_response_code(405);
                 echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);

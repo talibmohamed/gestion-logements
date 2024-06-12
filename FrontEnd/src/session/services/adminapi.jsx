@@ -20,3 +20,48 @@ export const loginadmin = async (email, password) => {
     throw error;
   }
 };
+
+// Function to fetch admin profile
+export const fetchAdminProfile = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/admin/profile`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error in fetchAdminProfile:",
+      error.response || error.message || error
+    );
+    throw error;
+  }
+};
+
+// Function to change password
+export const changePassword = async (jwt, password, confirmedPassword) => {
+  try {
+    const response = await axios.post(
+      `${baseURL}/admin/change-password`,
+      {
+        password,
+        confirmedPassword,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error in changePassword:",
+      error.response || error.message || error
+    );
+    throw error;
+  }
+};
+

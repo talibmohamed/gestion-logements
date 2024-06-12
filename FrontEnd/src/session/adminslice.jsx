@@ -1,11 +1,11 @@
-// adminSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   nom: "",
   prenom: "",
   email: "",
-  // Add other admin-related state properties as needed
+  telephone: "",
+  date_creation: "",
 };
 
 const adminSlice = createSlice({
@@ -13,11 +13,12 @@ const adminSlice = createSlice({
   initialState,
   reducers: {
     setAdmin: (state, action) => {
-      const { nom, prenom, email } = action.payload;
+      const { nom, prenom, email, telephone, date_creation } = action.payload;
       state.nom = nom;
       state.prenom = prenom;
       state.email = email;
-      // Set other admin-related state properties as needed
+      state.telephone = telephone;
+      state.date_creation = date_creation;
     },
     // Add other admin-related reducers as needed
   },

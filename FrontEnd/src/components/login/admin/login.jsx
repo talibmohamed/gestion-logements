@@ -5,7 +5,7 @@ import sunset from "./sunset.jpeg";
 import "../style.scss";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { loginAdminThunk } from "../../../session/thunks/adminthink";
+import { loginAdminThunk } from "../../../session/thunks/adminthunk";
 import { Link, Button, Input } from "@nextui-org/react";
 import { EyeFilledIcon } from "../EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../EyeSlashFilledIcon";
