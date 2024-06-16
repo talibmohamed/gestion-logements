@@ -34,14 +34,14 @@ const users = [
     id: 4,
     num_de_log: "LOG004",
     nom: "Michael Brown",
-    type_log: "Ouvrier",
+    type_log: "Agent de maitrise",
     ameliored: "Oui",
   },
   {
     id: 5,
     num_de_log: "LOG005",
     nom: "Emily Wilson",
-    type_log: "Ouvrier  ",
+    type_log: "Agent de maitrise  ",
     ameliored: "Non",
   },
   {

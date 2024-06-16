@@ -206,6 +206,10 @@ const Profile = () => {
                           isOpen={isOpen}
                           onOpenChange={onOpenChange}
                           placement="center"
+                          classNames={{
+                            base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+                            closeButton: "hover:bg-white/5 active:bg-white/10",
+                          }}
                         >
                           <ModalContent>
                             {(onClose) => (
@@ -219,6 +223,23 @@ const Profile = () => {
                                     label="Nouveau Mot De Passe"
                                     variant="bordered"
                                     value={password}
+                                    classNames={{
+                                      label: "group-data-[filled-within=true]:text-zinc-400",
+                                      input: [
+                                        "bg-transparent",
+                                        "group-data-[has-value=true]:text-white/90",
+                                      ],
+                                      innerWrapper: "bg-transparent",
+                                      inputWrapper: [
+                                        "bg-transparent",
+                                        "group-data-[hover=true]:bg-zinc-800",
+                                        "group-data-[hover=true]:border-zinc-500",
+                                        "group-data-[focus=true]:bg-transparent ",
+                                        "group-data-[focus=true]:border-zinc-400 ",
+                                        "!cursor-text",
+                                        "border-zinc-600",
+                                      ],
+                                    }}
                                     onChange={(e) =>
                                       setpassword(e.target.value)
                                     }
@@ -241,6 +262,23 @@ const Profile = () => {
                                     label="Confirmer Votre Mot de Passe"
                                     variant="bordered"
                                     value={confirmedPassword}
+                                    classNames={{
+                                      label: "group-data-[filled-within=true]:text-zinc-400",
+                                      input: [
+                                        "bg-transparent",
+                                        "group-data-[has-value=true]:text-white/90",
+                                      ],
+                                      innerWrapper: "bg-transparent",
+                                      inputWrapper: [
+                                        "bg-transparent",
+                                        "group-data-[hover=true]:bg-zinc-800",
+                                        "group-data-[hover=true]:border-zinc-500",
+                                        "group-data-[focus=true]:bg-transparent ",
+                                        "group-data-[focus=true]:border-zinc-400 ",
+                                        "!cursor-text",
+                                        "border-zinc-600",
+                                      ],
+                                    }}
                                     onChange={(e) => {
                                       setconfirmedPassword(e.target.value);
                                       validateConfirmation(e.target.value);

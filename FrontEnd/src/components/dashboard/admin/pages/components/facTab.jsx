@@ -301,10 +301,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                         </div>
                       </ModalBody>
                       <ModalFooter>
-                        <Button
-                          color="danger"
-                          onPress={onClose}
-                        >
+                        <Button color="danger" onPress={onClose}>
                           Close
                         </Button>
                         <Button color="primary" onPress={onClose}>
@@ -391,6 +388,10 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
         size="lg"
         isOpen={isDetailsModalOpen}
         onOpenChange={() => setDetailsModalOpen(false)}
+        classNames={{
+          base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+          closeButton: "hover:bg-white/5 active:bg-white/10",
+        }}
       >
         <ModalContent>
           {(onClose) => (
@@ -407,6 +408,23 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                     variant="bordered"
                     defaultValue={currentInvoice.nom}
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
                   />
 
                   <Input
@@ -416,6 +434,23 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                     variant="bordered"
                     defaultValue={currentInvoice.profession}
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
                   />
                 </div>
 
@@ -427,6 +462,23 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                     variant="bordered"
                     defaultValue={currentInvoice.id_logement}
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
                   />
 
                   <Input
@@ -436,6 +488,23 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                     variant="bordered"
                     defaultValue={currentInvoice.type_log}
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
                   />
                   <Input
                     isReadOnly
@@ -444,9 +513,25 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                     variant="bordered"
                     defaultValue={currentInvoice.ameliored ? "Oui" : "Non"}
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
                   />
                 </div>
-
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="flat" onClick={onClose}>
@@ -458,7 +543,15 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
         </ModalContent>
       </Modal>
 
-      <Modal size="lg" isOpen={isEditModalOpen} onOpenChange={setEditModalOpen}>
+      <Modal
+        size="lg"
+        isOpen={isEditModalOpen}
+        onOpenChange={setEditModalOpen}
+        classNames={{
+          base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+          closeButton: "hover:bg-white/5 active:bg-white/10",
+        }}
+      >
         <ModalContent>
           {(onClose) => (
             <>
@@ -472,6 +565,20 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                     type="text"
                     label="Résidant"
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
                     defaultValue={currentInvoice?.nom}
                     onChange={(e) =>
                       setCurrentInvoice({
@@ -484,6 +591,29 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                     label="Type de Facture"
                     placeholder="Choisir le type de facture"
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled=true]:text-zinc-400",
+                      value: "group-data-[has-value=true]:text-white/90",
+                      trigger: [
+                        "bg-zinc-800",
+                        "text-white/90",
+                        "placeholder:text-white/60",
+                        "data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800",
+                        "group-data-[focus=true]:border-zinc-400",
+                      ],
+                      content: [
+                        "bg-zinc-800",
+                        "text-white/90",
+                        "border-zinc-800",
+                      ],
+                      popoverContent: ["bg-zinc-800", "text-white/90"],
+                      listboxWrapper: [
+                        "bg-zinc-800",
+                        "!cursor-text",
+                        "text-white/90",
+                      ],
+                    }}
                     defaultValue={currentInvoice?.typeFacture}
                     onChange={(value) =>
                       setCurrentInvoice({
@@ -505,7 +635,30 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                   <Select
                     label="Status"
                     placeholder="Choisir le statut"
-                    className="max-w-xs text-black"
+                    className="max-w-xs "
+                    classNames={{
+                      label: "group-data-[filled=true]:text-zinc-400",
+                      value: "group-data-[has-value=true]:text-white/90",
+                      trigger: [
+                        "bg-zinc-800",
+                        "text-white/90",
+                        "placeholder:text-white/60",
+                        "data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800",
+                        "group-data-[focus=true]:border-zinc-400",
+                      ],
+                      content: [
+                        "bg-zinc-800",
+                        "text-white/90",
+                        "border-zinc-800",
+                      ],
+                      popoverContent: ["bg-zinc-800", "text-white/90"],
+                      listboxWrapper: [
+                        "bg-zinc-800",
+                        "!cursor-text",
+                        "text-white/90",
+                      ],
+                    }}
                     color="warning"
                     defaultValue={currentInvoice?.status}
                     onSelectionChange={(keys) =>
@@ -527,6 +680,21 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                     type="price"
                     label="Montant TTC"
                     placeholder="Entrer le montant TTC"
+                    classNames={{
+                      label: "text-white/90",
+                      input: [
+                        "bg-zinc-800",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-zinc-800",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                      ],
+                    }}
                     startContent={
                       <div className="pointer-events-none flex items-center">
                         <span className="text-default-400 text-small">$</span>

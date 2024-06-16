@@ -250,6 +250,10 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
         size="lg"
         isOpen={isDetailsModalOpen}
         onOpenChange={() => setDetailsModalOpen(false)}
+        classNames={{
+          base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+          closeButton: "hover:bg-white/5 active:bg-white/10",
+        }}
       >
         <ModalContent>
           {(onClose) => (
@@ -266,6 +270,23 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     variant="bordered"
                     defaultValue={currentReclamation.nom}
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
                   />
 
                   <Input
@@ -275,6 +296,23 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     variant="bordered"
                     defaultValue={currentReclamation.profession}
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
                   />
                 </div>
 
@@ -286,6 +324,23 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     variant="bordered"
                     defaultValue={currentReclamation.id_logement}
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
                   />
 
                   <Input
@@ -295,6 +350,23 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     variant="bordered"
                     defaultValue={currentReclamation.type_log}
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
                   />
                   <Input
                     isReadOnly
@@ -303,6 +375,23 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     variant="bordered"
                     defaultValue={currentReclamation.ameliored ? "Oui" : "Non"}
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
                   />
                 </div>
               </ModalBody>
@@ -316,7 +405,15 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
         </ModalContent>
       </Modal>
 
-      <Modal size="lg" isOpen={isEditModalOpen} onOpenChange={setEditModalOpen}>
+      <Modal
+        size="lg"
+        isOpen={isEditModalOpen}
+        onOpenChange={setEditModalOpen}
+        classNames={{
+          base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+          closeButton: "hover:bg-white/5 active:bg-white/10",
+        }}
+      >
         <ModalContent>
           {(onClose) => (
             <>
@@ -330,6 +427,20 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     type="text"
                     label="Résidant"
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
                     defaultValue={currentReclamation?.nom}
                     onChange={(e) =>
                       setCurrentReclamation({
@@ -344,6 +455,20 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     type="text"
                     label="Description"
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
                     defaultValue={currentReclamation?.desc}
                     onChange={(e) =>
                       setCurrentReclamation({
@@ -360,6 +485,20 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     type="text"
                     label="Date de Réclamation"
                     className="max-w-xs"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
                     defaultValue={currentReclamation?.date}
                     onChange={(e) =>
                       setCurrentReclamation({
@@ -372,6 +511,29 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     label="Status"
                     placeholder="Choisir le statut"
                     className="max-w-xs text-black"
+                    classNames={{
+                      label: "group-data-[filled=true]:text-zinc-400",
+                      value: "group-data-[has-value=true]:text-white/90",
+                      trigger: [
+                        "bg-zinc-800",
+                        "text-white/90",
+                        "placeholder:text-white/60",
+                        "data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800",
+                        "group-data-[focus=true]:border-zinc-400",
+                      ],
+                      content: [
+                        "bg-zinc-800",
+                        "text-white/90",
+                        "border-zinc-800",
+                      ],
+                      popoverContent: ["bg-zinc-800", "text-white/90"],
+                      listboxWrapper: [
+                        "bg-zinc-800",
+                        "!cursor-text",
+                        "text-white/90",
+                      ],
+                    }}
                     defaultValue={currentReclamation?.status}
                     onSelectionChange={(keys) =>
                       handleStatusChange(keys.currentKey)
