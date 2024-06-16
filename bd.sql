@@ -12,7 +12,7 @@ CREATE TABLE logement (
     mc          INT NOT NULL,
     piece       INT NOT NULL,
     equip_ids   INT[],
-    is_vacant BOOLEAN default true;
+    is_vacant BOOLEAN DEFAULT true
 );
 
 CREATE TABLE admin (
@@ -99,7 +99,9 @@ CREATE TABLE notification (
     notif_desc VARCHAR(255),
     is_read BOOLEAN DEFAULT FALSE,
     res_id INT,
-    FOREIGN KEY (res_id) REFERENCES residant (res_id)
+    adm_id INT,
+    FOREIGN KEY (res_id) REFERENCES residant (res_id),
+    FOREIGN KEY (adm_id) REFERENCES admin (adm_id)
 );
 
 

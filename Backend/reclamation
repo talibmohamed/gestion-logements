@@ -1,5 +1,5 @@
 <?php
-class Reclamation{
+class reclamation{
     public $rec_id;
     public $rec_desc;
     public $rec_etat;

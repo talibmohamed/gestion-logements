@@ -106,13 +106,13 @@ class admin
         try {
             $jwtHandler = new JwtHandler();
             $token_info = $jwtHandler->verifyJwtToken($jwt);
-    
+
             if ($token_info['valid']) {
                 $connection = $this->db->getConnection();
                 $sql = $connection->prepare('SELECT nom, prenom, email, telephone, TO_CHAR(date_creation, \'DD-MM-YYYY\') as date_creation FROM admin WHERE adm_id = ?');
                 $sql->execute([$token_info['data']['id']]);
                 $admin = $sql->fetch(PDO::FETCH_ASSOC);
-    
+
                 if ($admin) {
                     return array(
                         'status' => 'success',
@@ -128,8 +128,8 @@ class admin
             return array('status' => 'error', 'message' => $e->getMessage());
         }
     }
-    
-    
+
+
 
     // API endpoint function to handle admin changing password
     public function changePassword($jwt, $password, $confirmedPassword)
@@ -277,6 +277,115 @@ class admin
         } catch (Exception $e) {
             return [
                 'status' => 'error3',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    // Get all admin notifications
+    public function getAllnotifications($jwt)
+    {
+        try {
+            $jwtHandler = new JwtHandler();
+            $token_info = $jwtHandler->verifyJwtToken($jwt);
+
+            if ($token_info['valid']) {
+                $connection = $this->db->getConnection();
+                $sql = $connection->prepare('SELECT notif_id, notif_titre, notif_date, notif_desc, is_read FROM notification WHERE adm_id = ?');
+                $sql->execute([$token_info['data']['id']]);
+                $notifications = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+                return [
+                    'status' => 'success',
+                    'notifications' => $notifications
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Invalid token'
+                ];
+            }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    //getAllreclamation
+    public function getAllreclamation($jwt)
+    {
+        try {
+            $jwtHandler = new JwtHandler();
+            $token_info = $jwtHandler->verifyJwtToken($jwt);
+
+            if ($token_info['valid']) {
+                $connection = $this->db->getConnection();
+                $sql = $connection->prepare('SELECT * FROM reclamation');
+                $sql->execute();
+                $reclamations = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+                return [
+                    'status' => 'success',
+                    'reclamations' => $reclamations
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Invalid token'
+                ];
+            }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    //get all facture 
+    public function getAllfacture($jwt)
+    {
+        try {
+            $jwtHandler = new JwtHandler();
+            $token_info = $jwtHandler->verifyJwtToken($jwt);
+
+            if ($token_info['valid']) {
+                $connection = $this->db->getConnection();
+                $sql = $connection->prepare("
+                    SELECT 
+                        f.fac_id, 
+                        f.res_id, 
+                        (r.nom || ' ' || r.prenom) AS nom,
+                        f.fac_type, 
+                        f.fac_date, 
+                        f.fac_echeance, 
+                        f.fac_etat, 
+                        f.fac_total 
+                    FROM 
+                        facture f
+                    JOIN 
+                        residant r 
+                    ON 
+                        f.res_id = r.res_id
+                ");
+                $sql->execute();
+                $factures = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+                return [
+                    'status' => 'success',
+                    'factures' => $factures
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Invalid token'
+                ];
+            }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
                 'message' => $e->getMessage()
             ];
         }

@@ -1,85 +1,102 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
-  DropdownSection,
   DropdownItem,
-  Button,
+  Badge,
 } from "@nextui-org/react";
-import { useSelector } from "react-redux"; // Import useSelector hook to access Redux state
-// import { notification } from "../../../../session/services/api"; // Import fetchData function
 import { NotificationIcon } from "./NotificationIcon";
+import { selectNotifications } from "../../../../session/notificationSlice";
 
 export default function App() {
-  // State to store notifications
-  const [notifications, setNotifications] = useState([]);
+  const notifications = useSelector(selectNotifications);
 
-  // Redux selector to get JWT token from the store
-  const jwtToken = useSelector((state) => state.auth.jwtToken);
+  // Function to calculate time since notification
+  const formatTimeSince = (dateString) => {
+    const notificationDate = new Date(dateString);
+    const now = new Date();
+    const diffMilliseconds = now - notificationDate;
+    const diffSeconds = Math.floor(diffMilliseconds / 1000);
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    const diffHours = Math.floor(diffMinutes / 60);
 
-  // Function to fetch notifications
-  const notification = async () => {
-    try {
-      // Fetch notifications data using JWT token
-      const notificationData = await fetchData("notifications", jwtToken); // Adjust the endpoint according to your API route
-      setNotifications(notificationData);
-    } catch (error) {
-      console.error("Error fetching notifications:", error);
+    if (diffSeconds < 60) {
+      return `${diffSeconds} second${diffSeconds !== 1 ? 's' : ''} ago`;
+    } else if (diffMinutes < 60) {
+      return `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''} ago`;
+    } else if (diffHours < 24) {
+      return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+    } else {
+      // Format the date as 'DD/MM/YYYY' if more than 24 hours ago
+      const day = notificationDate.getDate();
+      const month = notificationDate.getMonth() + 1;
+      const year = notificationDate.getFullYear();
+      return `${day}/${month}/${year}`;
     }
   };
 
-  // Fetch notifications when component mounts
-  useEffect(() => {
-    notification();
-  }, []);
+  // Sort notifications by date, newest first
+  const sortedNotifications = [...notifications].sort(
+    (a, b) => new Date(b.notif_date) - new Date(a.notif_date)
+  );
+
+  // Count unread notifications
+  const unreadCount = notifications.filter((notif) => !notif.is_read).length;
+
+  const markNotificationAsRead = (notifId) => {
+
+  };
 
   return (
     <Dropdown
       showArrow
-      radius="sm"
+      radius="l"
       classNames={{
-        base: "before:bg-default-200", // change arrow background
-        content: "p-0 border-small border-divider bg-background",
+        base: "before:bg-[#171821]",
+        content: "py-1 border-small border-divider bg-[#21222d]",
       }}
     >
-      <DropdownTrigger>
-        <Button radius="full" isIconOnly variant="none">
-          <NotificationIcon size={24} />
-        </Button>
-      </DropdownTrigger>
+      <Badge content={unreadCount} shape="circle" color="danger">
+        <DropdownTrigger>
+          <button className="flex items-center justify-center p-2 rounded-full bg-transparent border-none outline-none">
+            <NotificationIcon size={24} />
+          </button>
+        </DropdownTrigger>
+      </Badge>
+
       <DropdownMenu
-        aria-label="Custom item styles"
-        disabledKeys={["profile"]}
+        aria-label="Notifications"
+        closeOnSelect={false}
         classNames={{
-          base: "bg-[#171821] dark:bg-[#171821] text-[white]",
-        }}
-        itemClasses={{
-          base: [
-            "rounded-md",
-            "text-default-500",
-            "transition-opacity",
-            "data-[hover=true]:text-foreground",
-            "data-[hover=true]:bg-default-100",
-            "dark:data-[hover=true]:bg-default-50",
-            "data-[selectable=true]:focus:bg-default-50",
-            "data-[pressed=true]:opacity-70",
-            "data-[focus-visible=true]:ring-default-500",
-          ],
+          base: "bg-[#21222d] shadow-lg rounded-lg my-4 w-80",
+          content: "p-0 overflow-y-auto max-h-80",
         }}
       >
-        <DropdownSection aria-label="Notifications" showDivider>
-          {notifications.map((notification) => (
-            <DropdownItem key={notification.notif_id}>
-              {notification.notif_titre}
-            </DropdownItem>
-          ))}
-        </DropdownSection>
-
-        <DropdownSection aria-label="Help & Feedback">
-          <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
-          <DropdownItem key="logout">Log Out</DropdownItem>
-        </DropdownSection>
+        {sortedNotifications.map((notification) => (
+          <DropdownItem
+            key={notification.notif_id}
+            onClick={() => markNotificationAsRead(notification.notif_id)}
+            className={`${
+              notification.is_read ? "text-gray-400" : "text-white"
+            } hover:bg-[#171821] cursor-pointer`}
+          >
+            <div className="p-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className="text-sm font-medium">
+                  {notification.notif_titre}
+                </div>
+                <div className="text-xs text-gray-400">
+                  {formatTimeSince(notification.notif_date)}
+                </div>
+              </div>
+              <div className="text-xs text-gray-400">
+                {notification.notif_desc}
+              </div>
+            </div>
+          </DropdownItem>
+        ))}
       </DropdownMenu>
     </Dropdown>
   );
