@@ -125,59 +125,90 @@ const LogTable = ({ columns, rows, title }) => {
     const equipmentData = {
       cadre: {
         oui: [
-          "baignoire",
-          "douche",
-          "clim",
-          "heating",
-          "closet",
-          "dishwasher",
-          "four",
-          "refrigerateur",
-          "stove",
-          "microwave",
-          "balcon",
-          "jardin",
-          "parking",
-          "terasse",
+          "Baignoire",
+          "Douche",
+          "Climatisation central",
+          "Chauffage central",
+          "Lave-linge",
+          "Sèche-linge",
+          "Espaces de rangement (placards intégrés, dressing)",
+          "Réfrigérateur",
+          "Four à micro-ondes",
+          "Cuisinière électrique",
+          "Lave-vaisselle",
+          "Four",
+          "Balcon ou terasse spacieux",
+          "Jardins privés ou espaces verts personnels",
+          "Place de parking dédiée avec point de recharge pour véhicules électriques",
+          "Accès à des équipements de fitness en plein air",
+          "Wifi",
+          "Système de sécurité",
         ],
         non: [
-          "douche",
-          "four",
-          "refrigerateur",
-          "stove",
-          "microwave",
-          "heating",
-          "closet",
-          "parking",
+          "Douche",
+          "Four",
+          "Réfrigérateur",
+          "Four à micro-ondes",
+          "Cuisinière électrique",
+          "Chauffage électrique",
+          "Espaces de rangement basiques",
+          "Lave-linge",
+          "Petit balcon",
+          "Accès à un parking commun",
+          "Wifi",
+          "Système de sécurité",
+        ],
+      },
+      "agent de maitrise": {
+        oui: [
+          "Douche",
+          "Chauffage central",
+          "Lave-linge",
+          "Espaces de rangement suffisants",
+          "Réfrigérateur",
+          "Cuisinière électrique",
+          "Balcon",
+          "Place de parking partagée",
+          "Espaces verts communs",
+          "Wifi",
+          "Système de sécurité",
+        ],
+        non: [
+          "Douche",
+          "Réfrigérateur",
+          "Cuisinière à gaz",
+          "Chauffage au gaz",
+          "Rangement minimal",
+          "Accès à un parking commun",
+          "Wifi",
+          "Système de sécurité",
+          "Pas de balcon",
         ],
       },
       ouvrier: {
         oui: [
-          "douche",
-          "clim",
-          "heating",
-          "closet",
-          "refrigerateur",
-          "stove",
-          "microwave",
-          "balcon",
-          "jardin",
-          "parking",
+          "Douche",
+          "Chauffage électrique",
+          "Espaces de rangement suffisants",
+          "Réfrigérateur",
+          "Cuisinière à gaz",
+          "Petit balcon",
+          "Espaces verts partagés",
+          "Parking commun",
+          "Wifi",
+          "Système de sécurité",
         ],
-        non: ["douche","refrigerateur", "stove", "heating", "closet", "parking"],
-      },
-      "agent de maitrise": {
-        oui: [
-          "douche",
-          "heating",
-          "closet",
-          "refrigerateur",
-          "stove",
-          "balcon",
-          "jardin",
-          "parking",
+        non: [
+          "Douche",
+          "Chauffage au gaz",
+          "Réfrigérateur",
+          "Cuisinière à gaz",
+          "Rangement minimal",
+          "Accès à un parking commun",
+          "Système de sécurité",
+          "Wifi",
+          "Pas de balcon",
         ],
-        non: ["refrigerateur", "stove", "heating", "closet", "parking"],
       },
     };
     const userEquipments = equipmentData[typeLog]?.[ameliored] || [];
@@ -702,43 +733,72 @@ const LogTable = ({ columns, rows, title }) => {
                 <EquipmentSection
                   title="Salle de bain"
                   equipments={currentEquipments.filter((equip) =>
-                    ["baignoire", "douche"].includes(equip)
+                    ["Baignoire", "Douche"].includes(equip)
                   )}
                 />
                 <EquipmentSection
                   title="Chambre"
                   equipments={currentEquipments.filter((equip) =>
-                    ["closet"].includes(equip)
+                    [
+                      "Lave-linge",
+                      "Sèche-linge",
+                      "Espaces de rangement (placards intégrés, dressing)",
+                      "Espaces de rangement suffisants",
+                      "Rangement minimal",
+                    ].includes(equip)
                   )}
                 />
                 <EquipmentSection
                   title="Cuisine"
                   equipments={currentEquipments.filter((equip) =>
                     [
-                      "dishwasher",
-                      "four",
-                      "refrigerateur",
-                      "stove",
-                      "microwave",
+                      "Lave-vaisselle",
+                      "Four",
+                      "Réfrigérateur",
+                      "Cuisinière électrique",
+                      "Cuisinière à gaz",
+                      "Four à micro-ondes",
                     ].includes(equip)
                   )}
                 />
                 <EquipmentSection
                   title="Chauffage et climatisation"
                   equipments={currentEquipments.filter((equip) =>
-                    ["clim", "heating"].includes(equip)
+                    [
+                      "Climatisation central",
+                      "Chauffage central",
+                      "Chauffage électrique",
+                      "Chauffage au gaz",
+                    ].includes(equip)
                   )}
                 />
                 <EquipmentSection
                   title="Extérieur"
                   equipments={currentEquipments.filter((equip) =>
-                    ["balcon", "jardin", "terasse"].includes(equip)
+                    [ "Pas de balcon",
+                      "Balcon",
+                      "Balcon ou terasse spacieux",
+                      "Petit balcon",
+                      "Jardins privés ou espaces verts personnels",
+                      "Espaces verts communs",
+                    ].includes(equip)
+                  )}
+                />
+                <EquipmentSection
+                  title="Services"
+                  equipments={currentEquipments.filter((equip) =>
+                    [ "Wifi","Système de sécurité"].includes(equip)
                   )}
                 />
                 <EquipmentSection
                   title="Parking et installations"
                   equipments={currentEquipments.filter((equip) =>
-                    ["station", "parking", "gym"].includes(equip)
+                    [ "Parking commun",
+                      "Place de parking partagée",
+                      "Accès à un parking commun",
+                      "Place de parking dédiée avec point de recharge pour véhicules électriques",
+                      "Accès à des équipements de fitness en plein air",
+                    ].includes(equip)
                   )}
                 />
               </ModalBody>

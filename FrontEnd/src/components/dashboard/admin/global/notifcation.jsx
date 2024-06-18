@@ -23,11 +23,11 @@ export default function App() {
     const diffHours = Math.floor(diffMinutes / 60);
 
     if (diffSeconds < 60) {
-      return `${diffSeconds} second${diffSeconds !== 1 ? 's' : ''} ago`;
+      return `${diffSeconds} second${diffSeconds !== 1 ? "s" : ""} ago`;
     } else if (diffMinutes < 60) {
-      return `${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''} ago`;
+      return `${diffMinutes} minute${diffMinutes !== 1 ? "s" : ""} ago`;
     } else if (diffHours < 24) {
-      return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+      return `${diffHours} hour${diffHours !== 1 ? "s" : ""} ago`;
     } else {
       // Format the date as 'DD/MM/YYYY' if more than 24 hours ago
       const day = notificationDate.getDate();
@@ -45,9 +45,7 @@ export default function App() {
   // Count unread notifications
   const unreadCount = notifications.filter((notif) => !notif.is_read).length;
 
-  const markNotificationAsRead = (notifId) => {
-
-  };
+  const markNotificationAsRead = (notifId) => {};
 
   return (
     <Dropdown
@@ -58,13 +56,14 @@ export default function App() {
         content: "py-1 border-small border-divider bg-[#21222d]",
       }}
     >
-      <Badge content={unreadCount} shape="circle" color="danger">
-        <DropdownTrigger>
-          <button className="flex items-center justify-center p-2 rounded-full bg-transparent border-none outline-none">
+
+      <DropdownTrigger>
+        <button className="flex items-center justify-center p-2 rounded-full bg-transparent border-none outline-none">
+          <Badge content={unreadCount} shape="circle" size="md" color="danger" variant="shadow">
             <NotificationIcon size={24} />
-          </button>
-        </DropdownTrigger>
-      </Badge>
+          </Badge>
+        </button>
+      </DropdownTrigger>
 
       <DropdownMenu
         aria-label="Notifications"

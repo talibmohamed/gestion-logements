@@ -7,8 +7,7 @@
   line-height: 2.25vh;
   display: flex;
   flex-direction: column;
-
-
+  
 }
 
 .sidebar.toggled {
@@ -33,20 +32,11 @@
   font-weight: lighter;
 }
 
-.map-sidebar{
-  margin: 1vh;
-}
 
-.bottom{
-  position: absolute;
-  display: table-column-group;
-  flex-direction: column;
-  bottom: 0;
-  width: 100%;
-}
+
 
 .logo-sidebar img {
-width: 3rem;
+  width: 3rem;
 }
 
 .custom-hr {
@@ -63,14 +53,34 @@ width: 3rem;
 }
 
 .tab:hover{
- background-color: #171821;
+  background-color: #171821;
 }
 
-.menu{
+.bigmenu {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;  /* Ensure it takes up remaining space */
+  height: 60vh;
+}
+
+.menu {
   display: flex;
   flex-direction: column;
   gap: 1em;
-  margin-top: 2vh;
+  align-items: center;
+  width: 100%;
+  color: #F3F3F3A1;
+}
+
+.bottom{
+  // position: absolute;
+  display: table-column-group;
+  flex-direction: column;
+  bottom: 0;
+  width: 100%;
+  color: #F3F3F3A1;
+
 }
 
 
@@ -79,7 +89,7 @@ width: 3rem;
   .logo-sidebar {
     display: none !important;
   }
-
+  
   .back-button, .sm-logout{
     margin-top: 2vh;
     background-color: #171821;
