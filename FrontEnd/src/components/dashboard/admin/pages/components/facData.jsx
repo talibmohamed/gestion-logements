@@ -7,7 +7,7 @@ const columns = [
     { name: "Echéance", uid: "echeance" },
     { name: "Status", uid: "status", sortable: true },
     { name: "Montant TTC", uid: "ttc" },
-    {name: "actions", uid: "actions"}
+    {name: "Actions", uid: "actions"}
 ];
 
 const users = [

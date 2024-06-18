@@ -48,6 +48,8 @@ line.MuiChartsAxis-line {
   right: 30px;
   display: flex;
   flex-direction: column;
+  font-weight: lighter;
+  font-size: medium;
 
   .legend-item-reclgraph {
     display: flex;
@@ -66,6 +68,17 @@ line.MuiChartsAxis-line {
     color: #f3f3f3;
     font-family: "Lato";
     font-size: 1.5vh;
-    font-weight: 550;
   }
+}
+
+@media only screen and (max-width: 1000px) {
+  .custom-legend-reclgraph {
+    top: 25%; 
+    left: 17%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: small;
+  }
+  
 }

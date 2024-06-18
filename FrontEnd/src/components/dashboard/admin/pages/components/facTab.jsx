@@ -28,6 +28,7 @@ import { EditIcon } from "../Icons/EditIcon";
 import { DeleteIcon } from "../Icons/DeleteIcon";
 import { EyeIcon } from "../Icons/EyeIcon";
 import PropTypes from "prop-types";
+import "./customWrappers.scss";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id_res",
@@ -232,15 +233,19 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                 size="lg"
                 isOpen={isAddModalOpen}
                 onOpenChange={setAddModalOpen}
+                classNames={{
+                  base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+                  closeButton: "hover:bg-white/5 active:bg-white/10",
+                }}
               >
                 <ModalContent>
                   {(onClose) => (
                     <>
                       <ModalHeader className="flex flex-col gap-1">
-                        Ajouter Une Facture
+                        Ajouter Une facture
                       </ModalHeader>
                       <ModalBody>
-                        <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                        <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4 autocomplete">
                           <Autocomplete
                             defaultItems={rows}
                             label="Résidant"
@@ -258,6 +263,30 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                             label="Type de Facture"
                             placeholder="Choisir le type de facture"
                             className="max-w-xs"
+                            classNames={{
+                              label: "group-data-[filled=true]:text-zinc-400",
+                              value:
+                                "group-data-[has-value=true]:text-white/90",
+                              trigger: [
+                                "bg-zinc-800",
+                                "text-white/90",
+                                "placeholder:text-white/60",
+                                "data-[hover=true]:bg-zinc-800",
+                                "group-data-[focus=true]:bg-zinc-800",
+                                "group-data-[focus=true]:border-zinc-400",
+                              ],
+                              content: [
+                                "bg-zinc-800",
+                                "text-white/90",
+                                "border-zinc-800",
+                              ],
+                              popoverContent: ["bg-zinc-800", "text-white/90"],
+                              listboxWrapper: [
+                                "bg-zinc-800",
+                                "!cursor-text",
+                                "text-white/90",
+                              ],
+                            }}
                           >
                             <SelectItem key="eau" value="eau">
                               Eau
@@ -280,6 +309,21 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                                 </span>
                               </div>
                             }
+                            classNames={{
+                              label:
+                                "group-data-[filled-within=true]:text-zinc-400",
+                              input: [
+                                "bg-transparent",
+                                "group-data-[has-value=true]:text-white/90",
+                              ],
+                              innerWrapper: "bg-transparent",
+                              inputWrapper: [
+                                "bg-zinc-800",
+                                "group-data-[hover=true]:bg-zinc-800",
+                                "group-data-[focus=true]:bg-zinc-800 ",
+                                "!cursor-text",
+                              ],
+                            }}
                           />
 
                           <Select
@@ -287,7 +331,30 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                             label="Status"
                             defaultSelectedKeys={["Attente"]}
                             className="max-w-xs"
-                            color="warning"
+                            classNames={{
+                              label: "group-data-[filled=true]:text-zinc-400",
+                              value:
+                                "group-data-[has-value=true]:text-white/90",
+                              trigger: [
+                                "bg-zinc-800",
+                                "text-white/90",
+                                "placeholder:text-white/60",
+                                "data-[hover=true]:bg-zinc-700",
+                                "group-data-[focus=true]:bg-zinc-800",
+                                "group-data-[focus=true]:border-zinc-400",
+                              ],
+                              content: [
+                                "bg-zinc-800",
+                                "text-white/90",
+                                "border-zinc-800",
+                              ],
+                              popoverContent: ["bg-zinc-800", "text-white/90"],
+                              listboxWrapper: [
+                                "bg-zinc-800",
+                                "!cursor-text",
+                                "text-white/90",
+                              ],
+                            }}
                           >
                             <SelectItem key="Attente" value="attente">
                               Attente
@@ -295,8 +362,8 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                           </Select>
                         </div>
 
-                        <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                          <DatePicker label="Mois de consommation " />
+                        <div className=" flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4 datePicker">
+                          <DatePicker label="Mois de consommation"/>
                           <DatePicker label="Echeance" />
                         </div>
                       </ModalBody>
@@ -534,7 +601,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="flat" onClick={onClose}>
+                <Button color="danger" onClick={onClose}>
                   Fermer
                 </Button>
               </ModalFooter>
@@ -711,7 +778,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="flat" onClick={onClose}>
+                <Button color="danger" variant="light" onClick={onClose}>
                   Fermer
                 </Button>
                 <Button color="primary" onClick={handleSave}>

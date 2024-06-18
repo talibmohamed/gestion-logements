@@ -16,7 +16,23 @@ import { EyeFilledIcon } from "./Icons/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "./Icons/EyeSlashFilledIcon";
 import "./Overview.scss";
 
+import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
+
+let DefaultIcon = L.icon({
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+
+
 const Profile = () => {
+  const position = [32.375289, -6.318726];
+
   const dispatch = useDispatch();
 
   const [password, setpassword] = useState("");
@@ -64,7 +80,7 @@ const Profile = () => {
     if (password !== confirmedPassword) {
       setErrorMessage("Les nouveaux mots de passe ne correspondent pas.");
       return;
-    }else{
+    } else {
       setErrorMessage("");
     }
     if (!validatePassword(password)) {
@@ -183,7 +199,7 @@ const Profile = () => {
                         label="Date d'ajout"
                         variant="bordered"
                         defaultValue={profData.date_creation}
-                        className="mb-4 max-w-md"
+                        className="max-w-md"
                         size="lg"
                         labelPlacement="outside"
                       />
@@ -194,7 +210,7 @@ const Profile = () => {
                         label="Password"
                         color="transparent"
                         size="lg"
-                        className=" mb-4 max-w-md border-solid border-2 border-zinc-700 mt-6 w-full justify-start"
+                        className=" max-w-md border-solid border-2 border-zinc-700 mt-6 w-full justify-start"
                       >
                         Changer Le Mot De Passe
                       </Button>
@@ -202,10 +218,8 @@ const Profile = () => {
                     <div className="mb-4 max-w-md btn-pwd">
                       <>
                         <Modal
-                          backdrop="blur"
                           isOpen={isOpen}
                           onOpenChange={onOpenChange}
-                          placement="center"
                           classNames={{
                             base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
                             closeButton: "hover:bg-white/5 active:bg-white/10",
@@ -224,7 +238,8 @@ const Profile = () => {
                                     variant="bordered"
                                     value={password}
                                     classNames={{
-                                      label: "group-data-[filled-within=true]:text-zinc-400",
+                                      label:
+                                        "group-data-[filled-within=true]:text-zinc-400",
                                       input: [
                                         "bg-transparent",
                                         "group-data-[has-value=true]:text-white/90",
@@ -262,8 +277,10 @@ const Profile = () => {
                                     label="Confirmer Votre Mot de Passe"
                                     variant="bordered"
                                     value={confirmedPassword}
+                                    className="mb-2"
                                     classNames={{
-                                      label: "group-data-[filled-within=true]:text-zinc-400",
+                                      label:
+                                        "group-data-[filled-within=true]:text-zinc-400",
                                       input: [
                                         "bg-transparent",
                                         "group-data-[has-value=true]:text-white/90",
@@ -301,14 +318,14 @@ const Profile = () => {
                                     }
                                   />
                                   <div className="password-requirements">
-                                    <label className="flex items-center mb-2">
+                                    <label className="flex items-center mb-2 mt-2">
                                       <Checkbox
                                         size="sm"
                                         isSelected={hasUpperCase}
                                         isReadOnly
                                       />
                                       <span className="mr-2">
-                                        1 Lettre majuscule
+                                        Une lettre majuscule
                                       </span>
                                     </label>
                                     <label className="flex items-center mb-2">
@@ -317,7 +334,7 @@ const Profile = () => {
                                         isSelected={hasNumber}
                                         isReadOnly
                                       />
-                                      <span className="mr-2">1 Nombre</span>
+                                      <span className="mr-2">Un nombre</span>
                                     </label>
                                     <label className="flex items-center mb-2">
                                       <Checkbox
@@ -326,7 +343,7 @@ const Profile = () => {
                                         isReadOnly
                                       />
                                       <span className="mr-2">
-                                        Au moins 1 caractère spécial
+                                        Au moins un caractère spécial
                                       </span>
                                     </label>
                                     <label className="flex items-center mb-2">
@@ -340,7 +357,7 @@ const Profile = () => {
                                       </span>
                                     </label>
                                   </div>
-                                   {/*alerts for the password change using MUI*/}
+                                  {/*alerts for the password change using MUI*/}
                                   {success && (
                                     <Alert
                                       variant="outlined"
@@ -350,9 +367,10 @@ const Profile = () => {
                                     </Alert>
                                   )}
                                   {errorMessage && (
-                                    <Alert 
-                                      // variant="outlined" 
-                                      severity="error">
+                                    <Alert
+                                      // variant="outlined"
+                                      severity="error"
+                                    >
                                       {errorMessage}
                                     </Alert>
                                   )}
@@ -385,7 +403,20 @@ const Profile = () => {
               </Card>
 
               <CardBody>
-                <h3 className="mt-3 ml-3 text-left mb-2">Adresse</h3>             
+                <h3 className=" text-left mb-2">Adresse</h3>
+                <div className="map-sidebar">
+                  <MapContainer
+                    center={position}
+                    zoom={15}
+                    style={{ height: "400px" }}
+                  >
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <Marker position={position}></Marker>
+                  </MapContainer>
+                </div>
               </CardBody>
             </CardBody>
           </CardBody>

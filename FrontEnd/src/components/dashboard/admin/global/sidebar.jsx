@@ -4,7 +4,7 @@ import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { logout } from "../../../../session/authentication";
 import "./sidebare.scss";
-import { ArrowBack } from "@mui/icons-material";
+import { ArrowBack, Margin } from "@mui/icons-material";
 import { FaUserCircle } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import "leaflet/dist/leaflet.css";
@@ -19,18 +19,6 @@ import {
 import { FaFileInvoiceDollar } from "react-icons/fa6";
 import { FaChartPie } from "react-icons/fa";
 import logo from "./logo.svg";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
-import "leaflet/dist/leaflet.css";
-import L from "leaflet";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
-
-let DefaultIcon = L.icon({
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
 
 const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
   const location = useLocation();
@@ -39,7 +27,6 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
   const prenom = useSelector((state) => state.auth.prenom);
   const dispatch = useDispatch();
 
-  const position = [32.375289, -6.318726];
 
   // logout
   const handleLogout = () => {
@@ -172,19 +159,6 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
             >
               Profil
             </MenuItem>
-            <div className="map-sidebar">
-              <MapContainer
-                center={position}
-                zoom={15}
-                style={{ height: "300px" }}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <Marker position={position}></Marker>
-              </MapContainer>
-            </div>
           </div>
           <div className="bottom">
             {!toggled && (
