@@ -31,7 +31,7 @@ import PropTypes from "prop-types";
 const INITIAL_VISIBLE_COLUMNS = [
   "id_res",
   "nom",
-  "desc",
+  "type_recl",
   "date",
   "sol",
   "status",
@@ -40,8 +40,8 @@ const INITIAL_VISIBLE_COLUMNS = [
 
 const statusColorMap = {
   résolu: "secondary",
-  inachevé: "primary",
-  attente: "warning",
+  "non résolu": "primary",
+  "en attente": "warning",
 };
 
 const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
@@ -68,6 +68,11 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     isOpen: isEditModalOpen,
     onOpen: openEditModal,
     onOpenChange: setEditModalOpen,
+  } = useDisclosure();
+  const {
+    isOpen: isDeleteModalOpen,
+    onOpen: openDeleteModal,
+    onOpenChange: setDeleteModalOpen,
   } = useDisclosure();
 
   const headerColumns = React.useMemo(() => {
@@ -121,6 +126,10 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
   const handleStatusChange = (status) => {
     setCurrentReclamation({ ...currentReclamation, status });
   };
+  const handleDeleteIconClick = (reclamation) => {
+    setCurrentReclamation(reclamation);
+    openDeleteModal();
+  };
   const handleSave = () => {
     // to handle saving the updated data
     console.log("Updated Status:", currentReclamation);
@@ -151,7 +160,29 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Details">
+            <Tooltip
+              content="Details"
+              delay={0}
+              closeDelay={0}
+              motionProps={{
+                variants: {
+                  exit: {
+                    opacity: 0,
+                    transition: {
+                      duration: 0.1,
+                      ease: "easeIn",
+                    },
+                  },
+                  enter: {
+                    opacity: 1,
+                    transition: {
+                      duration: 0.15,
+                      ease: "easeOut",
+                    },
+                  },
+                },
+              }}
+            >
               <span
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
                 onClick={() => handleDetailsIconClick(user)}
@@ -160,7 +191,29 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
               </span>
             </Tooltip>
 
-            <Tooltip content="Modifier">
+            <Tooltip
+              content="Modifier"
+              delay={0}
+              closeDelay={0}
+              motionProps={{
+                variants: {
+                  exit: {
+                    opacity: 0,
+                    transition: {
+                      duration: 0.1,
+                      ease: "easeIn",
+                    },
+                  },
+                  enter: {
+                    opacity: 1,
+                    transition: {
+                      duration: 0.15,
+                      ease: "easeOut",
+                    },
+                  },
+                },
+              }}
+            >
               <span
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
                 onClick={() => handleEditIconClick(user)}
@@ -169,8 +222,34 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
               </span>
             </Tooltip>
 
-            <Tooltip color="danger" content="Supprimer">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+            <Tooltip
+              color="danger"
+              content="Supprimer"
+              delay={0}
+              closeDelay={0}
+              motionProps={{
+                variants: {
+                  exit: {
+                    opacity: 0,
+                    transition: {
+                      duration: 0.1,
+                      ease: "easeIn",
+                    },
+                  },
+                  enter: {
+                    opacity: 1,
+                    transition: {
+                      duration: 0.15,
+                      ease: "easeOut",
+                    },
+                  },
+                },
+              }}
+            >
+              <span
+                className="text-lg text-danger cursor-pointer active:opacity-50"
+                onClick={() => handleDeleteIconClick(user)}
+              >
                 <DeleteIcon />
               </span>
             </Tooltip>
@@ -259,17 +338,17 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Détails de la Facture
+                Détails de la réclamation
               </ModalHeader>
               <ModalBody>
-                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Input
                     isReadOnly
                     type="text"
                     label="Résidant:"
                     variant="bordered"
                     defaultValue={currentReclamation.nom}
-                    className="max-w-xs"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -288,14 +367,13 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                       ],
                     }}
                   />
-
                   <Input
                     isReadOnly
                     type="text"
-                    label="Profession:"
+                    label="No du logement:"
                     variant="bordered"
-                    defaultValue={currentReclamation.profession}
-                    className="max-w-xs"
+                    defaultValue={currentReclamation.num_de_log}
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -316,40 +394,14 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                   />
                 </div>
 
-                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
-                  <Input
-                    isReadOnly
-                    type="text"
-                    label="ID Logement:"
-                    variant="bordered"
-                    defaultValue={currentReclamation.id_logement}
-                    className="max-w-xs"
-                    classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
-                      input: [
-                        "bg-transparent",
-                        "group-data-[has-value=true]:text-white/90",
-                      ],
-                      innerWrapper: "bg-transparent",
-                      inputWrapper: [
-                        "bg-transparent",
-                        "group-data-[hover=true]:bg-zinc-800",
-                        "group-data-[hover=true]:border-zinc-500",
-                        "group-data-[focus=true]:bg-transparent ",
-                        "group-data-[focus=true]:border-zinc-400 ",
-                        "!cursor-text",
-                        "border-zinc-600",
-                      ],
-                    }}
-                  />
-
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Input
                     isReadOnly
                     type="text"
                     label="Type du logement:"
                     variant="bordered"
                     defaultValue={currentReclamation.type_log}
-                    className="max-w-xs"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -374,7 +426,34 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     label="Amélioré:"
                     variant="bordered"
                     defaultValue={currentReclamation.ameliored ? "Oui" : "Non"}
-                    className="max-w-xs"
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                  />
+                </div>
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
+                <Input
+                    isReadOnly
+                    type="text"
+                    label="Description:"
+                    variant="bordered"
+                    defaultValue={currentReclamation.desc}
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -421,12 +500,12 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                 Modifier le status de la réclamation
               </ModalHeader>
               <ModalBody>
-                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Input
                     isDisabled
                     type="text"
                     label="Résidant"
-                    className="max-w-xs"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -454,7 +533,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     isDisabled
                     type="text"
                     label="Description"
-                    className="max-w-xs"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -479,12 +558,12 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                   />
                 </div>
 
-                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Input
                     isDisabled
                     type="text"
                     label="Date de Réclamation"
-                    className="max-w-xs"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -510,7 +589,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                   <Select
                     label="Status"
                     placeholder="Choisir le statut"
-                    className="max-w-xs text-black"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled=true]:text-zinc-400",
                       value: "group-data-[has-value=true]:text-white/90",
@@ -558,6 +637,39 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                 <Button color="primary" onClick={handleSave}>
                   Sauvegarder
                 </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        size="md"
+        backdrop="blur"
+        isOpen={isDeleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        scrollBehavior="inside"
+        placement="center"
+        classNames={{
+          base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+          closeButton: "hover:bg-white/5 active:bg-white/10",
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="text-xl">Attention</ModalHeader>
+              <ModalBody>Êtes-vous sûr(e) de vouloir continuer ?</ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  variant="light"
+                  className="text-sm font-medium"
+                  onPress={onClose}
+                >
+                  Fermer
+                </Button>
+                <Button color="primary">Continuer</Button>
               </ModalFooter>
             </>
           )}

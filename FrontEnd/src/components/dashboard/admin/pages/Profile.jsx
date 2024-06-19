@@ -15,7 +15,7 @@ import { fetchAdminProfileThunk } from "../../../../session/thunks/adminthunk";
 import { EyeFilledIcon } from "./Icons/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "./Icons/EyeSlashFilledIcon";
 import "./Overview.scss";
-
+import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";

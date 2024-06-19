@@ -2,12 +2,11 @@
   border :0px !important;
   height: 100vh;
   font-family: lato;
-  font-weight: 600;
-  font-size: 1.5vh;
+  font-weight: 600 !important;
+  font-size: 1.7vh !important;
   line-height: 2.25vh;
   display: flex;
   flex-direction: column;
-  
 }
 
 .sidebar.toggled {
@@ -21,7 +20,8 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  font-size: 1.5rem;
+  font-size: 1.8rem !important;
+  font-weight: 600;
 }
 
 .logo-sidebar p {
@@ -29,12 +29,11 @@
   height: auto;
   margin-left: 2vh;
   margin-bottom: 0px;
-  font-weight: lighter;
 }
 
 
 .logo-sidebar img {
-  width: 3rem;
+  width: 3.9rem !important;
 }
 
 .custom-hr {
@@ -69,6 +68,31 @@
   align-items: center;
   width: 100%;
   color: #F3F3F3A1;
+
+  .house-icon{
+    height: 2.95vh !important;
+    width: 3.5vh !important;
+    margin-bottom: 0.65vh !important;
+  }
+  .pie-icon{
+    height: 2.15vh !important;
+    width: 3.4vh !important;
+  }
+  .file-icon{
+    height: 2.3vh !important;
+    width: 2.5vh !important;
+    margin-bottom: 0.65vh !important;
+  }
+  .tools-icon{
+    height: 2.9vh !important;
+    width: 3.35vh !important;
+    margin-bottom: 0.3vh !important;
+  }
+  .ppl-icon{
+    height: 2.9vh !important;
+    width: 3.35vh !important;
+    margin-bottom: 0.3vh !important;
+  }
 }
 
 .bottom{
@@ -78,8 +102,9 @@
   bottom: 0;
   width: 100%;
   color: #F3F3F3A1;
-
+  margin-bottom: 1vh;
 }
+
 
 
 //design for small screens 
@@ -93,7 +118,9 @@
     background-color: #171821;
   }
   .sidebar{
-    font-family: lato,
+    font-family: lato;
+    font-weight: 600 !important;
+    font-size: 1.6vh !important;
   }
 
   .user-info {
@@ -120,7 +147,7 @@
   .menu{
     display: flex;
     flex-direction: column;
-    gap: 0em;
+    gap: 2em !important;
     margin-top: 2vh;
     margin-left:1vh;
     margin-right:1vh;

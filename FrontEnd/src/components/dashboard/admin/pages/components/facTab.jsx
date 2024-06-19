@@ -42,9 +42,9 @@ const INITIAL_VISIBLE_COLUMNS = [
 ];
 
 const statusColorMap = {
-  payé: "secondary",
-  retard: "primary",
-  attente: "warning",
+  payée: "secondary",
+  "en retard": "primary",
+  "en attente": "warning",
 };
 
 const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
@@ -75,6 +75,11 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
     isOpen: isEditModalOpen,
     onOpen: openEditModal,
     onOpenChange: setEditModalOpen,
+  } = useDisclosure();
+  const {
+    isOpen: isDeleteModalOpen,
+    onOpen: openDeleteModal,
+    onOpenChange: setDeleteModalOpen,
   } = useDisclosure();
 
   const pages = Math.ceil(rows.length / rowsPerPage);
@@ -134,6 +139,11 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
     setCurrentInvoice(invoice);
     openEditModal();
   };
+  const handleDeleteIconClick = (invoice) => {
+    setCurrentInvoice(invoice);
+    openDeleteModal();
+  };
+
   const handleStatusChange = (status) => {
     setCurrentInvoice({ ...currentInvoice, status });
   };
@@ -167,7 +177,29 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Details">
+            <Tooltip
+              content="Details"
+              delay={0}
+              closeDelay={0}
+              motionProps={{
+                variants: {
+                  exit: {
+                    opacity: 0,
+                    transition: {
+                      duration: 0.1,
+                      ease: "easeIn",
+                    },
+                  },
+                  enter: {
+                    opacity: 1,
+                    transition: {
+                      duration: 0.15,
+                      ease: "easeOut",
+                    },
+                  },
+                },
+              }}
+            >
               <span
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
                 onClick={() => handleDetailsIconClick(user)}
@@ -176,7 +208,29 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
               </span>
             </Tooltip>
 
-            <Tooltip content="Modifier">
+            <Tooltip
+              content="Modifier"
+              delay={0}
+              closeDelay={0}
+              motionProps={{
+                variants: {
+                  exit: {
+                    opacity: 0,
+                    transition: {
+                      duration: 0.1,
+                      ease: "easeIn",
+                    },
+                  },
+                  enter: {
+                    opacity: 1,
+                    transition: {
+                      duration: 0.15,
+                      ease: "easeOut",
+                    },
+                  },
+                },
+              }}
+            >
               <span
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
                 onClick={() => handleEditIconClick(user)}
@@ -185,8 +239,34 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
               </span>
             </Tooltip>
 
-            <Tooltip color="danger" content="Supprimer">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+            <Tooltip
+              color="danger"
+              content="Supprimer"
+              delay={0}
+              closeDelay={0}
+              motionProps={{
+                variants: {
+                  exit: {
+                    opacity: 0,
+                    transition: {
+                      duration: 0.1,
+                      ease: "easeIn",
+                    },
+                  },
+                  enter: {
+                    opacity: 1,
+                    transition: {
+                      duration: 0.15,
+                      ease: "easeOut",
+                    },
+                  },
+                },
+              }}
+            >
+              <span
+                className="text-lg text-danger cursor-pointer active:opacity-50 "
+                onClick={() => handleDeleteIconClick(user)}
+              >
                 <DeleteIcon />
               </span>
             </Tooltip>
@@ -225,9 +305,9 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
               <Button
                 onPress={openAddModal}
                 className="bg-foreground text-background text-sm"
-                size="sm"
+                size="md"
               >
-                Ajouter une Facture
+                Ajouter une facture
               </Button>
               <Modal
                 size="lg"
@@ -242,15 +322,18 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                   {(onClose) => (
                     <>
                       <ModalHeader className="flex flex-col gap-1">
-                        Ajouter Une facture
+                        Ajouter une facture
                       </ModalHeader>
                       <ModalBody>
-                        <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4 autocomplete">
+                        <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4 autocomplete">
                           <Autocomplete
                             defaultItems={rows}
                             label="Résidant"
                             placeholder="Chercher un résidant"
-                            className="max-w-xs"
+                            className="max-w-sm"
+                            classNames={{
+                              popoverContent: ["bg-zinc-800", "text-white/90",],
+                            }}
                           >
                             {(user) => (
                               <AutocompleteItem key={user.id}>
@@ -262,7 +345,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                           <Select
                             label="Type de Facture"
                             placeholder="Choisir le type de facture"
-                            className="max-w-xs"
+                            className="max-w-sm"
                             classNames={{
                               label: "group-data-[filled=true]:text-zinc-400",
                               value:
@@ -297,7 +380,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                           </Select>
                         </div>
 
-                        <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                        <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                           <Input
                             type="price"
                             label="Montant TTC"
@@ -309,6 +392,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                                 </span>
                               </div>
                             }
+                            className="max-w-sm"
                             classNames={{
                               label:
                                 "group-data-[filled-within=true]:text-zinc-400",
@@ -330,7 +414,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                             isDisabled
                             label="Status"
                             defaultSelectedKeys={["Attente"]}
-                            className="max-w-xs"
+                            className="max-w-sm"
                             classNames={{
                               label: "group-data-[filled=true]:text-zinc-400",
                               value:
@@ -362,9 +446,12 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                           </Select>
                         </div>
 
-                        <div className=" flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4 datePicker">
-                          <DatePicker label="Mois de consommation"/>
-                          <DatePicker label="Echeance" />
+                        <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4 datePicker">
+                          <DatePicker
+                            label="Mois de consommation"
+                            className="max-w-sm"
+                          />
+                          <DatePicker label="Echeance" className="max-w-sm" />
                         </div>
                       </ModalBody>
                       <ModalFooter>
@@ -467,14 +554,14 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                 Détails de la Facture
               </ModalHeader>
               <ModalBody>
-                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Input
                     isReadOnly
                     type="text"
                     label="Résidant:"
                     variant="bordered"
                     defaultValue={currentInvoice.nom}
-                    className="max-w-xs"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -500,7 +587,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                     label="Profession:"
                     variant="bordered"
                     defaultValue={currentInvoice.profession}
-                    className="max-w-xs"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -521,14 +608,14 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                   />
                 </div>
 
-                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Input
                     isReadOnly
                     type="text"
                     label="ID Logement:"
                     variant="bordered"
                     defaultValue={currentInvoice.id_logement}
-                    className="max-w-xs"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -554,7 +641,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                     label="Type du logement:"
                     variant="bordered"
                     defaultValue={currentInvoice.type_log}
-                    className="max-w-xs"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -579,7 +666,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                     label="Amélioré:"
                     variant="bordered"
                     defaultValue={currentInvoice.ameliored ? "Oui" : "Non"}
-                    className="max-w-xs"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -626,7 +713,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                 Modifier la Facture
               </ModalHeader>
               <ModalBody>
-                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Input
                     isDisabled
                     type="text"
@@ -698,7 +785,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                   </Select>
                 </div>
 
-                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center mb-6 md:mb-0 gap-4">
                   <Select
                     label="Status"
                     placeholder="Choisir le statut"
@@ -747,6 +834,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                     type="price"
                     label="Montant TTC"
                     placeholder="Entrer le montant TTC"
+                    className="max-w-xs"
                     classNames={{
                       label: "text-white/90",
                       input: [
@@ -784,6 +872,39 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                 <Button color="primary" onClick={handleSave}>
                   Sauvegarder
                 </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        size="md"
+        backdrop="blur"
+        isOpen={isDeleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        scrollBehavior="inside"
+        placement="center"
+        classNames={{
+          base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+          closeButton: "hover:bg-white/5 active:bg-white/10",
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="text-xl">Attention</ModalHeader>
+              <ModalBody>Êtes-vous sûr(e) de vouloir continuer ?</ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  variant="light"
+                  className="text-sm font-medium"
+                  onPress={onClose}
+                >
+                  Fermer
+                </Button>
+                <Button color="primary">Continuer</Button>
               </ModalFooter>
             </>
           )}
