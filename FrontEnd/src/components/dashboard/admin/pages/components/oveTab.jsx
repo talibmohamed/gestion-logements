@@ -14,6 +14,7 @@ import {
 } from "@nextui-org/react";
 import PropTypes from "prop-types";
 
+
 const statusColorMap = {
   retard: "primary",
   attente: "warning",
@@ -54,8 +55,8 @@ const DataTable = ({ columns, rows, title }) => {
             <div className="card-header">
               {title && <h2 className="mb-4 table-title">{title}</h2>}
               <Button
-                href="/dashboard/facture"
-                as={Link}
+                as={Link} // Render the Button as a Link
+                to="/dashboard/facture" // Specify the destination path
                 variant="light"
                 color="primary"
                 size="md"
@@ -64,7 +65,7 @@ const DataTable = ({ columns, rows, title }) => {
                 See more
               </Button>
             </div>
-            <Table 
+            <Table
               aria-label="Example table with custom cells"
               removeWrapper={true}
               className={{ base: "overflow-auto", wrapper: "max-h-[382px]" }}

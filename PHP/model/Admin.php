@@ -390,4 +390,77 @@ class admin
             ];
         }
     }
+
+    public function getStatistics()
+    {
+        $connection = $this->db->getConnection();
+        $curmois = date('n'); // Current month
+        $curyear = date('Y'); // Current year
+    
+        // Logement Statistics
+        // Prepare and execute the query to count all logements
+        $allStmt = $connection->prepare("SELECT COUNT(*) FROM logement");
+        $allStmt->execute();
+        $allLogements = $allStmt->fetchColumn();
+    
+        // Prepare and execute the query to count vacant logements
+        $vacantStmt = $connection->prepare("SELECT COUNT(*) FROM logement WHERE is_vacant = true");
+        $vacantStmt->execute();
+        $vacantLogements = $vacantStmt->fetchColumn();
+    
+        // Facture Statistics
+        // Calculate the number of paid factures for the current month
+        $paidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'payé' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
+        $paidStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
+        $paidStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
+        $paidStmt->execute();
+        $paidCount = $paidStmt->fetchColumn();
+    
+        // Calculate the number of overdue factures for the current month
+        $overdueStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'retard' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
+        $overdueStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
+        $overdueStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
+        $overdueStmt->execute();
+        $overdueCount = $overdueStmt->fetchColumn();
+    
+        // Calculate the number of unpaid factures for the previous month
+        $lastMonth = $curmois - 1;
+        if ($lastMonth == 0) {
+            $lastMonth = 12; // Handle December of the previous year
+            $lastYear = $curyear - 1;
+        } else {
+            $lastYear = $curyear;
+        }
+        $unpaidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'impayé' AND DATE_PART('month', fac_date) = :lastMonth AND DATE_PART('year', fac_date) = :lastYear");
+        $unpaidStmt->bindValue(':lastMonth', $lastMonth, PDO::PARAM_INT);
+        $unpaidStmt->bindValue(':lastYear', $lastYear, PDO::PARAM_INT);
+        $unpaidStmt->execute();
+        $unpaidCount = $unpaidStmt->fetchColumn();
+    
+        // Combine results into a single associative array
+        $response = array(
+            'statistics' => array(
+                'facture' => array(
+                    'total_paid_count' => $paidCount,
+                    'total_overdue_count' => $overdueCount,
+                    'total_unpaid_count' => $unpaidCount,
+                    'last_update_date' => date('Y-m-d H:i:s') // Current date in standard format
+                ),
+                'logement' => array(
+                    'total_logements_count' => $allLogements,
+                    'total_occupied_count' => $allLogements - $vacantLogements,
+                    'total_vacant_count' => $vacantLogements
+                )
+            )
+        );
+    
+        // Set the content type header to application/json
+        header('Content-Type: application/json');
+    
+        // Return the JSON response
+        echo json_encode($response);
+        exit; // Ensure no further output is appended
+    }
+    
+    
 }
