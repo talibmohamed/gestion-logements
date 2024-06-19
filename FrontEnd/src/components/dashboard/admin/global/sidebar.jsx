@@ -7,8 +7,6 @@ import "./sidebare.scss";
 import { ArrowBack, Margin } from "@mui/icons-material";
 import { FaUserCircle } from "react-icons/fa";
 import { useSelector } from "react-redux";
-import "leaflet/dist/leaflet.css";
-
 import {
   HomeRounded as HomeRoundedicon,
   Construction as Constructionicon,
@@ -67,7 +65,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
             button: {
               "&:hover": {
                 background: "#171821",
-                fontWeight: "bold",
+                fontWeight: "semibold",
                 borderLeft: "5px solid #f9769d",
               },
               textAlign: "left",
@@ -105,7 +103,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
             <div className="menu">
               <MenuItem
                 component={<Link to="/dashboard" />}
-                icon={<HomeRoundedicon />}
+                icon={<HomeRoundedicon className="house-icon"/>}
                 className={
                   location.pathname === "/dashboard" ? "active tab" : "tab"
                 }
@@ -115,7 +113,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               </MenuItem>
               <MenuItem
                 component={<Link to="/dashboard/logement" />}
-                icon={<FaChartPie />}
+                icon={<FaChartPie className="pie-icon"/>}
                 className={
                   location.pathname === "/dashboard/logement"
                     ? "active tab"
@@ -127,7 +125,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               </MenuItem>
               <MenuItem
                 component={<Link to="/dashboard/facture" />}
-                icon={<FaFileInvoiceDollar />}
+                icon={<FaFileInvoiceDollar className="file-icon"/>}
                 className={
                   location.pathname === "/dashboard/facture"
                     ? "active tab"
@@ -139,7 +137,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               </MenuItem>
               <MenuItem
                 component={<Link to="/dashboard/reclamation" />}
-                icon={<Constructionicon />}
+                icon={<Constructionicon className="tools-icon"/>}
                 className={
                   location.pathname === "/dashboard/reclamation"
                     ? "active tab"
@@ -151,7 +149,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               </MenuItem>
               <MenuItem
                 component={<Link to="/dashboard/profile" />}
-                icon={<Person2icon />}
+                icon={<Person2icon className="ppl-icon"/>}
                 className={
                   location.pathname === "/dashboard/profile"
                     ? "active tab"

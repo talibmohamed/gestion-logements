@@ -20,7 +20,7 @@ const Topbar = ({ broken, toggled, setToggled }) => {
             <p>Houselytics</p>
           </div>
 
-          <div>
+          <div className="notif-mobile">
           <Notification />
             <button onClick={() => setToggled(!toggled)} className="pl-5 humb-button">
               <GiHamburgerMenu />

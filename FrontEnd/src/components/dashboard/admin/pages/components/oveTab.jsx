@@ -16,12 +16,34 @@ import PropTypes from "prop-types";
 
 
 const statusColorMap = {
-  retard: "primary",
-  attente: "warning",
-  payé: "secondary",
+  "en retard": "primary",
+  "en attente" : "warning",
+  payée: "secondary",
 };
 
+const INITIAL_VISIBLE_COLUMNS = [
+  "id_res",
+  "nom",
+  "type",
+  "mois",
+  "echeance",
+  "status",
+  "ttc",
+];
+
 const DataTable = ({ columns, rows, title }) => {
+  const [visibleColumns, setVisibleColumns] = React.useState(
+    new Set(INITIAL_VISIBLE_COLUMNS)
+  );
+  
+  const headerColumns = React.useMemo(() => {
+    if (visibleColumns === "all") return columns;
+
+    return columns.filter((column) =>
+      Array.from(visibleColumns).includes(column.uid)
+    );
+  }, [visibleColumns]);
+
   const renderCell = React.useCallback((item, column) => {
     const cellValue = item[column.uid];
     switch (column.uid) {
@@ -70,7 +92,7 @@ const DataTable = ({ columns, rows, title }) => {
               removeWrapper={true}
               className={{ base: "overflow-auto", wrapper: "max-h-[382px]" }}
             >
-              <TableHeader columns={columns}>
+              <TableHeader columns={headerColumns}>
                 {(column) => (
                   <TableColumn key={column.uid} align={"center"}>
                     {column.name}

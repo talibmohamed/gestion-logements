@@ -18,8 +18,6 @@ import {
   Select,
   SelectItem,
   useDisclosure,
-  Autocomplete,
-  AutocompleteItem,
 } from "@nextui-org/react";
 import { SearchIcon } from "../Icons/SearchIcon";
 import { EditIcon } from "../Icons/EditIcon";
@@ -34,6 +32,9 @@ const INITIAL_VISIBLE_COLUMNS = [
   "nom",
   "type_log",
   "ameliored",
+  "mc",
+  "quotaE",
+  "quotaW",
   "equip",
   "actions",
 ];
@@ -54,20 +55,23 @@ const LogTable = ({ columns, rows, title }) => {
   const {
     isOpen: isAddModalOpen,
     onOpen: openAddModal,
-    onClose: closeAddModal,
     onOpenChange: setAddModalOpen,
   } = useDisclosure();
   const {
     isOpen: isEquipModalOpen,
     onOpen: openEquipModal,
-    onClose: closeEquipModal,
     onOpenChange: setEquipModalOpen,
   } = useDisclosure();
   const {
     isOpen: isEditModalOpen,
     onOpen: openEditModal,
-    onClose: closeEditModal,
     onOpenChange: setEditModalOpen,
+  } = useDisclosure();
+
+  const {
+    isOpen: isDeleteModalOpen,
+    onOpen: openDeleteModal,
+    onOpenChange: setDeleteModalOpen,
   } = useDisclosure();
 
   const [currentLogement, setCurrentLogement] = useState(null);
@@ -117,6 +121,11 @@ const LogTable = ({ columns, rows, title }) => {
   const handleEditIconClick = (logement) => {
     setCurrentLogement(logement);
     openEditModal();
+  };
+
+  const handleDeleteIconClick = (logement) => {
+    setCurrentLogement(logement);
+    openDeleteModal();
   };
 
   const handleEyeIconClick = (user) => {
@@ -234,7 +243,29 @@ const LogTable = ({ columns, rows, title }) => {
       case "equip":
         return (
           <div className="flex items-center">
-            <Tooltip content="Details">
+            <Tooltip
+              content="Details"
+              delay={0}
+              closeDelay={0}
+              motionProps={{
+                variants: {
+                  exit: {
+                    opacity: 0,
+                    transition: {
+                      duration: 0.1,
+                      ease: "easeIn",
+                    },
+                  },
+                  enter: {
+                    opacity: 1,
+                    transition: {
+                      duration: 0.15,
+                      ease: "easeOut",
+                    },
+                  },
+                },
+              }}
+            >
               <span
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
                 onClick={() => handleEyeIconClick(user)}
@@ -247,7 +278,29 @@ const LogTable = ({ columns, rows, title }) => {
       case "actions":
         return (
           <div className="relative flex items-center gap-2">
-            <Tooltip content="Modifier">
+            <Tooltip
+              content="Modifier"
+              delay={0}
+              closeDelay={0}
+              motionProps={{
+                variants: {
+                  exit: {
+                    opacity: 0,
+                    transition: {
+                      duration: 0.1,
+                      ease: "easeIn",
+                    },
+                  },
+                  enter: {
+                    opacity: 1,
+                    transition: {
+                      duration: 0.15,
+                      ease: "easeOut",
+                    },
+                  },
+                },
+              }}
+            >
               <span
                 className="text-lg text-default-400 cursor-pointer active:opacity-50"
                 onClick={() => handleEditIconClick(user)}
@@ -255,8 +308,35 @@ const LogTable = ({ columns, rows, title }) => {
                 <EditIcon />
               </span>
             </Tooltip>
-            <Tooltip color="danger" variant="light" content="Supprimer">
-              <span className="text-lg text-danger cursor-pointer active:opacity-50">
+            <Tooltip
+              color="danger"
+              variant="light"
+              content="Supprimer"
+              delay={0}
+              closeDelay={0}
+              motionProps={{
+                variants: {
+                  exit: {
+                    opacity: 0,
+                    transition: {
+                      duration: 0.1,
+                      ease: "easeIn",
+                    },
+                  },
+                  enter: {
+                    opacity: 1,
+                    transition: {
+                      duration: 0.15,
+                      ease: "easeOut",
+                    },
+                  },
+                },
+              }}
+            >
+              <span
+                className="text-lg text-danger cursor-pointer active:opacity-50 "
+                onClick={() => handleDeleteIconClick(user)}
+              >
                 <DeleteIcon />
               </span>
             </Tooltip>
@@ -284,7 +364,7 @@ const LogTable = ({ columns, rows, title }) => {
           <Input
             isClearable
             className="w-full sm:max-w-[44%]"
-            placeholder="Search by name..."
+            placeholder="Chercher par résidant..."
             startContent={<SearchIcon />}
             value={filterValue}
             onClear={() => onSearchChange("")}
@@ -293,7 +373,7 @@ const LogTable = ({ columns, rows, title }) => {
           <div className="flex gap-3">
             <Button
               className="bg-foreground text-background"
-              size="sm"
+              size="md"
               onPress={openAddModal}
             >
               Ajouter
@@ -392,11 +472,12 @@ const LogTable = ({ columns, rows, title }) => {
                 Ajouter Un Logement
               </ModalHeader>
               <ModalBody>
-                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4 ">
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4 ">
                   <Input
                     type="text"
                     label="No logement"
                     placeholder="Entrer le no du logement"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -416,6 +497,7 @@ const LogTable = ({ columns, rows, title }) => {
                     isDisabled
                     type="text"
                     label="Occupe Par"
+                    className="max-w-sm"
                     classNames={{
                       label: "text-white/90",
                       input: [
@@ -433,11 +515,12 @@ const LogTable = ({ columns, rows, title }) => {
                     }}
                   />
                 </div>
-                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Select
                     type="text"
                     label="Profession/Type de Logement"
                     placeholder="Choisir le type de logement"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled=true]:text-zinc-400",
                       value: "group-data-[has-value=true]:text-white/90",
@@ -484,6 +567,7 @@ const LogTable = ({ columns, rows, title }) => {
                     type="text"
                     label="Amelioré"
                     placeholder="Choisir le type de logement"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled=true]:text-zinc-400",
                       value: "group-data-[has-value=true]:text-white/90",
@@ -523,6 +607,53 @@ const LogTable = ({ columns, rows, title }) => {
                     </SelectItem>
                   </Select>
                 </div>
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
+                  <Input
+                    type="text"
+                    label="Nombre de pièces"
+                    placeholder="Entrer le nombre de pièces"
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
+                  />
+                  <Input
+                    type="text"
+                    label="Superficie"
+                    placeholder="Entrer la superficie"
+                    endContent={
+                      <div className="pointer-events-none flex items-center">
+                        <span className="text-default-400 text-small">m²</span>
+                      </div>
+                    }
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
+                  />
+                </div>
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="flat" onPress={onClose}>
@@ -553,12 +684,12 @@ const LogTable = ({ columns, rows, title }) => {
                 Modifier les détails du logement
               </ModalHeader>
               <ModalBody>
-                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Input
                     isDisabled
                     type="text"
                     label="Résidant"
-                    className="max-w-xs"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -586,6 +717,7 @@ const LogTable = ({ columns, rows, title }) => {
                     type="text"
                     label="No du logement"
                     placeholder="Entrer No du logement"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
@@ -610,12 +742,13 @@ const LogTable = ({ columns, rows, title }) => {
                   />
                 </div>
 
-                <div className="flex w-full flex-wrap md:flex-nowrap mb-6 md:mb-0 gap-4">
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Select
                     type="text"
                     label="Profession/Type de Logement"
                     placeholder="Choisir le type de logement"
                     defaultValue={currentLogement?.type_log}
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled=true]:text-zinc-400",
                       value: "group-data-[has-value=true]:text-white/90",
@@ -661,6 +794,7 @@ const LogTable = ({ columns, rows, title }) => {
                     type="text"
                     label="Amelioré"
                     placeholder="Oui / Non"
+                    className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled=true]:text-zinc-400",
                       value: "group-data-[has-value=true]:text-white/90",
@@ -699,6 +833,68 @@ const LogTable = ({ columns, rows, title }) => {
                       Non
                     </SelectItem>
                   </Select>
+                </div>
+
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
+                  <Input
+                    type="text"
+                    label="Nombre de pièces"
+                    placeholder="Entrer le nombre de pièces"
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
+                    defaultValue={currentLogement?.piece}
+                    onChange={(e) =>
+                      setCurrentLogement({
+                        ...currentLogement,
+                        piece: e.target.value,
+                      })
+                    }
+                  />
+                  <Input
+                    type="text"
+                    label="Superficie"
+                    placeholder="Entrer la superficie"
+                    endContent={
+                      <div className="pointer-events-none flex items-center">
+                        <span className="text-default-400 text-small">m²</span>
+                      </div>
+                    }
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
+                    defaultValue={currentLogement?.mc}
+                    onChange={(e) =>
+                      setCurrentLogement({
+                        ...currentLogement,
+                        mc: e.target.value,
+                      })
+                    }
+                  />
                 </div>
               </ModalBody>
               <ModalFooter>
@@ -775,7 +971,8 @@ const LogTable = ({ columns, rows, title }) => {
                 <EquipmentSection
                   title="Extérieur"
                   equipments={currentEquipments.filter((equip) =>
-                    [ "Pas de balcon",
+                    [
+                      "Pas de balcon",
                       "Balcon",
                       "Balcon ou terasse spacieux",
                       "Petit balcon",
@@ -787,13 +984,14 @@ const LogTable = ({ columns, rows, title }) => {
                 <EquipmentSection
                   title="Services"
                   equipments={currentEquipments.filter((equip) =>
-                    [ "Wifi","Système de sécurité"].includes(equip)
+                    ["Wifi", "Système de sécurité"].includes(equip)
                   )}
                 />
                 <EquipmentSection
                   title="Parking et installations"
                   equipments={currentEquipments.filter((equip) =>
-                    [ "Parking commun",
+                    [
+                      "Parking commun",
                       "Place de parking partagée",
                       "Accès à un parking commun",
                       "Place de parking dédiée avec point de recharge pour véhicules électriques",
@@ -810,6 +1008,42 @@ const LogTable = ({ columns, rows, title }) => {
                   onPress={onClose}
                 >
                   Fermer
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        size="sm"
+        backdrop="blur"
+        placement="center"
+        isOpen={isDeleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        scrollBehavior="inside"
+        classNames={{
+          base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+          closeButton: "hover:bg-white/5 active:bg-white/10",
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="text-xl">Attention</ModalHeader>
+              <ModalBody>Êtes-vous sûr(e) de vouloir continuer ?</ModalBody>
+              <ModalFooter>
+              
+                <Button
+                  color="danger"
+                  variant="light"
+                  className="text-sm font-medium"
+                  onPress={onClose}
+                >
+                  Fermer
+                </Button>
+                <Button color="primary" >
+                  Continuer
                 </Button>
               </ModalFooter>
             </>
