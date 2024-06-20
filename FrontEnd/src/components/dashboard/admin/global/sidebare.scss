@@ -57,7 +57,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-grow: 1;  /* Ensure it takes up remaining space */
+  flex-grow: 1;
   height: 60vh;
 }
 
@@ -137,7 +137,7 @@
   }
   
   .user-name {
-    font-size: 2em; 
+    font-size: 20em; 
     font-weight: 700;
   }
   .active {
