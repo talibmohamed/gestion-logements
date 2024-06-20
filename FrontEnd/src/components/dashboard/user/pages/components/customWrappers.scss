@@ -1,0 +1,68 @@
+.autocomplete {
+  //autocomplete
+  .bg-default-100 {
+    background-color: #27272a;
+  }
+  .group[data-focus="true"] .group-data-\[focus\=true\]\:bg-default-100 {
+    --tw-bg-opacity: 1;
+    background-color: #27272a;
+  }
+
+  //svg
+  .data-\[hover\=true\]\:bg-default\/40[data-hover="true"] {
+    color: white;
+  }
+  .text-default-foreground {
+    color: white;
+  }
+
+  //label
+  .group[data-filled-within="true"]
+    .group-data-\[filled-within\=true\]\:text-default-600 {
+    --tw-text-opacity: 1;
+    color: #a1a1aa;
+  }
+
+  //input field
+  .group[data-has-value="true"]
+    .group-data-\[has-value\=true\]\:text-default-foreground {
+    --tw-text-opacity: 1;
+    color: white;
+  }
+
+  .data-\[hover\=true\]\:bg-default[data-hover=true]{
+    background-color: black !important;
+  }
+  .data-\[hover\=true\]\:text-default-foreground[data-hover=true]{
+    color: white !important;
+  }
+  .data-\[hover\=true\]\:transition-colors[data-hover=true] {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 250ms;
+}
+}
+
+.datePicker {
+  .bg-default-100 {
+    background-color: #27272a;
+  }
+
+  .focus-within\:hover\:bg-default-100:hover:focus-within{
+    --tw-bg-opacity: 1;
+    background-color: #27272a;
+  }
+
+
+  .text-default-600 {
+    color: #a1a1aa;
+  }
+  .data-\[editable\=true\]\:data-\[placeholder\=true\]\:text-foreground-500[data-placeholder=true][data-editable=true] {
+    color: #71717a;
+  }
+
+  .data-\[editable\=true\]\:text-foreground[data-editable=true] {
+    color: white;
+  }
+
+}

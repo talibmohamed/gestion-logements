@@ -70,7 +70,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               },
               textAlign: "left",
               border: "0px",
-              marginTop: "3px",
+              // marginTop: "3px",
               paddingLeft: "30px"
             },
           }}

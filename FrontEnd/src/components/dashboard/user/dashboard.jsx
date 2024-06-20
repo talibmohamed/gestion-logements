@@ -1,18 +1,19 @@
+// AdminDashboard component
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Topbar from "./global/topbar";
 import SidebarComponent from "./global/sidebar"; 
 import Overview from "./pages/Overview";
-import Statistics from "./pages/Statistics";
+import Logement from "./pages/Logement";
 import Facture from "./pages/Facture";
 import Reclamation from "./pages/Reclamation";
 import Profile from "./pages/Profile";
 import "./dashboard.scss";
 
-const UserDashboard = () => {
+const AdminDashboard = () => {
   const [toggled, setToggled] = React.useState(false);
   const [broken, setBroken] = React.useState(
-    window.matchMedia("(max-width: 900px)").matches
+    window.matchMedia("(max-width: 9000px)").matches
   );
 
   React.useEffect(() => {
@@ -34,7 +35,7 @@ const UserDashboard = () => {
         <div className="content">
           <Routes>
             <Route path="/" element={<Overview />} />
-            <Route path="statistics" element={<Statistics />} />
+            <Route path="logement" element={<Logement />} />
             <Route path="facture" element={<Facture />} />
             <Route path="reclamation" element={<Reclamation />} />
             <Route path="profile" element={<Profile />} />
@@ -45,4 +46,4 @@ const UserDashboard = () => {
   );
 };
 
-export default UserDashboard;
+export default AdminDashboard;

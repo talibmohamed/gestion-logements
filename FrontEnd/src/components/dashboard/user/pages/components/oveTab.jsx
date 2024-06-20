@@ -10,20 +10,18 @@ import {
   Card,
   CardBody,
   Button,
-  Link,
 } from "@nextui-org/react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 
 const statusColorMap = {
   "en retard": "primary",
-  "en attente" : "warning",
+  "en attente": "warning",
   payée: "secondary",
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id_res",
-  "nom",
   "type",
   "mois",
   "echeance",
@@ -35,7 +33,7 @@ const DataTable = ({ columns, rows, title }) => {
   const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
-  
+
   const navigate = useNavigate();
 
   const headerColumns = React.useMemo(() => {
@@ -67,6 +65,7 @@ const DataTable = ({ columns, rows, title }) => {
 
   const isAbove900 = window.innerWidth > 900;
 
+
   return (
     <div className="w-full">
       {isAbove900 ? (
@@ -85,10 +84,10 @@ const DataTable = ({ columns, rows, title }) => {
                 className="mb-4 mr-1 cMore"
                 onClick={() => navigate('/dashboard/facture')}
               >
-                See more
+                Voir plus
               </Button>
             </div>
-            <Table 
+            <Table
               aria-label="Example table with custom cells"
               removeWrapper={true}
               className={{ base: "overflow-auto", wrapper: "max-h-[382px]" }}
