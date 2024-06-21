@@ -16,7 +16,7 @@ const Graph = ({ title, data }) => {
     } else if(window.innerWidth <= 1024){
       return 731; // I made it for larger screens
     } else{
-      return 679; 
+      return 575; 
     }
   };
 
