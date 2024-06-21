@@ -21,14 +21,14 @@ import logo from "./logo.svg";
 const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
   const location = useLocation();
   const navigate = useNavigate(); // Define navigate function
-  const nom = useSelector((state) => state.auth.nom);
-  const prenom = useSelector((state) => state.auth.prenom);
+  const nom = useSelector((state) => state.admin.nom);
+  const prenom = useSelector((state) => state.admin.prenom);
   const dispatch = useDispatch();
 
   // logout
   const handleLogout = () => {
     dispatch(logout());
-    localStorage.removeItem("state"); // Remove Redux state from localStorage
+    localStorage.removeItem("state");
     navigate("/admin");
   };
 

@@ -128,6 +128,14 @@ class AdminController
         }
     }
 
+    //get statistics
+    public function getStatisticsAPI()
+    {
+        $response = $this->admin->getStatistics();
+        http_response_code(200);
+        echo json_encode($response);
+    }
+
 
     //the web socket controller 
     // public function broadcastMessage($message)

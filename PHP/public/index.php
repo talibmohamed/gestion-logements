@@ -199,7 +199,7 @@ function route($uri, $method)
                 echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
             }
             break;
-        
+
         case '/api/v1/admin/allnotification':
             if ($method === 'GET') {
                 $jwtHandler = new JwtHandler();
@@ -211,7 +211,7 @@ function route($uri, $method)
                     $adminController = new AdminController();
                     $adminController->getAllnotificationsAPI($jwt_token);
                 } else {
-                    http_response_code(401); 
+                    http_response_code(401);
                     echo json_encode([
                         'status' => 'error',
                         'message' => 'Unauthorized',
@@ -235,7 +235,7 @@ function route($uri, $method)
                     $adminController = new AdminController();
                     $adminController->getAllreclamationAPI($jwt_token);
                 } else {
-                    http_response_code(401); 
+                    http_response_code(401);
                     echo json_encode([
                         'status' => 'error',
                         'message' => 'Unauthorized',
@@ -259,7 +259,7 @@ function route($uri, $method)
                     $adminController = new AdminController();
                     $adminController->getAllfactureAPI($jwt_token);
                 } else {
-                    http_response_code(401); 
+                    http_response_code(401);
                     echo json_encode([
                         'status' => 'error',
                         'message' => 'Unauthorized',
@@ -270,7 +270,29 @@ function route($uri, $method)
                 echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
             }
             break;
-            // Add more routes for user and admin actions as needed3
+
+        case '/api/v1/admin/statistics':
+            if ($method === 'GET') {
+                $jwtHandler = new JwtHandler();
+                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                $jwt_token = str_replace('Bearer ', '', $jwt_token);
+                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+
+                if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
+                    $adminController = new AdminController();
+                    $adminController->getStatisticsAPI();
+                } else {
+                    http_response_code(401);
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Unauthorized',
+                    ]);
+                }
+            } else {
+                http_response_code(405);
+                echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+            }
+            break;
 
         default:
             http_response_code(404);

@@ -1,10 +1,14 @@
+// Overview.jsx
+
 import React, { useState, useEffect } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import PieChartCard from "./components/pie";
 import DataTable from "./components/oveTab";
 import "./Overview.scss";
-import { columns, users } from "./components/data";
+import { columns } from "./components/data";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchFactureThunk, fetchStatisticsThunk } from "../../../../session/thunks/adminthunk";
 
 const data1 = [
   { id: "total-payé", label: "Total Payé", value: 42, color: "#96A7FF" },
@@ -19,6 +23,23 @@ const data2 = [
 
 const Overview = () => {
   const [isMobile, setIsMobile] = useState(false);
+  const dispatch = useDispatch();
+  const factures = useSelector((state) => state.facture.factures);
+  const statistics = useSelector((state) => state.statistics.statistics);
+  const [filteredFactures, setFilteredFactures] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await dispatch(fetchFactureThunk());
+        await dispatch(fetchStatisticsThunk());
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [dispatch]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -32,6 +53,25 @@ const Overview = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  useEffect(() => {
+    const filtered = factures.filter(
+      (facture) => facture.fac_etat === "retard" || facture.fac_etat === "attente"
+    ).slice(0, 6); // Adjusted to slice(0, 6)
+    setFilteredFactures(filtered);
+  }, [factures]);
+
+  // Transform filtered factures data to match the table's expected structure
+  const transformedFactures = filteredFactures.map((facture) => ({
+    id: facture.fac_id,
+    id_res: facture.res_id,
+    nom: facture.nom,
+    type: facture.fac_type,
+    mois: facture.fac_date,
+    echeance: facture.fac_echeance,
+    status: facture.fac_etat,
+    ttc: facture.fac_total,
+  }));
 
   return (
     <div className="container mx-auto">
@@ -55,7 +95,7 @@ const Overview = () => {
         </div>
       )}
       <div className="w-full">
-        <DataTable columns={columns} rows={users} title="Factures récentes" />
+        <DataTable columns={columns} rows={transformedFactures} title="Factures récentes" />
       </div>
     </div>
   );

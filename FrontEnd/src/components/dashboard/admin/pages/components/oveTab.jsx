@@ -15,6 +15,7 @@ import {
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 
+
 const statusColorMap = {
   "en retard": "primary",
   "en attente" : "warning",
@@ -79,6 +80,8 @@ const DataTable = ({ columns, rows, title }) => {
             <div className="card-header">
               {title && <h2 className="mb-4 table-title">{title}</h2>}
               <Button
+                as={Link} // Render the Button as a Link
+                to="/dashboard/facture" // Specify the destination path
                 variant="light"
                 color="primary"
                 size="md"
@@ -88,7 +91,7 @@ const DataTable = ({ columns, rows, title }) => {
                 See more
               </Button>
             </div>
-            <Table 
+            <Table
               aria-label="Example table with custom cells"
               removeWrapper={true}
               className={{ base: "overflow-auto", wrapper: "max-h-[382px]" }}

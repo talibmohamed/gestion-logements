@@ -3,16 +3,16 @@ import authReducer from './authentication';
 import notificationReducer from './notificationSlice';
 import userReducer from './userslice';
 import adminReducer from './adminslice';
-import factureReducer from './factureSlice' 
+import factureReducer from './factureSlice';
+import statisticsReducer from "./statisticsSlice"; // Ensure correct import path
 
 const rootReducer = combineReducers({
   auth: authReducer,
   notifications: notificationReducer,
   user: userReducer,
-  admin: adminReducer, 
-  facture: factureReducer
-
-
+  admin: adminReducer,
+  facture: factureReducer,
+  statistics: statisticsReducer, // Include the new statistics reducer
 });
 
 export const resetStateReducer = (state, action) => {
@@ -21,8 +21,9 @@ export const resetStateReducer = (state, action) => {
       auth: undefined,
       notifications: undefined,
       user: undefined,
-      admin: undefined, 
-      facture: undefined
+      admin: undefined,
+      facture: undefined,
+      statistics: undefined, 
     };
   }
   return rootReducer(state, action);

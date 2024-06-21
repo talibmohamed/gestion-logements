@@ -86,6 +86,8 @@ class admin
             'all' => $all_facture // Total invoices
         );
     }
+
+    
     public function all_factures() {
         // Get the database connection
         $connection = $this->db->getConnection();

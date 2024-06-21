@@ -7,7 +7,8 @@ import { fetchNotifications } from "../services/adminapi";
 import {setNotifications } from "../notificationSlice"
 import { fetchFacture } from "../services/adminapi";
 import { setFacture } from "../factureSlice";
-
+import { fetchStatistics } from "../services/adminapi";
+import { setStatistics, setStatisticsLoading, setStatisticsError } from '../statisticsSlice';
 
 // Thunk for admin login
 export const loginAdminThunk = createAsyncThunk(
@@ -104,6 +105,25 @@ export const fetchFactureThunk = createAsyncThunk(
       return response;
     } catch (error) {
       console.error('Error fetching facture:', error);
+      throw error;
+    }
+  }
+);
+
+export const fetchStatisticsThunk = createAsyncThunk(
+  'statistics/fetchStatistics',
+  async (_, { dispatch, getState }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+    dispatch(setStatisticsLoading()); // Dispatch loading state
+
+    try {
+      const response = await fetchStatistics(jwt); // Assuming fetchStatistics is a function that makes an API call
+      dispatch(setStatistics(response.statistics)); // Dispatch successful action with parsed data
+      return response; // Return response if needed by the caller
+    } catch (error) {
+      dispatch(setStatisticsError(error.message)); // Dispatch error action with error message
+      console.error('Error fetching statistics:', error);
       throw error;
     }
   }

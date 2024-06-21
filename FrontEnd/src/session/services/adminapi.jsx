@@ -108,3 +108,19 @@ export const fetchFacture = async (jwt) => {
     throw error;
   }
 }
+
+
+// Function to fetch statistics
+export const fetchStatistics = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/admin/statistics`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetchStatistics:", error.response || error.message || error);
+    throw error;
+  }
+};
