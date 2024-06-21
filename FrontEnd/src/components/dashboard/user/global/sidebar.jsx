@@ -17,6 +17,7 @@ import {
 import { FaFileInvoiceDollar } from "react-icons/fa6";
 import { FaChartPie } from "react-icons/fa";
 import logo from "./logo.svg";
+import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 
 const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
   const location = useLocation();
@@ -113,7 +114,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               </MenuItem>
               <MenuItem
                 component={<Link to="/dashboard/logement" />}
-                icon={<FaChartPie className="pie-icon"/>}
+                icon={<ApartmentOutlinedIcon className="pie-icon"/>}
                 className={
                   location.pathname === "/dashboard/logement"
                     ? "active tab"

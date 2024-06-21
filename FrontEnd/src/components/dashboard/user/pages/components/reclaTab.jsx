@@ -17,20 +17,15 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
-  Autocomplete,
-  AutocompleteItem,
-  Select,
-  SelectItem,
-  DatePicker,
+  Textarea,
 } from "@nextui-org/react";
-import { EditIcon } from "../Icons/EditIcon";
 import { DeleteIcon } from "../Icons/DeleteIcon";
 import { EyeIcon } from "../Icons/EyeIcon";
 import PropTypes from "prop-types";
+import "./customWrappers.scss";
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id_res",
-  "nom",
+  "id_recl",
   "type_recl",
   "date",
   "sol",
@@ -63,11 +58,6 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     isOpen: isDetailsModalOpen,
     onOpen: openDetailsModal,
     onOpenChange: setDetailsModalOpen,
-  } = useDisclosure();
-  const {
-    isOpen: isEditModalOpen,
-    onOpen: openEditModal,
-    onOpenChange: setEditModalOpen,
   } = useDisclosure();
   const {
     isOpen: isDeleteModalOpen,
@@ -119,21 +109,9 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     setCurrentReclamation(reclamation);
     openDetailsModal(true);
   };
-  const handleEditIconClick = (reclamation) => {
-    setCurrentReclamation(reclamation);
-    openEditModal();
-  };
-  const handleStatusChange = (status) => {
-    setCurrentReclamation({ ...currentReclamation, status });
-  };
   const handleDeleteIconClick = (reclamation) => {
     setCurrentReclamation(reclamation);
     openDeleteModal();
-  };
-  const handleSave = () => {
-    // to handle saving the updated data
-    console.log("Updated Status:", currentReclamation);
-    setEditModalOpen(false);
   };
 
   const renderCell = React.useCallback((user, columnKey) => {
@@ -188,37 +166,6 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                 onClick={() => handleDetailsIconClick(user)}
               >
                 <EyeIcon />
-              </span>
-            </Tooltip>
-
-            <Tooltip
-              content="Modifier"
-              delay={0}
-              closeDelay={0}
-              motionProps={{
-                variants: {
-                  exit: {
-                    opacity: 0,
-                    transition: {
-                      duration: 0.1,
-                      ease: "easeIn",
-                    },
-                  },
-                  enter: {
-                    opacity: 1,
-                    transition: {
-                      duration: 0.15,
-                      ease: "easeOut",
-                    },
-                  },
-                },
-              }}
-            >
-              <span
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                onClick={() => handleEditIconClick(user)}
-              >
-                <EditIcon />
               </span>
             </Tooltip>
 
@@ -329,6 +276,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
         size="lg"
         isOpen={isDetailsModalOpen}
         onOpenChange={() => setDetailsModalOpen(false)}
+        className="recDesc"
         classNames={{
           base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
           closeButton: "hover:bg-white/5 active:bg-white/10",
@@ -341,301 +289,18 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                 Détails de la réclamation
               </ModalHeader>
               <ModalBody>
-                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
-                  <Input
-                    isReadOnly
-                    type="text"
-                    label="Résidant:"
-                    variant="bordered"
-                    defaultValue={currentReclamation.nom}
-                    className="max-w-sm"
-                    classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
-                      input: [
-                        "bg-transparent",
-                        "group-data-[has-value=true]:text-white/90",
-                      ],
-                      innerWrapper: "bg-transparent",
-                      inputWrapper: [
-                        "bg-transparent",
-                        "group-data-[hover=true]:bg-zinc-800",
-                        "group-data-[hover=true]:border-zinc-500",
-                        "group-data-[focus=true]:bg-transparent ",
-                        "group-data-[focus=true]:border-zinc-400 ",
-                        "!cursor-text",
-                        "border-zinc-600",
-                      ],
-                    }}
-                  />
-                  <Input
-                    isReadOnly
-                    type="text"
-                    label="No du logement:"
-                    variant="bordered"
-                    defaultValue={currentReclamation.num_de_log}
-                    className="max-w-sm"
-                    classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
-                      input: [
-                        "bg-transparent",
-                        "group-data-[has-value=true]:text-white/90",
-                      ],
-                      innerWrapper: "bg-transparent",
-                      inputWrapper: [
-                        "bg-transparent",
-                        "group-data-[hover=true]:bg-zinc-800",
-                        "group-data-[hover=true]:border-zinc-500",
-                        "group-data-[focus=true]:bg-transparent ",
-                        "group-data-[focus=true]:border-zinc-400 ",
-                        "!cursor-text",
-                        "border-zinc-600",
-                      ],
-                    }}
-                  />
-                </div>
-
-                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
-                  <Input
-                    isReadOnly
-                    type="text"
-                    label="Type du logement:"
-                    variant="bordered"
-                    defaultValue={currentReclamation.type_log}
-                    className="max-w-sm"
-                    classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
-                      input: [
-                        "bg-transparent",
-                        "group-data-[has-value=true]:text-white/90",
-                      ],
-                      innerWrapper: "bg-transparent",
-                      inputWrapper: [
-                        "bg-transparent",
-                        "group-data-[hover=true]:bg-zinc-800",
-                        "group-data-[hover=true]:border-zinc-500",
-                        "group-data-[focus=true]:bg-transparent ",
-                        "group-data-[focus=true]:border-zinc-400 ",
-                        "!cursor-text",
-                        "border-zinc-600",
-                      ],
-                    }}
-                  />
-                  <Input
-                    isReadOnly
-                    type="text"
-                    label="Amélioré:"
-                    variant="bordered"
-                    defaultValue={currentReclamation.ameliored ? "Oui" : "Non"}
-                    className="max-w-sm"
-                    classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
-                      input: [
-                        "bg-transparent",
-                        "group-data-[has-value=true]:text-white/90",
-                      ],
-                      innerWrapper: "bg-transparent",
-                      inputWrapper: [
-                        "bg-transparent",
-                        "group-data-[hover=true]:bg-zinc-800",
-                        "group-data-[hover=true]:border-zinc-500",
-                        "group-data-[focus=true]:bg-transparent ",
-                        "group-data-[focus=true]:border-zinc-400 ",
-                        "!cursor-text",
-                        "border-zinc-600",
-                      ],
-                    }}
-                  />
-                </div>
-                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
-                <Input
-                    isReadOnly
-                    type="text"
-                    label="Description:"
-                    variant="bordered"
-                    defaultValue={currentReclamation.desc}
-                    className="max-w-sm"
-                    classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
-                      input: [
-                        "bg-transparent",
-                        "group-data-[has-value=true]:text-white/90",
-                      ],
-                      innerWrapper: "bg-transparent",
-                      inputWrapper: [
-                        "bg-transparent",
-                        "group-data-[hover=true]:bg-zinc-800",
-                        "group-data-[hover=true]:border-zinc-500",
-                        "group-data-[focus=true]:bg-transparent ",
-                        "group-data-[focus=true]:border-zinc-400 ",
-                        "!cursor-text",
-                        "border-zinc-600",
-                      ],
-                    }}
-                  />
-                </div>
+                <Textarea
+                  isReadOnly
+                  label="Description"
+                  variant="bordered"
+                  labelPlacement="outside"
+                  placeholder="Enter your description"
+                  defaultValue={currentReclamation.desc}
+                />
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="flat" onClick={onClose}>
                   Fermer
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-
-      <Modal
-        size="lg"
-        isOpen={isEditModalOpen}
-        onOpenChange={setEditModalOpen}
-        classNames={{
-          base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
-          closeButton: "hover:bg-white/5 active:bg-white/10",
-        }}
-      >
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Modifier le status de la réclamation
-              </ModalHeader>
-              <ModalBody>
-                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
-                  <Input
-                    isDisabled
-                    type="text"
-                    label="Résidant"
-                    className="max-w-sm"
-                    classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
-                      input: [
-                        "bg-transparent",
-                        "group-data-[has-value=true]:text-white/90",
-                      ],
-                      innerWrapper: "bg-transparent",
-                      inputWrapper: [
-                        "bg-zinc-800",
-                        "group-data-[hover=true]:bg-zinc-700",
-                        "group-data-[focus=true]:bg-zinc-800 ",
-                        "!cursor-text",
-                      ],
-                    }}
-                    defaultValue={currentReclamation?.nom}
-                    onChange={(e) =>
-                      setCurrentReclamation({
-                        ...currentReclamation,
-                        nom: e.target.value,
-                      })
-                    }
-                  />
-
-                  <Input
-                    isDisabled
-                    type="text"
-                    label="Description"
-                    className="max-w-sm"
-                    classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
-                      input: [
-                        "bg-transparent",
-                        "group-data-[has-value=true]:text-white/90",
-                      ],
-                      innerWrapper: "bg-transparent",
-                      inputWrapper: [
-                        "bg-zinc-800",
-                        "group-data-[hover=true]:bg-zinc-700",
-                        "group-data-[focus=true]:bg-zinc-800 ",
-                        "!cursor-text",
-                      ],
-                    }}
-                    defaultValue={currentReclamation?.desc}
-                    onChange={(e) =>
-                      setCurrentReclamation({
-                        ...currentReclamation,
-                        nom: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-
-                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
-                  <Input
-                    isDisabled
-                    type="text"
-                    label="Date de Réclamation"
-                    className="max-w-sm"
-                    classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
-                      input: [
-                        "bg-transparent",
-                        "group-data-[has-value=true]:text-white/90",
-                      ],
-                      innerWrapper: "bg-transparent",
-                      inputWrapper: [
-                        "bg-zinc-800",
-                        "group-data-[hover=true]:bg-zinc-700",
-                        "group-data-[focus=true]:bg-zinc-800 ",
-                        "!cursor-text",
-                      ],
-                    }}
-                    defaultValue={currentReclamation?.date}
-                    onChange={(e) =>
-                      setCurrentReclamation({
-                        ...currentReclamation,
-                        nom: e.target.value,
-                      })
-                    }
-                  />
-                  <Select
-                    label="Status"
-                    placeholder="Choisir le statut"
-                    className="max-w-sm"
-                    classNames={{
-                      label: "group-data-[filled=true]:text-zinc-400",
-                      value: "group-data-[has-value=true]:text-white/90",
-                      trigger: [
-                        "bg-zinc-800",
-                        "text-white/90",
-                        "placeholder:text-white/60",
-                        "data-[hover=true]:bg-zinc-700",
-                        "group-data-[focus=true]:bg-zinc-800",
-                        "group-data-[focus=true]:border-zinc-400",
-                      ],
-                      content: [
-                        "bg-zinc-800",
-                        "text-white/90",
-                        "border-zinc-800",
-                      ],
-                      popoverContent: ["bg-zinc-800", "text-white/90"],
-                      listboxWrapper: [
-                        "bg-zinc-800",
-                        "!cursor-text",
-                        "text-white/90",
-                      ],
-                    }}
-                    defaultValue={currentReclamation?.status}
-                    onSelectionChange={(keys) =>
-                      handleStatusChange(keys.currentKey)
-                    }
-                  >
-                    <SelectItem key="resolu" textValue="Résolu">
-                      Résolu
-                    </SelectItem>
-                    <SelectItem key="inacheve" textValue="Inachevé">
-                      Inachevé
-                    </SelectItem>
-                    <SelectItem key="attente" textValue="Attente">
-                      Attente
-                    </SelectItem>
-                  </Select>
-                </div>
-              </ModalBody>
-              <ModalFooter>
-                <Button color="danger" variant="flat" onClick={onClose}>
-                  Fermer
-                </Button>
-                <Button color="primary" onClick={handleSave}>
-                  Sauvegarder
                 </Button>
               </ModalFooter>
             </>
@@ -689,8 +354,7 @@ ReclamationTable.propTypes = {
   rows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      id_res: PropTypes.string.isRequired,
-      nom: PropTypes.string.isRequired,
+      id_recl: PropTypes.string.isRequired,
       desc: PropTypes.string.isRequired,
       date: PropTypes.string.isRequired,
       status: PropTypes.string.isRequired,

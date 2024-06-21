@@ -31,7 +31,7 @@ import PropTypes from "prop-types";
 import "./customWrappers.scss";
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id_res",
+  "id_fac",
   "nom",
   "type",
   "mois",
@@ -924,7 +924,7 @@ InvoiceTable.propTypes = {
   rows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      id_res: PropTypes.string.isRequired,
+      id_fac: PropTypes.string.isRequired,
       nom: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
       mois: PropTypes.string.isRequired,

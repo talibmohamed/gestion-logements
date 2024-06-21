@@ -52,49 +52,6 @@ const Facture = () => {
           />
         </CardBody>
       </Card>
-      <Card
-        isBlurred
-        className="border-none bg-background/15 white:bg-default-100/50 card-wrapper custom-card-wrapper w-full over"
-        shadow="sm"
-      >
-        <CardBody>
-          <h2 className="mx-2 mb-4 flex justify-between items-center">
-            Envoyer un avis de facture en retard
-            <div className="flex gap-3">
-              <Button color="danger" variant="flat">
-                Envoyer !
-              </Button>
-            </div>
-          </h2>
-          <div className="reclMsg">
-            <Input
-              variant="bordered"
-              type="res_id"
-              label="Id résidant"
-              labelPlacement="outside-left"
-              size="sm"
-              onClear={() => console.log("input cleared")}
-              startContent={
-                <div className="pointer-events-none flex items-center">
-                  <span className="text-default-400 text-small">#</span>
-                </div>
-              }
-              className="custom-input max-w-xs mb-2 ml-2 "
-              classNames={{
-                label: "text-sm font-normal"
-              }}
-            />
-          </div>
-          <div className="flex flex-col items-center justify-center">
-            <Textarea
-              variant="bordered"
-              labelPlacement="outside"
-              placeholder="Entrer votre description"
-              className="max-w-5xl mb-4"
-            />
-          </div>
-        </CardBody>
-      </Card>
     </div>
   );
 };

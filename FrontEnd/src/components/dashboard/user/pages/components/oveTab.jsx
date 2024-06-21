@@ -21,7 +21,7 @@ const statusColorMap = {
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id_res",
+  "id_fac",
   "type",
   "mois",
   "echeance",

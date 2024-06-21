@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from "react-responsive-carousel";
-import LogTable from "./components/logTab.jsx";
+import LogSection from "./components/logSection.jsx";
 import Graph from "./components/logGraph.jsx";
 import "./Statics.scss";
 import { Card, CardBody } from "@nextui-org/react";
+import { users } from "./components/logData.jsx";
 
 const eData = [
   {
@@ -45,7 +46,7 @@ const Logement = () => {
           shadow="sm"
         >
           <CardBody>
-            <LogTable title="Logements" />
+            <LogSection title="Logements" />
           </CardBody>
         </Card>
         {isMobile ? (
