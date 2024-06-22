@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableHeader,
@@ -10,20 +10,36 @@ import {
   Card,
   CardBody,
   Button,
-  Link,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+  Input,
+  Select,
+  SelectItem,
 } from "@nextui-org/react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
-
+import { EyeIcon } from "../Icons/EyeIcon";
+import ReadMoreIcon from "@mui/icons-material/ReadMore";
+import { VerticalDotsIcon } from "../Icons/VerticalDotsIcon";
+import { DeleteIcon } from "../Icons/DeleteIcon";
+import { EditIcon } from "../Icons/EditIcon";
 
 const statusColorMap = {
   "en retard": "primary",
-  "en attente" : "warning",
+  "en attente": "warning",
   payée: "secondary",
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id_res",
+  "id_fac",
   "nom",
   "type",
   "mois",
@@ -32,22 +48,60 @@ const INITIAL_VISIBLE_COLUMNS = [
   "ttc",
 ];
 
+const SMALL_DEVICE_COLUMNS = [
+  "id_res",
+  "nom",
+  "type",
+  "echeance",
+  "status",
+  "actions",
+];
+
 const DataTable = ({ columns, rows, title }) => {
-  const [visibleColumns, setVisibleColumns] = React.useState(
+  const [visibleColumns, setVisibleColumns] = useState(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
-  
+  const [currentOverview, setCurrentOverview] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
 
-  const headerColumns = React.useMemo(() => {
-    if (visibleColumns === "all") return columns;
+  const {
+    isOpen: isDetailsModalOpen,
+    onOpen: openDetailsModal,
+    onOpenChange: setDetailsModalOpen,
+  } = useDisclosure();
 
-    return columns.filter((column) =>
-      Array.from(visibleColumns).includes(column.uid)
-    );
-  }, [visibleColumns]);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 900);
+      setVisibleColumns(
+        window.innerWidth <= 900
+          ? new Set(SMALL_DEVICE_COLUMNS)
+          : new Set(INITIAL_VISIBLE_COLUMNS)
+      );
+    };
 
-  const renderCell = React.useCallback((item, column) => {
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const headerColumns = columns.filter((column) =>
+    visibleColumns.has(column.uid)
+  );
+
+  const handleDotsIconClick = (item) => {
+    setCurrentOverview(item);
+  };
+  const handleDetailsIconClick = (item) => {
+    setCurrentOverview(item);
+    openDetailsModal(true);
+  };
+
+  const renderCell = (item, column) => {
     const cellValue = item[column.uid];
     switch (column.uid) {
       case "status":
@@ -61,96 +115,254 @@ const DataTable = ({ columns, rows, title }) => {
             {cellValue}
           </Chip>
         );
+      case "actions":
+        return (
+          <Dropdown
+            classNames={{
+              content: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+            }}
+          >
+            <DropdownTrigger>
+              <span className="icon-wrapper">
+                <VerticalDotsIcon onClick={() => handleDotsIconClick(item)} />
+              </span>
+            </DropdownTrigger>
+            <DropdownMenu
+              aria-label="Action event example"
+              onAction={(key) => {
+                if (key === "details") handleDetailsIconClick(item);
+                if (key === "voirPlus") navigate("/dashboard/facture");
+              }}
+            >
+              <DropdownItem key="details" startContent={<EyeIcon />}>
+                Détails
+              </DropdownItem>
+              <DropdownItem
+                key="voirPlus"
+                startContent={<ReadMoreIcon sx={{ fontSize: 17 }} />}
+              >
+                Voir plus
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        );
       default:
         return <p className="text-bold text-sm capitalize">{cellValue}</p>;
     }
-  }, []);
-
-  const isAbove900 = window.innerWidth > 900;
+  };
 
   return (
     <div className="w-full">
-      {isAbove900 ? (
-        <Card
-          isBlurred
-          className="border-none bg-background/15 white:bg-default-100/50 card-wrapper custom-card-wrapper w-full over"
-          shadow="sm"
-        >
-          <CardBody>
-            <div className="card-header">
-              {title && <h2 className="mb-4 table-title">{title}</h2>}
-              <Button
-                as={Link} // Render the Button as a Link
-                to="/dashboard/facture" // Specify the destination path
-                variant="light"
-                color="primary"
-                size="md"
-                className="mb-4 mr-1 cMore"
-                onClick={() => navigate('/dashboard/facture')}
-              >
-                See more
-              </Button>
-            </div>
-            <Table
-              aria-label="Example table with custom cells"
-              removeWrapper={true}
-              className={{ base: "overflow-auto", wrapper: "max-h-[382px]" }}
-            >
-              <TableHeader columns={headerColumns}>
-                {(column) => (
-                  <TableColumn key={column.uid} align={"center"}>
-                    {column.name}
-                  </TableColumn>
-                )}
-              </TableHeader>
-              <TableBody items={rows}>
-                {(item) => (
-                  <TableRow key={item.id}>
-                    {columns.map((column) => (
-                      <TableCell key={column.uid}>
-                        {renderCell(item, column)}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </CardBody>
-        </Card>
-      ) : (
-        <div className="below-900-content">
-          {/* Placeholder for the component to be rendered below 900px */}
-          <Card>
-            {" "}
-            <CardBody>
-              <h2 className="table-title">{title}</h2>
-              {rows.map((item, rowIndex) => (
-                <div key={rowIndex} className="below-900-card-row">
-                  <Card
-                    isBlurred
-                    className="border-none white:bg-default-100/50 p-3 my-3 w-full over"
-                    shadow="sm"
-                  >
-                    <table
-                      className="w-full"
-                      aria-label="Example static collection table"
-                    >
-                      <tbody>
-                        {columns.map((column) => (
-                          <tr key={column.uid}>
-                            <td>{column.name}</td>
-                            <td>{renderCell(item, column)}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </Card>
-                </div>
-              ))}
-            </CardBody>
-          </Card>
-        </div>
-      )}
+      <Card
+        isBlurred
+        className="border-none bg-background/15 white:bg-default-100/50 card-wrapper custom-card-wrapper w-full over"
+        shadow="sm"
+      >
+        <CardBody>
+          <div className="card-header">
+            {title && <h2 className="mb-4 table-title">{title}</h2>}
+          </div>
+          <Table
+            aria-label="Example table with custom cells"
+            removeWrapper={true}
+            className={{ base: "overflow-auto", wrapper: "max-h-[382px]" }}
+          >
+            <TableHeader columns={headerColumns}>
+              {(column) => (
+                <TableColumn key={column.uid} align="center">
+                  {column.name}
+                </TableColumn>
+              )}
+            </TableHeader>
+            <TableBody items={rows}>
+              {(item) => (
+                <TableRow key={item.id}>
+                  {headerColumns.map((column) => (
+                    <TableCell key={column.uid}>
+                      {renderCell(item, column)}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardBody>
+      </Card>
+
+      <Modal
+        size="lg"
+        isOpen={isDetailsModalOpen}
+        onOpenChange={() => setDetailsModalOpen(false)}
+        classNames={{
+          base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+          closeButton: "hover:bg-white/5 active:bg-white/10",
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Détails de la Facture
+              </ModalHeader>
+              <ModalBody>
+                <Input
+                  isReadOnly
+                  type="text"
+                  label="Résidant:"
+                  variant="bordered"
+                  defaultValue={currentOverview.nom}
+                  className="max-w-sm"
+                  classNames={{
+                    label: "group-data-[filled-within=true]:text-zinc-400",
+                    input: [
+                      "bg-transparent",
+                      "group-data-[has-value=true]:text-white/90",
+                    ],
+                    innerWrapper: "bg-transparent",
+                    inputWrapper: [
+                      "bg-transparent",
+                      "group-data-[hover=true]:bg-zinc-800",
+                      "group-data-[hover=true]:border-zinc-500",
+                      "group-data-[focus=true]:bg-transparent ",
+                      "group-data-[focus=true]:border-zinc-400 ",
+                      "!cursor-text",
+                      "border-zinc-600",
+                    ],
+                  }}
+                />
+
+                <Input
+                  isReadOnly
+                  type="text"
+                  label="Type de Facture:"
+                  variant="bordered"
+                  defaultValue={currentOverview.type}
+                  className="max-w-sm"
+                  classNames={{
+                    label: "group-data-[filled-within=true]:text-zinc-400",
+                    input: [
+                      "bg-transparent",
+                      "group-data-[has-value=true]:text-white/90",
+                    ],
+                    innerWrapper: "bg-transparent",
+                    inputWrapper: [
+                      "bg-transparent",
+                      "group-data-[hover=true]:bg-zinc-800",
+                      "group-data-[hover=true]:border-zinc-500",
+                      "group-data-[focus=true]:bg-transparent ",
+                      "group-data-[focus=true]:border-zinc-400 ",
+                      "!cursor-text",
+                      "border-zinc-600",
+                    ],
+                  }}
+                />
+
+                <Input
+                  isReadOnly
+                  label="Mois de Consommation"
+                  variant="bordered"
+                  defaultValue={currentOverview.mois}
+                  className="max-w-sm"
+                  classNames={{
+                    label: "group-data-[filled-within=true]:text-zinc-400",
+                    input: [
+                      "bg-transparent",
+                      "group-data-[has-value=true]:text-white/90",
+                    ],
+                    innerWrapper: "bg-transparent",
+                    inputWrapper: [
+                      "bg-transparent",
+                      "group-data-[hover=true]:bg-zinc-800",
+                      "group-data-[hover=true]:border-zinc-500",
+                      "group-data-[focus=true]:bg-transparent ",
+                      "group-data-[focus=true]:border-zinc-400 ",
+                      "!cursor-text",
+                      "border-zinc-600",
+                    ],
+                  }}
+                />
+                <Input
+                  isReadOnly
+                  label="Echeance"
+                  variant="bordered"
+                  defaultValue={currentOverview.echeance}
+                  className="max-w-sm"
+                  classNames={{
+                    label: "group-data-[filled-within=true]:text-zinc-400",
+                    input: [
+                      "bg-transparent",
+                      "group-data-[has-value=true]:text-white/90",
+                    ],
+                    innerWrapper: "bg-transparent",
+                    inputWrapper: [
+                      "bg-transparent",
+                      "group-data-[hover=true]:bg-zinc-800",
+                      "group-data-[hover=true]:border-zinc-500",
+                      "group-data-[focus=true]:bg-transparent ",
+                      "group-data-[focus=true]:border-zinc-400 ",
+                      "!cursor-text",
+                      "border-zinc-600",
+                    ],
+                  }}
+                />
+                <Input
+                  isReadOnly
+                  label="Status"
+                  variant="bordered"
+                  defaultValue={currentOverview.status}
+                  className="max-w-sm"
+                  classNames={{
+                    label: "group-data-[filled-within=true]:text-zinc-400",
+                    input: [
+                      "bg-transparent",
+                      "group-data-[has-value=true]:text-white/90",
+                    ],
+                    innerWrapper: "bg-transparent",
+                    inputWrapper: [
+                      "bg-transparent",
+                      "group-data-[hover=true]:bg-zinc-800",
+                      "group-data-[hover=true]:border-zinc-500",
+                      "group-data-[focus=true]:bg-transparent ",
+                      "group-data-[focus=true]:border-zinc-400 ",
+                      "!cursor-text",
+                      "border-zinc-600",
+                    ],
+                  }}
+                />
+                <Input
+                  isReadOnly
+                  label="Montant TTC"
+                  variant="bordered"
+                  defaultValue={currentOverview.ttc}
+                  className="max-w-sm"
+                  classNames={{
+                    label: "group-data-[filled-within=true]:text-zinc-400",
+                    input: [
+                      "bg-transparent",
+                      "group-data-[has-value=true]:text-white/90",
+                    ],
+                    innerWrapper: "bg-transparent",
+                    inputWrapper: [
+                      "bg-transparent",
+                      "group-data-[hover=true]:bg-zinc-800",
+                      "group-data-[hover=true]:border-zinc-500",
+                      "group-data-[focus=true]:bg-transparent ",
+                      "group-data-[focus=true]:border-zinc-400 ",
+                      "!cursor-text",
+                      "border-zinc-600",
+                    ],
+                  }}
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" onClick={onClose}>
+                  Fermer
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 };

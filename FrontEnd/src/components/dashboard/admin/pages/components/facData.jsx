@@ -2,11 +2,13 @@ import React from "react";
 const columns = [
   { name: "No", uid: "id", sortable: true },
     { name: "Id Facture", uid: "id_fac" },
+    { name : "Nom du Résident", uid: "nom" },
     { name: "Type de Facture", uid: "type", sortable: true },
     { name: "Mois Consommation", uid: "mois"},
     { name: "Echéance", uid: "echeance" },
     { name: "Status", uid: "status", sortable: true },
     { name: "Montant TTC", uid: "ttc" },
+    { name: "Actions", uid :"actions"},
 ];
 
 const users = [

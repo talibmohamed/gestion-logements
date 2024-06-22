@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableHeader,
@@ -22,11 +22,16 @@ import {
   Select,
   SelectItem,
   DatePicker,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@nextui-org/react";
 import { SearchIcon } from "../Icons/SearchIcon";
 import { EditIcon } from "../Icons/EditIcon";
 import { DeleteIcon } from "../Icons/DeleteIcon";
 import { EyeIcon } from "../Icons/EyeIcon";
+import { VerticalDotsIcon } from "../Icons/VerticalDotsIcon";
 import PropTypes from "prop-types";
 import "./customWrappers.scss";
 
@@ -40,6 +45,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "ttc",
   "actions",
 ];
+const SMALL_DEVICE_COLUMNS = ["nom", "type", "echeance", "status", "actions"];
 
 const statusColorMap = {
   payée: "secondary",
@@ -61,6 +67,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
   const rowsPerPage = 10;
 
   const [currentInvoice, setCurrentInvoice] = useState(null);
+
   const {
     isOpen: isAddModalOpen,
     onOpen: openAddModal,
@@ -93,6 +100,26 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
       Array.from(visibleColumns).includes(column.uid)
     );
   }, [visibleColumns]);
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 900);
+      setVisibleColumns(
+        window.innerWidth <= 900
+          ? new Set(SMALL_DEVICE_COLUMNS)
+          : new Set(INITIAL_VISIBLE_COLUMNS)
+      );
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const filteredItems = React.useMemo(() => {
     let filteredUsers = [...rows];
@@ -131,6 +158,10 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
     });
   }, [sortDescriptor, items]);
 
+  const handleDotsIconClick = (invoice) => {
+    setCurrentInvoice(invoice);
+  };
+
   const handleDetailsIconClick = (invoice) => {
     setCurrentInvoice(invoice);
     openDetailsModal(true);
@@ -147,135 +178,174 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
   const handleStatusChange = (status) => {
     setCurrentInvoice({ ...currentInvoice, status });
   };
-  const handleSave = () => {
-    // to handle saving the updated data
-    console.log("Updated Invoice:", currentInvoice);
-    setEditModalOpen(false);
-  };
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
+  const renderCell = React.useCallback(
+    (user, columnKey) => {
+      const cellValue = user[columnKey];
 
-    switch (columnKey) {
-      case "role":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-          </div>
-        );
-      case "status":
-        return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[user.status]}
-            size="sm"
-            variant="flat"
-          >
-            {cellValue}
-          </Chip>
-        );
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip
-              content="Details"
-              delay={0}
-              closeDelay={0}
-              motionProps={{
-                variants: {
-                  exit: {
-                    opacity: 0,
-                    transition: {
-                      duration: 0.1,
-                      ease: "easeIn",
-                    },
-                  },
-                  enter: {
-                    opacity: 1,
-                    transition: {
-                      duration: 0.15,
-                      ease: "easeOut",
-                    },
-                  },
-                },
-              }}
+      switch (columnKey) {
+        case "role":
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-small capitalize">{cellValue}</p>
+            </div>
+          );
+        case "status":
+          return (
+            <Chip
+              className="capitalize"
+              color={statusColorMap[user.status]}
+              size="sm"
+              variant="flat"
             >
-              <span
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                onClick={() => handleDetailsIconClick(user)}
-              >
-                <EyeIcon />
-              </span>
-            </Tooltip>
+              {cellValue}
+            </Chip>
+          );
+        case "actions":
+          return (
+            <div className="relative flex items-center gap-2">
+              {isMobile ? (
+                <Dropdown
+                  classNames={{
+                    content: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+                  }}
+                >
+                  <DropdownTrigger>
+                    <span
+                      className="icon-wrapper"
+                      onClick={handleDotsIconClick}
+                    >
+                      <VerticalDotsIcon />
+                    </span>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    aria-label="Action event example"
+                    onAction={(key) => {
+                      if (key === "details") handleDetailsIconClick(user);
+                      if (key === "edit") handleEditIconClick(user);
+                      if (key === "delete") handleDeleteIconClick(user);
+                    }}
+                  >
+                    <DropdownItem key="details" startContent={<EyeIcon />}>
+                      Détails
+                    </DropdownItem>
+                    <DropdownItem key="edit" startContent={<EditIcon />}>
+                      Modifier
+                    </DropdownItem>
+                    <DropdownItem
+                      key="delete"
+                      color="danger"
+                      className="text-danger"
+                      startContent={<DeleteIcon />}
+                    >
+                      Supprimer
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              ) : (
+                <>
+                  <Tooltip
+                    content="Détails"
+                    delay={0}
+                    closeDelay={0}
+                    motionProps={{
+                      variants: {
+                        exit: {
+                          opacity: 0,
+                          transition: {
+                            duration: 0.1,
+                            ease: "easeIn",
+                          },
+                        },
+                        enter: {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            ease: "easeOut",
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    <span
+                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                      onClick={() => handleDetailsIconClick(user)}
+                    >
+                      <EyeIcon />
+                    </span>
+                  </Tooltip>
+                  <Tooltip
+                    content="Modifier"
+                    delay={0}
+                    closeDelay={0}
+                    motionProps={{
+                      variants: {
+                        exit: {
+                          opacity: 0,
+                          transition: {
+                            duration: 0.1,
+                            ease: "easeIn",
+                          },
+                        },
+                        enter: {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            ease: "easeOut",
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    <span
+                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                      onClick={() => handleEditIconClick(user)}
+                    >
+                      <EditIcon />
+                    </span>
+                  </Tooltip>
 
-            <Tooltip
-              content="Modifier"
-              delay={0}
-              closeDelay={0}
-              motionProps={{
-                variants: {
-                  exit: {
-                    opacity: 0,
-                    transition: {
-                      duration: 0.1,
-                      ease: "easeIn",
-                    },
-                  },
-                  enter: {
-                    opacity: 1,
-                    transition: {
-                      duration: 0.15,
-                      ease: "easeOut",
-                    },
-                  },
-                },
-              }}
-            >
-              <span
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                onClick={() => handleEditIconClick(user)}
-              >
-                <EditIcon />
-              </span>
-            </Tooltip>
-
-            <Tooltip
-              color="danger"
-              content="Supprimer"
-              delay={0}
-              closeDelay={0}
-              motionProps={{
-                variants: {
-                  exit: {
-                    opacity: 0,
-                    transition: {
-                      duration: 0.1,
-                      ease: "easeIn",
-                    },
-                  },
-                  enter: {
-                    opacity: 1,
-                    transition: {
-                      duration: 0.15,
-                      ease: "easeOut",
-                    },
-                  },
-                },
-              }}
-            >
-              <span
-                className="text-lg text-danger cursor-pointer active:opacity-50 "
-                onClick={() => handleDeleteIconClick(user)}
-              >
-                <DeleteIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+                  <Tooltip
+                    color="danger"
+                    content="Supprimer"
+                    delay={0}
+                    closeDelay={0}
+                    motionProps={{
+                      variants: {
+                        exit: {
+                          opacity: 0,
+                          transition: {
+                            duration: 0.1,
+                            ease: "easeIn",
+                          },
+                        },
+                        enter: {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            ease: "easeOut",
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    <span
+                      className="text-lg text-danger cursor-pointer active:opacity-50"
+                      onClick={() => handleDeleteIconClick(user)}
+                    >
+                      <DeleteIcon />
+                    </span>
+                  </Tooltip>
+                </>
+              )}
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    [isMobile]
+  );
 
   const onSearchChange = React.useCallback((value) => {
     if (value) {
@@ -332,7 +402,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                             placeholder="Chercher un résidant"
                             className="max-w-sm"
                             classNames={{
-                              popoverContent: ["bg-zinc-800", "text-white/90",],
+                              popoverContent: ["bg-zinc-800", "text-white/90"],
                             }}
                           >
                             {(user) => (
@@ -528,10 +598,10 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
           )}
         </TableHeader>
         <TableBody emptyContent={"No users found"} items={sortedItems}>
-          {(item) => (
-            <TableRow key={item.id}>
+          {(user) => (
+            <TableRow key={user.id}>
               {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
+                <TableCell>{renderCell(user, columnKey)}</TableCell>
               )}
             </TableRow>
           )}
@@ -554,138 +624,324 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                 Détails de la Facture
               </ModalHeader>
               <ModalBody>
-                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
-                  <Input
-                    isReadOnly
-                    type="text"
-                    label="Résidant:"
-                    variant="bordered"
-                    defaultValue={currentInvoice.nom}
-                    className="max-w-sm"
-                    classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
-                      input: [
-                        "bg-transparent",
-                        "group-data-[has-value=true]:text-white/90",
-                      ],
-                      innerWrapper: "bg-transparent",
-                      inputWrapper: [
-                        "bg-transparent",
-                        "group-data-[hover=true]:bg-zinc-800",
-                        "group-data-[hover=true]:border-zinc-500",
-                        "group-data-[focus=true]:bg-transparent ",
-                        "group-data-[focus=true]:border-zinc-400 ",
-                        "!cursor-text",
-                        "border-zinc-600",
-                      ],
-                    }}
-                  />
+                {isMobile ? (
+                  <>
+                    <Input
+                      isReadOnly
+                      type="text"
+                      label="Facture ID:"
+                      variant="bordered"
+                      defaultValue={currentInvoice.id_fac}
+                      className="max-w-sm"
+                      classNames={{
+                        label: "group-data-[filled-within=true]:text-zinc-400",
+                        input: [
+                          "bg-transparent",
+                          "group-data-[has-value=true]:text-white/90",
+                        ],
+                        innerWrapper: "bg-transparent",
+                        inputWrapper: [
+                          "bg-transparent",
+                          "group-data-[hover=true]:bg-zinc-800",
+                          "group-data-[hover=true]:border-zinc-500",
+                          "group-data-[focus=true]:bg-transparent ",
+                          "group-data-[focus=true]:border-zinc-400 ",
+                          "!cursor-text",
+                          "border-zinc-600",
+                        ],
+                      }}
+                    />
 
-                  <Input
-                    isReadOnly
-                    type="text"
-                    label="Profession:"
-                    variant="bordered"
-                    defaultValue={currentInvoice.profession}
-                    className="max-w-sm"
-                    classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
-                      input: [
-                        "bg-transparent",
-                        "group-data-[has-value=true]:text-white/90",
-                      ],
-                      innerWrapper: "bg-transparent",
-                      inputWrapper: [
-                        "bg-transparent",
-                        "group-data-[hover=true]:bg-zinc-800",
-                        "group-data-[hover=true]:border-zinc-500",
-                        "group-data-[focus=true]:bg-transparent ",
-                        "group-data-[focus=true]:border-zinc-400 ",
-                        "!cursor-text",
-                        "border-zinc-600",
-                      ],
-                    }}
-                  />
-                </div>
+                    <Input
+                      isReadOnly
+                      type="text"
+                      label="Résidant:"
+                      variant="bordered"
+                      defaultValue={currentInvoice.nom}
+                      className="max-w-sm"
+                      classNames={{
+                        label: "group-data-[filled-within=true]:text-zinc-400",
+                        input: [
+                          "bg-transparent",
+                          "group-data-[has-value=true]:text-white/90",
+                        ],
+                        innerWrapper: "bg-transparent",
+                        inputWrapper: [
+                          "bg-transparent",
+                          "group-data-[hover=true]:bg-zinc-800",
+                          "group-data-[hover=true]:border-zinc-500",
+                          "group-data-[focus=true]:bg-transparent ",
+                          "group-data-[focus=true]:border-zinc-400 ",
+                          "!cursor-text",
+                          "border-zinc-600",
+                        ],
+                      }}
+                    />
 
-                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
-                  <Input
-                    isReadOnly
-                    type="text"
-                    label="ID Logement:"
-                    variant="bordered"
-                    defaultValue={currentInvoice.id_logement}
-                    className="max-w-sm"
-                    classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
-                      input: [
-                        "bg-transparent",
-                        "group-data-[has-value=true]:text-white/90",
-                      ],
-                      innerWrapper: "bg-transparent",
-                      inputWrapper: [
-                        "bg-transparent",
-                        "group-data-[hover=true]:bg-zinc-800",
-                        "group-data-[hover=true]:border-zinc-500",
-                        "group-data-[focus=true]:bg-transparent ",
-                        "group-data-[focus=true]:border-zinc-400 ",
-                        "!cursor-text",
-                        "border-zinc-600",
-                      ],
-                    }}
-                  />
+                    <Input
+                      isReadOnly
+                      type="text"
+                      label="Type de Facture:"
+                      variant="bordered"
+                      defaultValue={currentInvoice.type}
+                      className="max-w-sm"
+                      classNames={{
+                        label: "group-data-[filled-within=true]:text-zinc-400",
+                        input: [
+                          "bg-transparent",
+                          "group-data-[has-value=true]:text-white/90",
+                        ],
+                        innerWrapper: "bg-transparent",
+                        inputWrapper: [
+                          "bg-transparent",
+                          "group-data-[hover=true]:bg-zinc-800",
+                          "group-data-[hover=true]:border-zinc-500",
+                          "group-data-[focus=true]:bg-transparent ",
+                          "group-data-[focus=true]:border-zinc-400 ",
+                          "!cursor-text",
+                          "border-zinc-600",
+                        ],
+                      }}
+                    />
 
-                  <Input
-                    isReadOnly
-                    type="text"
-                    label="Type du logement:"
-                    variant="bordered"
-                    defaultValue={currentInvoice.type_log}
-                    className="max-w-sm"
-                    classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
-                      input: [
-                        "bg-transparent",
-                        "group-data-[has-value=true]:text-white/90",
-                      ],
-                      innerWrapper: "bg-transparent",
-                      inputWrapper: [
-                        "bg-transparent",
-                        "group-data-[hover=true]:bg-zinc-800",
-                        "group-data-[hover=true]:border-zinc-500",
-                        "group-data-[focus=true]:bg-transparent ",
-                        "group-data-[focus=true]:border-zinc-400 ",
-                        "!cursor-text",
-                        "border-zinc-600",
-                      ],
-                    }}
-                  />
-                  <Input
-                    isReadOnly
-                    type="text"
-                    label="Amélioré:"
-                    variant="bordered"
-                    defaultValue={currentInvoice.ameliored ? "Oui" : "Non"}
-                    className="max-w-sm"
-                    classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
-                      input: [
-                        "bg-transparent",
-                        "group-data-[has-value=true]:text-white/90",
-                      ],
-                      innerWrapper: "bg-transparent",
-                      inputWrapper: [
-                        "bg-transparent",
-                        "group-data-[hover=true]:bg-zinc-800",
-                        "group-data-[hover=true]:border-zinc-500",
-                        "group-data-[focus=true]:bg-transparent ",
-                        "group-data-[focus=true]:border-zinc-400 ",
-                        "!cursor-text",
-                        "border-zinc-600",
-                      ],
-                    }}
-                  />
-                </div>
+                    <Input
+                      isReadOnly
+                      label="Mois de Consommation"
+                      variant="bordered"
+                      defaultValue={currentInvoice.mois}
+                      className="max-w-sm"
+                      classNames={{
+                        label: "group-data-[filled-within=true]:text-zinc-400",
+                        input: [
+                          "bg-transparent",
+                          "group-data-[has-value=true]:text-white/90",
+                        ],
+                        innerWrapper: "bg-transparent",
+                        inputWrapper: [
+                          "bg-transparent",
+                          "group-data-[hover=true]:bg-zinc-800",
+                          "group-data-[hover=true]:border-zinc-500",
+                          "group-data-[focus=true]:bg-transparent ",
+                          "group-data-[focus=true]:border-zinc-400 ",
+                          "!cursor-text",
+                          "border-zinc-600",
+                        ],
+                      }}
+                    />
+                    <Input
+                      isReadOnly
+                      label="Echeance"
+                      variant="bordered"
+                      defaultValue={currentInvoice.echeance}
+                      className="max-w-sm"
+                      classNames={{
+                        label: "group-data-[filled-within=true]:text-zinc-400",
+                        input: [
+                          "bg-transparent",
+                          "group-data-[has-value=true]:text-white/90",
+                        ],
+                        innerWrapper: "bg-transparent",
+                        inputWrapper: [
+                          "bg-transparent",
+                          "group-data-[hover=true]:bg-zinc-800",
+                          "group-data-[hover=true]:border-zinc-500",
+                          "group-data-[focus=true]:bg-transparent ",
+                          "group-data-[focus=true]:border-zinc-400 ",
+                          "!cursor-text",
+                          "border-zinc-600",
+                        ],
+                      }}
+                    />
+                    <Input
+                      isReadOnly
+                      label="Status"
+                      variant="bordered"
+                      defaultValue={currentInvoice.status}
+                      className="max-w-sm"
+                      classNames={{
+                        label: "group-data-[filled-within=true]:text-zinc-400",
+                        input: [
+                          "bg-transparent",
+                          "group-data-[has-value=true]:text-white/90",
+                        ],
+                        innerWrapper: "bg-transparent",
+                        inputWrapper: [
+                          "bg-transparent",
+                          "group-data-[hover=true]:bg-zinc-800",
+                          "group-data-[hover=true]:border-zinc-500",
+                          "group-data-[focus=true]:bg-transparent ",
+                          "group-data-[focus=true]:border-zinc-400 ",
+                          "!cursor-text",
+                          "border-zinc-600",
+                        ],
+                      }}
+                    />
+                    <Input
+                      isReadOnly
+                      label="Montant TTC"
+                      variant="bordered"
+                      defaultValue={currentInvoice.ttc}
+                      className="max-w-sm"
+                      classNames={{
+                        label: "group-data-[filled-within=true]:text-zinc-400",
+                        input: [
+                          "bg-transparent",
+                          "group-data-[has-value=true]:text-white/90",
+                        ],
+                        innerWrapper: "bg-transparent",
+                        inputWrapper: [
+                          "bg-transparent",
+                          "group-data-[hover=true]:bg-zinc-800",
+                          "group-data-[hover=true]:border-zinc-500",
+                          "group-data-[focus=true]:bg-transparent ",
+                          "group-data-[focus=true]:border-zinc-400 ",
+                          "!cursor-text",
+                          "border-zinc-600",
+                        ],
+                      }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
+                      <Input
+                        isReadOnly
+                        type="text"
+                        label="Résidant:"
+                        variant="bordered"
+                        defaultValue={currentInvoice.nom}
+                        className="max-w-sm"
+                        classNames={{
+                          label:
+                            "group-data-[filled-within=true]:text-zinc-400",
+                          input: [
+                            "bg-transparent",
+                            "group-data-[has-value=true]:text-white/90",
+                          ],
+                          innerWrapper: "bg-transparent",
+                          inputWrapper: [
+                            "bg-transparent",
+                            "group-data-[hover=true]:bg-zinc-800",
+                            "group-data-[hover=true]:border-zinc-500",
+                            "group-data-[focus=true]:bg-transparent ",
+                            "group-data-[focus=true]:border-zinc-400 ",
+                            "!cursor-text",
+                            "border-zinc-600",
+                          ],
+                        }}
+                      />
+
+                      <Input
+                        isReadOnly
+                        type="text"
+                        label="Profession:"
+                        variant="bordered"
+                        defaultValue={currentInvoice.profession}
+                        className="max-w-sm"
+                        classNames={{
+                          label:
+                            "group-data-[filled-within=true]:text-zinc-400",
+                          input: [
+                            "bg-transparent",
+                            "group-data-[has-value=true]:text-white/90",
+                          ],
+                          innerWrapper: "bg-transparent",
+                          inputWrapper: [
+                            "bg-transparent",
+                            "group-data-[hover=true]:bg-zinc-800",
+                            "group-data-[hover=true]:border-zinc-500",
+                            "group-data-[focus=true]:bg-transparent ",
+                            "group-data-[focus=true]:border-zinc-400 ",
+                            "!cursor-text",
+                            "border-zinc-600",
+                          ],
+                        }}
+                      />
+                    </div>
+
+                    <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
+                      <Input
+                        isReadOnly
+                        type="text"
+                        label="ID Logement:"
+                        variant="bordered"
+                        defaultValue={currentInvoice.id_logement}
+                        className="max-w-sm"
+                        classNames={{
+                          label:
+                            "group-data-[filled-within=true]:text-zinc-400",
+                          input: [
+                            "bg-transparent",
+                            "group-data-[has-value=true]:text-white/90",
+                          ],
+                          innerWrapper: "bg-transparent",
+                          inputWrapper: [
+                            "bg-transparent",
+                            "group-data-[hover=true]:bg-zinc-800",
+                            "group-data-[hover=true]:border-zinc-500",
+                            "group-data-[focus=true]:bg-transparent ",
+                            "group-data-[focus=true]:border-zinc-400 ",
+                            "!cursor-text",
+                            "border-zinc-600",
+                          ],
+                        }}
+                      />
+
+                      <Input
+                        isReadOnly
+                        type="text"
+                        label="Type du logement:"
+                        variant="bordered"
+                        defaultValue={currentInvoice.type_log}
+                        className="max-w-sm"
+                        classNames={{
+                          label:
+                            "group-data-[filled-within=true]:text-zinc-400",
+                          input: [
+                            "bg-transparent",
+                            "group-data-[has-value=true]:text-white/90",
+                          ],
+                          innerWrapper: "bg-transparent",
+                          inputWrapper: [
+                            "bg-transparent",
+                            "group-data-[hover=true]:bg-zinc-800",
+                            "group-data-[hover=true]:border-zinc-500",
+                            "group-data-[focus=true]:bg-transparent ",
+                            "group-data-[focus=true]:border-zinc-400 ",
+                            "!cursor-text",
+                            "border-zinc-600",
+                          ],
+                        }}
+                      />
+                      <Input
+                        isReadOnly
+                        type="text"
+                        label="Amélioré:"
+                        variant="bordered"
+                        defaultValue={currentInvoice.ameliored ? "Oui" : "Non"}
+                        className="max-w-sm"
+                        classNames={{
+                          label:
+                            "group-data-[filled-within=true]:text-zinc-400",
+                          input: [
+                            "bg-transparent",
+                            "group-data-[has-value=true]:text-white/90",
+                          ],
+                          innerWrapper: "bg-transparent",
+                          inputWrapper: [
+                            "bg-transparent",
+                            "group-data-[hover=true]:bg-zinc-800",
+                            "group-data-[hover=true]:border-zinc-500",
+                            "group-data-[focus=true]:bg-transparent ",
+                            "group-data-[focus=true]:border-zinc-400 ",
+                            "!cursor-text",
+                            "border-zinc-600",
+                          ],
+                        }}
+                      />
+                    </div>
+                  </>
+                )}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" onClick={onClose}>
@@ -869,7 +1125,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                 <Button color="danger" variant="light" onClick={onClose}>
                   Fermer
                 </Button>
-                <Button color="primary" onClick={handleSave}>
+                <Button color="primary" onClick={handleEditIconClick}>
                   Sauvegarder
                 </Button>
               </ModalFooter>

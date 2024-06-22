@@ -299,7 +299,7 @@ const LogSection = ({ title }) => {
                   {(onClose) => (
                     <>
                       <ModalHeader className="text-xl">
-                        Equipement Details
+                        Les équipements disponibles dans votre logement
                       </ModalHeader>
                       <ModalBody>
                         <EquipmentSection

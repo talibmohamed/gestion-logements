@@ -185,7 +185,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                     }}
                   >
                     <DropdownItem key="details" startContent={<EyeIcon />}>
-                      Details
+                      Détails
                     </DropdownItem>
                     <DropdownItem
                       key="voirPlus"

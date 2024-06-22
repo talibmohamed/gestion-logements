@@ -49,7 +49,7 @@ const DataTable = ({ columns, rows, title }) => {
   const [visibleColumns, setVisibleColumns] = useState(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
-  const [currentReclamation, setCurrentReclamation] = useState(null);
+  const [currentOverview, setCurrentOverview] = useState(null);
   const {
     isOpen: isDetailsModalOpen,
     onOpen: openDetailsModal,
@@ -82,12 +82,12 @@ const DataTable = ({ columns, rows, title }) => {
     };
   }, []);
 
-  const handleDotsIconClick = (reclamation) => {
-    setCurrentReclamation(reclamation);
+  const handleDotsIconClick = (overview) => {
+    setCurrentOverview(overview);
   };
 
-  const handleDetailsIconClick = (reclamation) => {
-    setCurrentReclamation(reclamation);
+  const handleDetailsIconClick = (overview) => {
+    setCurrentOverview(overview);
     openDetailsModal(true);
   };
 
@@ -126,7 +126,7 @@ const DataTable = ({ columns, rows, title }) => {
                     }}
                   >
                     <DropdownItem key="details" startContent={<EyeIcon />}>
-                      Details
+                      Détails
                     </DropdownItem>
                     <DropdownItem
                       key="voirPlus"
@@ -205,7 +205,7 @@ const DataTable = ({ columns, rows, title }) => {
                           label="Type de Facture"
                           variant="bordered"
                           labelPlacement="outside"
-                          defaultValue={currentReclamation.type}
+                          defaultValue={currentOverview.type}
                           className="mb-3"
                         />
                         <Input
@@ -213,7 +213,7 @@ const DataTable = ({ columns, rows, title }) => {
                           label="Mois de Consommation"
                           variant="bordered"
                           labelPlacement="outside"
-                          defaultValue={currentReclamation.mois}
+                          defaultValue={currentOverview.mois}
                           className="mb-3"
                         />
                         <Input
@@ -221,7 +221,7 @@ const DataTable = ({ columns, rows, title }) => {
                           label="Echeance"
                           variant="bordered"
                           labelPlacement="outside"
-                          defaultValue={currentReclamation.echeance}
+                          defaultValue={currentOverview.echeance}
                           className="mb-3"
                         />
                         <Input
@@ -229,7 +229,7 @@ const DataTable = ({ columns, rows, title }) => {
                           label="Status"
                           variant="bordered"
                           labelPlacement="outside"
-                          defaultValue={currentReclamation.status}
+                          defaultValue={currentOverview.status}
                           className="mb-3"
                         />
                         <Input
@@ -237,7 +237,7 @@ const DataTable = ({ columns, rows, title }) => {
                           label="Montant TTC"
                           variant="bordered"
                           labelPlacement="outside"
-                          defaultValue={currentReclamation.ttc}
+                          defaultValue={currentOverview.ttc}
                           className="mb-3"
                         />
                       </>

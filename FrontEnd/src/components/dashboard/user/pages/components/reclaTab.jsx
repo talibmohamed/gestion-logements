@@ -70,9 +70,9 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     onOpenChange: setDetailsModalOpen,
   } = useDisclosure();
   const {
-    isOpen: isDeleteModalOpen,
-    onOpen: openDeleteModal,
-    onOpenChange: setDeleteModalOpen,
+    isOpen: isCancelModalOpen,
+    onOpen: openCancelModal,
+    onOpenChange: setCancelModalOpen,
   } = useDisclosure();
 
   const [isMobile, setIsMobile] = useState(false);
@@ -145,7 +145,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
   };
   const handleCancelIconClick = (reclamation) => {
     setCurrentReclamation(reclamation);
-    openDeleteModal();
+    openCancelModal();
   };
 
   const renderCell = React.useCallback(
@@ -195,21 +195,21 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     }}
                   >
                     <DropdownItem key="details" startContent={<EyeIcon />}>
-                      Details
+                      Détails
                     </DropdownItem>
                     <DropdownItem
                       key="cancel"
                       color="danger"
                       startContent={<CancelIcon />}
                     >
-                      Annuler
+                      Annuler la réclamation
                     </DropdownItem>
                   </DropdownMenu>
                 </Dropdown>
               ) : (
                 <>
                   <Tooltip
-                    content="Details"
+                    content="Détails"
                     delay={0}
                     closeDelay={0}
                     motionProps={{
@@ -241,7 +241,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
 
                   <Tooltip
                     color="danger"
-                    content="Annuler"
+                    content="Annuler la réclamation"
                     delay={0}
                     closeDelay={0}
                     motionProps={{
@@ -425,8 +425,8 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
       <Modal
         size="md"
         backdrop="blur"
-        isOpen={isDeleteModalOpen}
-        onOpenChange={setDeleteModalOpen}
+        isOpen={isCancelModalOpen}
+        onOpenChange={setCancelModalOpen}
         scrollBehavior="inside"
         placement="center"
         classNames={{

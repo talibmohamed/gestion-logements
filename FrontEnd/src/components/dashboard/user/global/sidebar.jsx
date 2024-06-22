@@ -15,7 +15,6 @@ import {
   Logout as Logouticon,
 } from "@mui/icons-material";
 import { FaFileInvoiceDollar } from "react-icons/fa6";
-import { FaChartPie } from "react-icons/fa";
 import logo from "./logo.svg";
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 

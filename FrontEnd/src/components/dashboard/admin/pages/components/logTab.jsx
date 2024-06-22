@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableHeader,
@@ -18,16 +18,22 @@ import {
   Select,
   SelectItem,
   useDisclosure,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@nextui-org/react";
 import { SearchIcon } from "../Icons/SearchIcon";
 import { EditIcon } from "../Icons/EditIcon";
 import { DeleteIcon } from "../Icons/DeleteIcon";
 import { EyeIcon } from "../Icons/EyeIcon";
+import { Eye2Icon } from "../Icons/Eye2Icon";
+import { VerticalDotsIcon } from "../Icons/VerticalDotsIcon";
+import TipsAndUpdatesOutlinedIcon from "@mui/icons-material/TipsAndUpdatesOutlined";
 import PropTypes from "prop-types";
 import { IconMappings } from "./svgMappings.jsx";
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id_res",
   "num_de_log",
   "nom",
   "type_log",
@@ -36,6 +42,14 @@ const INITIAL_VISIBLE_COLUMNS = [
   "quotaE",
   "quotaW",
   "equip",
+  "actions",
+];
+
+const SMALL_DEVICE_COLUMNS = [
+  "num_de_log",
+  "nom",
+  "type",
+  "ameliored",
   "actions",
 ];
 
@@ -73,6 +87,12 @@ const LogTable = ({ columns, rows, title }) => {
     onOpen: openDeleteModal,
     onOpenChange: setDeleteModalOpen,
   } = useDisclosure();
+  const {
+    isOpen: isDetails2ModalOpen,
+    onOpen: openDetails2Modal,
+    onOpenChange: setDetails2ModalOpen,
+  } = useDisclosure();
+
 
   const [currentLogement, setCurrentLogement] = useState(null);
   const [currentEquipments, setCurrentEquipments] = useState([]);
@@ -88,6 +108,26 @@ const LogTable = ({ columns, rows, title }) => {
       Array.from(visibleColumns).includes(column.uid)
     );
   }, [visibleColumns]);
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 900);
+      setVisibleColumns(
+        window.innerWidth <= 900
+          ? new Set(SMALL_DEVICE_COLUMNS)
+          : new Set(INITIAL_VISIBLE_COLUMNS)
+      );
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const filteredItems = React.useMemo(() => {
     let filteredUsers = [...rows];
@@ -118,6 +158,15 @@ const LogTable = ({ columns, rows, title }) => {
     });
   }, [sortDescriptor, items]);
 
+  const handleDotsIconClick = (logement) => {
+    setCurrentLogement(logement);
+  };
+
+  const handleDetails2IconClick = (logement) => {
+    setCurrentLogement(logement);
+    openDetails2Modal(true);
+  };
+
   const handleEditIconClick = (logement) => {
     setCurrentLogement(logement);
     openEditModal();
@@ -128,7 +177,7 @@ const LogTable = ({ columns, rows, title }) => {
     openDeleteModal();
   };
 
-  const handleEyeIconClick = (user) => {
+  const handleDetailsIconClick = (user) => {
     const typeLog = user.type_log.toLowerCase().trim();
     const ameliored = user.ameliored.toLowerCase().trim();
     const equipmentData = {
@@ -225,127 +274,179 @@ const LogTable = ({ columns, rows, title }) => {
     openEquipModal();
   };
 
-  const handleSave = () => {
-    // to handle saving the updated data
-    console.log("Updated Logement:", currentLogement);
-    setEditModalOpen(false);
-  };
-
   const renderSvgIcon = (equipment) => {
     const SvgComponent = IconMappings[equipment];
     return SvgComponent ? <SvgComponent className="inline-block mr-2" /> : null;
   };
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
+  const renderCell = React.useCallback(
+    (user, columnKey) => {
+      const cellValue = user[columnKey];
 
-    switch (columnKey) {
-      case "equip":
-        return (
-          <div className="flex items-center">
-            <Tooltip
-              content="Details"
-              delay={0}
-              closeDelay={0}
-              motionProps={{
-                variants: {
-                  exit: {
-                    opacity: 0,
-                    transition: {
-                      duration: 0.1,
-                      ease: "easeIn",
+      switch (columnKey) {
+        case "equip":
+          return (
+            <div className="flex items-center">
+              <Tooltip
+                content="Détails"
+                delay={0}
+                closeDelay={0}
+                motionProps={{
+                  variants: {
+                    exit: {
+                      opacity: 0,
+                      transition: {
+                        duration: 0.1,
+                        ease: "easeIn",
+                      },
+                    },
+                    enter: {
+                      opacity: 1,
+                      transition: {
+                        duration: 0.15,
+                        ease: "easeOut",
+                      },
                     },
                   },
-                  enter: {
-                    opacity: 1,
-                    transition: {
-                      duration: 0.15,
-                      ease: "easeOut",
-                    },
-                  },
-                },
-              }}
-            >
-              <span
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                onClick={() => handleEyeIconClick(user)}
+                }}
               >
-                <EyeIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip
-              content="Modifier"
-              delay={0}
-              closeDelay={0}
-              motionProps={{
-                variants: {
-                  exit: {
-                    opacity: 0,
-                    transition: {
-                      duration: 0.1,
-                      ease: "easeIn",
-                    },
-                  },
-                  enter: {
-                    opacity: 1,
-                    transition: {
-                      duration: 0.15,
-                      ease: "easeOut",
-                    },
-                  },
-                },
-              }}
-            >
-              <span
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                onClick={() => handleEditIconClick(user)}
-              >
-                <EditIcon />
-              </span>
-            </Tooltip>
-            <Tooltip
-              color="danger"
-              variant="light"
-              content="Supprimer"
-              delay={0}
-              closeDelay={0}
-              motionProps={{
-                variants: {
-                  exit: {
-                    opacity: 0,
-                    transition: {
-                      duration: 0.1,
-                      ease: "easeIn",
-                    },
-                  },
-                  enter: {
-                    opacity: 1,
-                    transition: {
-                      duration: 0.15,
-                      ease: "easeOut",
-                    },
-                  },
-                },
-              }}
-            >
-              <span
-                className="text-lg text-danger cursor-pointer active:opacity-50 "
-                onClick={() => handleDeleteIconClick(user)}
-              >
-                <DeleteIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+                <span
+                  className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                  onClick={() => handleDetailsIconClick(user)}
+                >
+                  <EyeIcon />
+                </span>
+              </Tooltip>
+            </div>
+            
+          );
+        case "actions":
+          return (
+            <div className="relative flex items-center gap-2">
+              {isMobile ? (
+                <Dropdown
+                  classNames={{
+                    content: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+                  }}
+                >
+                  <DropdownTrigger>
+                    <span
+                      className="icon-wrapper"
+                      onClick={handleDotsIconClick}
+                    >
+                      <VerticalDotsIcon />
+                    </span>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    aria-label="Action event example"
+                    onAction={(key) => {
+                      if (key === "details") handleDetails2IconClick(user);
+                      if (key === "equip") handleDetailsIconClick(user);
+                      if (key === "edit") handleEditIconClick(user);
+                      if (key === "delete") handleDeleteIconClick(user);
+                    }}
+                  >
+                    <DropdownItem key="details" startContent={<Eye2Icon />}>
+                      Détails
+                    </DropdownItem>
+
+                    <DropdownItem
+                      key="equip"
+                      startContent={
+                        <TipsAndUpdatesOutlinedIcon sx={{ fontSize: 16 }} />
+                      }
+                    >
+                      Les équipements disponibles
+                    </DropdownItem>
+
+                    <DropdownItem key="edit" startContent={<EditIcon />}>
+                      Modifier
+                    </DropdownItem>
+                    <DropdownItem
+                      key="delete"
+                      color="danger"
+                      className="text-danger"
+                      startContent={<DeleteIcon />}
+                    >
+                      Supprimer
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              ) : (
+                <>
+                
+                  <Tooltip
+                    content="Modifier"
+                    delay={0}
+                    closeDelay={0}
+                    motionProps={{
+                      variants: {
+                        exit: {
+                          opacity: 0,
+                          transition: {
+                            duration: 0.1,
+                            ease: "easeIn",
+                          },
+                        },
+                        enter: {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            ease: "easeOut",
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    <span
+                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                      onClick={() => handleEditIconClick(user)}
+                    >
+                      <EditIcon />
+                    </span>
+                  </Tooltip>
+                  <Tooltip
+                    color="danger"
+                    variant="light"
+                    content="Supprimer"
+                    delay={0}
+                    closeDelay={0}
+                    motionProps={{
+                      variants: {
+                        exit: {
+                          opacity: 0,
+                          transition: {
+                            duration: 0.1,
+                            ease: "easeIn",
+                          },
+                        },
+                        enter: {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            ease: "easeOut",
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    <span
+                      className="text-lg text-danger cursor-pointer active:opacity-50 "
+                      onClick={() => handleDeleteIconClick(user)}
+                    >
+                      <DeleteIcon />
+                    </span>
+                  </Tooltip>
+                </>
+              )}
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    [isMobile]
+  );
 
   const onSearchChange = React.useCallback((value) => {
     if (value) {
@@ -496,7 +597,7 @@ const LogTable = ({ columns, rows, title }) => {
                   <Input
                     isDisabled
                     type="text"
-                    label="Occupe Par"
+                    label="Occupé Par"
                     className="max-w-sm"
                     classNames={{
                       label: "text-white/90",
@@ -901,7 +1002,7 @@ const LogTable = ({ columns, rows, title }) => {
                 <Button color="danger" variant="flat" onClick={onClose}>
                   Fermer
                 </Button>
-                <Button color="primary" onClick={handleSave}>
+                <Button color="primary" onClick={handleEditIconClick}>
                   Sauvegarder
                 </Button>
               </ModalFooter>
@@ -924,7 +1025,7 @@ const LogTable = ({ columns, rows, title }) => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="text-xl">Equipement Details</ModalHeader>
+              <ModalHeader className="text-xl">Les équipements disponibles</ModalHeader>
               <ModalBody>
                 <EquipmentSection
                   title="Salle de bain"
@@ -1033,7 +1134,6 @@ const LogTable = ({ columns, rows, title }) => {
               <ModalHeader className="text-xl">Attention</ModalHeader>
               <ModalBody>Êtes-vous sûr(e) de vouloir continuer ?</ModalBody>
               <ModalFooter>
-              
                 <Button
                   color="danger"
                   variant="light"
@@ -1042,8 +1142,190 @@ const LogTable = ({ columns, rows, title }) => {
                 >
                   Fermer
                 </Button>
-                <Button color="primary" >
-                  Continuer
+                <Button color="primary">Continuer</Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        size="lg"
+        isOpen={isDetails2ModalOpen}
+        onOpenChange={setDetails2ModalOpen}
+        classNames={{
+          base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+          closeButton: "hover:bg-white/5 active:bg-white/10",
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="text-xl">Détails du logement</ModalHeader>
+              <ModalBody>
+                <Input
+                  isReadOnly
+                  type="text"
+                  label="Résidant:"
+                  variant="bordered"
+                  defaultValue={currentLogement.id_res}
+                  className="max-w-sm"
+                  classNames={{
+                    label: "group-data-[filled-within=true]:text-zinc-400",
+                    input: [
+                      "bg-transparent",
+                      "group-data-[has-value=true]:text-white/90",
+                    ],
+                    innerWrapper: "bg-transparent",
+                    inputWrapper: [
+                      "bg-transparent",
+                      "group-data-[hover=true]:bg-zinc-800",
+                      "group-data-[hover=true]:border-zinc-500",
+                      "group-data-[focus=true]:bg-transparent ",
+                      "group-data-[focus=true]:border-zinc-400 ",
+                      "!cursor-text",
+                      "border-zinc-600",
+                    ],
+                  }}
+                />
+                <Input
+                  isReadOnly
+                  type="text"
+                  label="Profession/Type de logement:"
+                  variant="bordered"
+                  defaultValue={currentLogement.type_log}
+                  className="max-w-sm"
+                  classNames={{
+                    label: "group-data-[filled-within=true]:text-zinc-400",
+                    input: [
+                      "bg-transparent",
+                      "group-data-[has-value=true]:text-white/90",
+                    ],
+                    innerWrapper: "bg-transparent",
+                    inputWrapper: [
+                      "bg-transparent",
+                      "group-data-[hover=true]:bg-zinc-800",
+                      "group-data-[hover=true]:border-zinc-500",
+                      "group-data-[focus=true]:bg-transparent ",
+                      "group-data-[focus=true]:border-zinc-400 ",
+                      "!cursor-text",
+                      "border-zinc-600",
+                    ],
+                  }}
+                />
+
+                <Input
+                  isReadOnly
+                  type="text"
+                  label="Amélioré:"
+                  variant="bordered"
+                  defaultValue={currentLogement.ameliored ? "Oui" : "Non"}
+                  className="max-w-sm"
+                  classNames={{
+                    label: "group-data-[filled-within=true]:text-zinc-400",
+                    input: [
+                      "bg-transparent",
+                      "group-data-[has-value=true]:text-white/90",
+                    ],
+                    innerWrapper: "bg-transparent",
+                    inputWrapper: [
+                      "bg-transparent",
+                      "group-data-[hover=true]:bg-zinc-800",
+                      "group-data-[hover=true]:border-zinc-500",
+                      "group-data-[focus=true]:bg-transparent ",
+                      "group-data-[focus=true]:border-zinc-400 ",
+                      "!cursor-text",
+                      "border-zinc-600",
+                    ],
+                  }}
+                />
+
+                <Input
+                  isReadOnly
+                  type="text"
+                  label="Superficie:"
+                  variant="bordered"
+                  defaultValue={currentLogement.mc}
+                  className="max-w-sm"
+                  classNames={{
+                    label: "group-data-[filled-within=true]:text-zinc-400",
+                    input: [
+                      "bg-transparent",
+                      "group-data-[has-value=true]:text-white/90",
+                    ],
+                    innerWrapper: "bg-transparent",
+                    inputWrapper: [
+                      "bg-transparent",
+                      "group-data-[hover=true]:bg-zinc-800",
+                      "group-data-[hover=true]:border-zinc-500",
+                      "group-data-[focus=true]:bg-transparent ",
+                      "group-data-[focus=true]:border-zinc-400 ",
+                      "!cursor-text",
+                      "border-zinc-600",
+                    ],
+                  }}
+                />
+
+                <Input
+                  isReadOnly
+                  type="text"
+                  label="Quotas d'électricité:"
+                  variant="bordered"
+                  defaultValue={currentLogement.quotaE}
+                  className="max-w-sm"
+                  classNames={{
+                    label: "group-data-[filled-within=true]:text-zinc-400",
+                    input: [
+                      "bg-transparent",
+                      "group-data-[has-value=true]:text-white/90",
+                    ],
+                    innerWrapper: "bg-transparent",
+                    inputWrapper: [
+                      "bg-transparent",
+                      "group-data-[hover=true]:bg-zinc-800",
+                      "group-data-[hover=true]:border-zinc-500",
+                      "group-data-[focus=true]:bg-transparent ",
+                      "group-data-[focus=true]:border-zinc-400 ",
+                      "!cursor-text",
+                      "border-zinc-600",
+                    ],
+                  }}
+                />
+
+                <Input
+                  isReadOnly
+                  type="text"
+                  label="Quotas d'eau:"
+                  variant="bordered"
+                  defaultValue={currentLogement.quotaW}
+                  className="max-w-sm"
+                  classNames={{
+                    label: "group-data-[filled-within=true]:text-zinc-400",
+                    input: [
+                      "bg-transparent",
+                      "group-data-[has-value=true]:text-white/90",
+                    ],
+                    innerWrapper: "bg-transparent",
+                    inputWrapper: [
+                      "bg-transparent",
+                      "group-data-[hover=true]:bg-zinc-800",
+                      "group-data-[hover=true]:border-zinc-500",
+                      "group-data-[focus=true]:bg-transparent ",
+                      "group-data-[focus=true]:border-zinc-400 ",
+                      "!cursor-text",
+                      "border-zinc-600",
+                    ],
+                  }}
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  color="danger"
+                  variant="light"
+                  className="text-sm font-medium"
+                  onPress={onClose}
+                >
+                  Fermer
                 </Button>
               </ModalFooter>
             </>
