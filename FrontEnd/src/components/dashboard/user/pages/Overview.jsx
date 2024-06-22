@@ -40,7 +40,7 @@ const Overview = () => {
             <PieChartCard title="Statistique Consommation Eau" data={data1} />
           </div>
           <div className="carousel-item-wrapper">
-            <PieChartCard title="Statistique Consommation Electricité" data={data2} />
+            <PieChartCard title="Statistique Consommation Électricité" data={data2} />
           </div>
         </Carousel>
       ) : (

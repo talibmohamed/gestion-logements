@@ -53,7 +53,7 @@ const Logement = () => {
           <Carousel showArrows={false} showStatus={false} showThumbs={false}>
             <div className="carousel-item-wrapper">
               <Graph
-                title="Graphe de consommation pour electricite"
+                title="Graphe de la consommation d'électricité"
                 data={eData}
               />
             </div>
@@ -64,11 +64,11 @@ const Logement = () => {
         ) : isTablet ? (
           <div>
             <Graph
-              title="Graphe linéaire de consommation d'electricite"
+              title="Graphe linéaire de la consommation d'électricité"
               data={eData}
             />
             <Graph
-              title="Graphe linéaire de consommation pour eau"
+              title="Graphe linéaire de la consommation d'eau"
               data={wData}
             />
           </div>
@@ -76,13 +76,13 @@ const Logement = () => {
           <div className="flex flex-wrap justify-around">
             <div className="w-full md:w-1/2 pr-3">
               <Graph
-                title="Graphe linéaire de consommation d'electricite"
+                title="Graphe linéaire de la consommation d'électricité"
                 data={eData}
               />
             </div>
             <div className="w-full md:w-1/2 pl-3">
               <Graph
-                title="Graphe linéaire de consommation pour eau"
+                title="Graphe linéaire de la consommation d'eau"
                 data={wData}
               />
             </div>

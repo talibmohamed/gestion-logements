@@ -510,7 +510,7 @@ const ReclaCard = ({ title }) => {
               <CardHeader className="flex gap-3 justify-center">
                 <BuildOutlinedIcon />
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold xl: text-lg 2xl: text-base">
+                  <h3 className="text-lg font-semibold 2xl: text-base">
                     Problèmes de maintenance
                   </h3>
                 </div>
@@ -564,7 +564,7 @@ const ReclaCard = ({ title }) => {
               <CardHeader className="flex gap-3 justify-center">
                 <BugReportOutlinedIcon />
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold xl: text-lg 2xl: text-base">
+                  <h3 className="text-lg font-semibold 2xl: text-base">
                     Infestations de parasites
                   </h3>
                 </div>
@@ -615,7 +615,7 @@ const ReclaCard = ({ title }) => {
               <CardHeader className="flex gap-3 justify-center">
                 <HomeRepairServiceOutlinedIcon />
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold xl: text-lg 2xl: text-base">Défauts structurels</h3>
+                  <h3 className="text-lg font-semibold 2xl: text-base">Défauts structurels</h3>
                 </div>
               </CardHeader>
               <Divider />
@@ -666,7 +666,7 @@ const ReclaCard = ({ title }) => {
               <CardHeader className="flex gap-3 justify-center">
                 <KitchenOutlinedIcon />
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold xl: text-lg 2xl: text-base">
+                  <h3 className="text-lg font-semibold 2xl: text-base">
                     Questions liées aux équipements fournis
                   </h3>
                 </div>
@@ -718,7 +718,7 @@ const ReclaCard = ({ title }) => {
               <CardHeader className="flex gap-3 justify-center">
                 <WaterDamageOutlinedIcon />
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold xl: text-lg 2xl: text-base">
+                  <h3 className="text-lg font-semibold 2xl: text-base">
                     Problèmes d'humidité ou de moisissure
                   </h3>
                 </div>
@@ -767,7 +767,7 @@ const ReclaCard = ({ title }) => {
               <CardHeader className="flex gap-3 justify-center">
                 <PeopleAltOutlinedIcon />
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold xl: text-lg 2xl: text-base">
+                  <h3 className="text-lg font-semibold 2xl: text-base">
                     Problèmes de voisinage
                   </h3>
                 </div>
@@ -814,7 +814,7 @@ const ReclaCard = ({ title }) => {
               <CardHeader className="flex gap-3 justify-center">
                 <ReportProblemOutlinedIcon />
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold xl: text-lg 2xl: text-base">Autres problèmes</h3>
+                  <h3 className="text-lg font-semibold 2xl: text-base">Autres problèmes</h3>
                 </div>
               </CardHeader>
               <Divider />

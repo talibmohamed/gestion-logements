@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Table,
   TableHeader,
@@ -9,10 +9,23 @@ import {
   Input,
   Chip,
   Pagination,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
 } from "@nextui-org/react";
 import { SearchIcon } from "../Icons/SearchIcon";
 import PropTypes from "prop-types";
 import "./customWrappers.scss";
+import { EyeIcon } from "../Icons/EyeIcon";
+import { VerticalDotsIcon } from "../Icons/VerticalDotsIcon";
+import ReadMoreIcon from '@mui/icons-material/ReadMore';
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id_fac",
@@ -24,6 +37,8 @@ const INITIAL_VISIBLE_COLUMNS = [
   "ttc",
 ];
 
+const SMALL_DEVICE_COLUMNS = ["id_fac", "type","echeance", "status", "actions"];
+
 const statusColorMap = {
   payée: "secondary",
   "en retard": "primary",
@@ -33,7 +48,8 @@ const statusColorMap = {
 const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
   const [filterValue, setFilterValue] = React.useState("");
   const [statusFilter] = React.useState("all");
-  const [visibleColumns] = React.useState(
+  const [currentReclamation, setCurrentReclamation] = useState(null);
+  const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
   const [sortDescriptor, setSortDescriptor] = React.useState({
@@ -48,6 +64,12 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
 
   const hasSearchFilter = Boolean(filterValue);
 
+  const {
+    isOpen: isDetailsModalOpen,
+    onOpen: openDetailsModal,
+    onOpenChange: setDetailsModalOpen,
+  } = useDisclosure();
+
   const headerColumns = React.useMemo(() => {
     if (visibleColumns === "all") return columns;
 
@@ -55,6 +77,26 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
       Array.from(visibleColumns).includes(column.uid)
     );
   }, [visibleColumns]);
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 900);
+      setVisibleColumns(
+        window.innerWidth <= 900
+          ? new Set(SMALL_DEVICE_COLUMNS)
+          : new Set(INITIAL_VISIBLE_COLUMNS)
+      );
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const filteredItems = React.useMemo(() => {
     let filteredUsers = [...rows];
@@ -93,6 +135,15 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
     });
   }, [sortDescriptor, items]);
 
+  const handleDotsIconClick = (reclamation) => {
+    setCurrentReclamation(reclamation);
+  };
+
+  const handleDetailsIconClick = (reclamation) => {
+    setCurrentReclamation(reclamation);
+    openDetailsModal(true);
+  };
+
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
 
@@ -113,6 +164,38 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
           >
             {cellValue}
           </Chip>
+        );
+        case "actions":
+        return (
+          <Dropdown
+            classNames={{
+              content: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+            }}
+          >
+            <DropdownTrigger>
+              <span className="icon-wrapper" onClick={handleDotsIconClick}>
+                <VerticalDotsIcon />
+              </span>
+            </DropdownTrigger>
+            <DropdownMenu
+                    aria-label="Action event example"
+                    onAction={(key) => {
+                      if (key === "details") handleDetailsIconClick(item);
+                      if (key === "voirPlus") navigate("/dashboard/facture");
+                    }}
+                  >
+                    <DropdownItem key="details" startContent={<EyeIcon />}>
+                      Details
+                    </DropdownItem>
+                    <DropdownItem
+                      key="voirPlus"
+                      color="danger"
+                      startContent={<ReadMoreIcon sx={{ fontSize: 17 }}/>}
+                    >
+                      Annuler
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
         );
       default:
         return cellValue;
@@ -208,6 +291,78 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
           )}
         </TableBody>
       </Table>
+      <Modal
+            size="lg"
+            isOpen={isDetailsModalOpen}
+            onOpenChange={() => setDetailsModalOpen(false)}
+            className="recDesc"
+            classNames={{
+              base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+              closeButton: "hover:bg-white/5 active:bg-white/10",
+            }}
+          >
+            <ModalContent>
+              {(onClose) => (
+                <>
+                  <ModalHeader className="flex flex-col gap-1">
+                    Détails de la réclamation
+                  </ModalHeader>
+                  <ModalBody>
+                    {isMobile && (
+                      <>
+                        <Input
+                          isReadOnly
+                          label="Type de Facture"
+                          variant="bordered"
+                          labelPlacement="outside"
+                          defaultValue={currentReclamation.type}
+                          className="mb-3"
+                        />
+                        <Input
+                          isReadOnly
+                          label="Mois de Consommation"
+                          variant="bordered"
+                          labelPlacement="outside"
+                          defaultValue={currentReclamation.mois}
+                          className="mb-3"
+                        />
+                        <Input
+                          isReadOnly
+                          label="Echeance"
+                          variant="bordered"
+                          labelPlacement="outside"
+                          defaultValue={currentReclamation.echeance}
+                          className="mb-3"
+                        />
+                        <Input
+                          isReadOnly
+                          label="Status"
+                          variant="bordered"
+                          labelPlacement="outside"
+                          defaultValue={currentReclamation.status}
+                          className="mb-3"
+                        />
+                        <Input
+                          isReadOnly
+                          label="Montant TTC"
+                          variant="bordered"
+                          labelPlacement="outside"
+                          defaultValue={currentReclamation.ttc}
+                          className="mb-3"
+                        />
+                      </>
+                    )}
+                    
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button color="danger" variant="flat" onClick={onClose}>
+                      Fermer
+                    </Button>
+                  </ModalFooter>
+                </>
+              )}
+            </ModalContent>
+          </Modal>
     </>
   );
 };

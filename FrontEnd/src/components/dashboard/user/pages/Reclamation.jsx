@@ -26,7 +26,7 @@ const Reclamation = () => {
           shadow="sm"
         >
           <CardBody>
-            <ReclaCard title="Reclamation" />
+            <ReclaCard title="Réclamations" />
           </CardBody>
           <CardBody>
             <ReclamationTable

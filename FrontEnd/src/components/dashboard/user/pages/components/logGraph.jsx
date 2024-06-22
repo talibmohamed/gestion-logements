@@ -15,8 +15,10 @@ const Graph = ({ title, data }) => {
       return 756; // made for tablet screens
     } else if(window.innerWidth <= 1024){
       return 731; // I made it for larger screens
+    } else if(window.innerWidth <= 1600){
+      return 575; // I made it for larger screens
     } else{
-      return 575; 
+      return 680; 
     }
   };
 

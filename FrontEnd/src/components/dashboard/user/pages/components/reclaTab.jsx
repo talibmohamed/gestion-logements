@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Input,
@@ -17,10 +17,15 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
   Textarea,
 } from "@nextui-org/react";
-import { DeleteIcon } from "../Icons/DeleteIcon";
+import { CancelIcon } from "../Icons/CancelIcon";
 import { EyeIcon } from "../Icons/EyeIcon";
+import { VerticalDotsIcon } from "../Icons/VerticalDotsIcon";
 import PropTypes from "prop-types";
 import "./customWrappers.scss";
 
@@ -33,9 +38,12 @@ const INITIAL_VISIBLE_COLUMNS = [
   "actions",
 ];
 
+const SMALL_DEVICE_COLUMNS = ["id_recl", "type_recl", "status", "actions"];
+
 const statusColorMap = {
-  résolu: "secondary",
-  "non résolu": "primary",
+  annulée: "default",
+  résolue: "secondary",
+  "non résolue": "primary",
   "en attente": "warning",
 };
 
@@ -54,6 +62,8 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
   const pages = Math.ceil(rows.length / rowsPerPage);
 
   const [currentReclamation, setCurrentReclamation] = useState(null);
+  const [setCurrentDots] = useState(null);
+
   const {
     isOpen: isDetailsModalOpen,
     onOpen: openDetailsModal,
@@ -64,6 +74,26 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     onOpen: openDeleteModal,
     onOpenChange: setDeleteModalOpen,
   } = useDisclosure();
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 900);
+      setVisibleColumns(
+        window.innerWidth <= 900
+          ? new Set(SMALL_DEVICE_COLUMNS)
+          : new Set(INITIAL_VISIBLE_COLUMNS)
+      );
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const headerColumns = React.useMemo(() => {
     if (visibleColumns === "all") return columns;
@@ -105,107 +135,151 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     });
   }, [sortDescriptor, items]);
 
+  const handleDotsIconClick = (reclamation) => {
+    setCurrentDots(reclamation);
+  };
+
   const handleDetailsIconClick = (reclamation) => {
     setCurrentReclamation(reclamation);
     openDetailsModal(true);
   };
-  const handleDeleteIconClick = (reclamation) => {
+  const handleCancelIconClick = (reclamation) => {
     setCurrentReclamation(reclamation);
     openDeleteModal();
   };
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
+  const renderCell = React.useCallback(
+    (user, columnKey) => {
+      const cellValue = user[columnKey];
 
-    switch (columnKey) {
-      case "role":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-          </div>
-        );
-      case "status":
-        return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[user.status]}
-            size="sm"
-            variant="flat"
-          >
-            {cellValue}
-          </Chip>
-        );
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-2">
-            <Tooltip
-              content="Details"
-              delay={0}
-              closeDelay={0}
-              motionProps={{
-                variants: {
-                  exit: {
-                    opacity: 0,
-                    transition: {
-                      duration: 0.1,
-                      ease: "easeIn",
-                    },
-                  },
-                  enter: {
-                    opacity: 1,
-                    transition: {
-                      duration: 0.15,
-                      ease: "easeOut",
-                    },
-                  },
-                },
-              }}
+      switch (columnKey) {
+        case "role":
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-small capitalize">{cellValue}</p>
+            </div>
+          );
+        case "status":
+          return (
+            <Chip
+              className="capitalize"
+              color={statusColorMap[user.status]}
+              size="sm"
+              variant="flat"
             >
-              <span
-                className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                onClick={() => handleDetailsIconClick(user)}
-              >
-                <EyeIcon />
-              </span>
-            </Tooltip>
+              {cellValue}
+            </Chip>
+          );
+        case "actions":
+          return (
+            <div className="relative flex items-center gap-2">
+              {isMobile ? (
+                <Dropdown
+                  classNames={{
+                    content: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+                  }}
+                >
+                  <DropdownTrigger>
+                    <span
+                      className="icon-wrapper"
+                      onClick={handleDotsIconClick}
+                    >
+                      <VerticalDotsIcon />
+                    </span>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    aria-label="Action event example"
+                    onAction={(key) => {
+                      if (key === "details") handleDetailsIconClick(user);
+                      if (key === "cancel") handleCancelIconClick(user);
+                    }}
+                  >
+                    <DropdownItem key="details" startContent={<EyeIcon />}>
+                      Details
+                    </DropdownItem>
+                    <DropdownItem
+                      key="cancel"
+                      color="danger"
+                      startContent={<CancelIcon />}
+                    >
+                      Annuler
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              ) : (
+                <>
+                  <Tooltip
+                    content="Details"
+                    delay={0}
+                    closeDelay={0}
+                    motionProps={{
+                      variants: {
+                        exit: {
+                          opacity: 0,
+                          transition: {
+                            duration: 0.1,
+                            ease: "easeIn",
+                          },
+                        },
+                        enter: {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            ease: "easeOut",
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    <span
+                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                      onClick={() => handleDetailsIconClick(user)}
+                    >
+                      <EyeIcon />
+                    </span>
+                  </Tooltip>
 
-            <Tooltip
-              color="danger"
-              content="Supprimer"
-              delay={0}
-              closeDelay={0}
-              motionProps={{
-                variants: {
-                  exit: {
-                    opacity: 0,
-                    transition: {
-                      duration: 0.1,
-                      ease: "easeIn",
-                    },
-                  },
-                  enter: {
-                    opacity: 1,
-                    transition: {
-                      duration: 0.15,
-                      ease: "easeOut",
-                    },
-                  },
-                },
-              }}
-            >
-              <span
-                className="text-lg text-danger cursor-pointer active:opacity-50"
-                onClick={() => handleDeleteIconClick(user)}
-              >
-                <DeleteIcon />
-              </span>
-            </Tooltip>
-          </div>
-        );
-      default:
-        return cellValue;
-    }
-  }, []);
+                  <Tooltip
+                    color="danger"
+                    content="Annuler"
+                    delay={0}
+                    closeDelay={0}
+                    motionProps={{
+                      variants: {
+                        exit: {
+                          opacity: 0,
+                          transition: {
+                            duration: 0.1,
+                            ease: "easeIn",
+                          },
+                        },
+                        enter: {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            ease: "easeOut",
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    <span
+                      className="text-lg text-danger cursor-pointer active:opacity-50"
+                      onClick={() => handleCancelIconClick(user)}
+                    >
+                      <CancelIcon />
+                    </span>
+                  </Tooltip>
+                </>
+              )}
+            </div>
+          );
+        default:
+          return cellValue;
+      }
+    },
+    [isMobile]
+  );
 
   const topContent = React.useMemo(() => {
     return (
@@ -289,14 +363,54 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                 Détails de la réclamation
               </ModalHeader>
               <ModalBody>
+                {isMobile && (
+                  <>
+                    <Input
+                      isReadOnly
+                      label="Type de Réclamation"
+                      variant="bordered"
+                      labelPlacement="outside"
+                      defaultValue={currentReclamation.type_recl}
+                      className="mb-3"  
+                    />
+                  </>
+                )}
                 <Textarea
                   isReadOnly
                   label="Description"
                   variant="bordered"
                   labelPlacement="outside"
-                  placeholder="Enter your description"
                   defaultValue={currentReclamation.desc}
+                  className="mb-3" 
                 />
+                {isMobile && (
+                  <>
+                    <Input
+                      isReadOnly
+                      label="Date de Réclamation"
+                      variant="bordered"
+                      labelPlacement="outside"
+                      defaultValue={currentReclamation.date}
+                      className="mb-3" 
+                    />
+                    <Input
+                      isReadOnly
+                      label="Status"
+                      variant="bordered"
+                      labelPlacement="outside"
+                      defaultValue={currentReclamation.status}
+                      className="mb-3" 
+                    />
+                    <Input
+                      isReadOnly
+                      label="Date de Résolution"
+                      variant="bordered"
+                      labelPlacement="outside"
+                      defaultValue={currentReclamation.sol}
+                      className="mb-3" 
+                    />
+                  </>
+                )}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="flat" onClick={onClose}>
@@ -324,7 +438,9 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
           {(onClose) => (
             <>
               <ModalHeader className="text-xl">Attention</ModalHeader>
-              <ModalBody>Êtes-vous sûr(e) de vouloir continuer ?</ModalBody>
+              <ModalBody>
+                Êtes-vous sûr(e) de vouloir annuler cette réclamation ?
+              </ModalBody>
               <ModalFooter>
                 <Button
                   color="danger"
