@@ -23,6 +23,6 @@ const users = [
       {id: 10,id_recl: "R010",nom: "Charles Babbage",type_recl: "Problème de porte",desc:"problème de porte",date: "2024-09-01",status: "en attente",sol: "--",},
     ];
 
-const statusReclOptions = ["en attente","resolu","non resolu"];
+const statusReclOptions = ["annuler", "en attente","resolu","non resolu"];
 
 export {columns, users, statusReclOptions};
