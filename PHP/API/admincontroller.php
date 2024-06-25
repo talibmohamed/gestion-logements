@@ -149,6 +149,29 @@ class AdminController
         }
     }
 
+    // //add logement
+    // public function addLogementAPI($data)
+    // {
+    //     //i will get     type_log: "",
+    // // ameliore: "",
+    // // nb_pieces: "",
+    // // superficie: "",
+
+    //     if ($data && isset($data['type_log']) && isset($data['ameliore']) && isset($data['nb_pieces']) && isset($data['superficie'])) {
+    //         $type_log = $data['type_log'];
+    //         $ameliore = $data['ameliore'];
+    //         $nb_pieces = $data['nb_pieces'];
+    //         $superficie = $data['superficie'];
+    //         $response = $this->admin->addLogement($type_log, $ameliore, $nb_pieces, $superficie);
+    //         http_response_code(200);
+    //         echo json_encode($response);
+    //     } else {
+    //         http_response_code(400);
+    //         echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
+    //     }
+        
+    // }
+
 
     //the web socket controller 
     // public function broadcastMessage($message)

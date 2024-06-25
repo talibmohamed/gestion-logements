@@ -33,12 +33,15 @@ import TipsAndUpdatesOutlinedIcon from "@mui/icons-material/TipsAndUpdatesOutlin
 import PropTypes from "prop-types";
 import { IconMappings } from "./svgMappings.jsx";
 
+console.log();
+
 const INITIAL_VISIBLE_COLUMNS = [
   "num_de_log",
   "nom",
   "type_log",
   "ameliored",
   "mc",
+  "address",
   "quotaE",
   "quotaW",
   "equip",
@@ -93,7 +96,6 @@ const LogTable = ({ columns, rows, title }) => {
     onOpenChange: setDetails2ModalOpen,
   } = useDisclosure();
 
-
   const [currentLogement, setCurrentLogement] = useState(null);
   const [currentEquipments, setCurrentEquipments] = useState([]);
 
@@ -133,8 +135,8 @@ const LogTable = ({ columns, rows, title }) => {
     let filteredUsers = [...rows];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((user) =>
-        user.nom.toLowerCase().includes(filterValue.toLowerCase())
+      filteredUsers = filteredUsers.filter((rows) =>
+        rows.nom.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
 
@@ -177,100 +179,8 @@ const LogTable = ({ columns, rows, title }) => {
     openDeleteModal();
   };
 
-  const handleDetailsIconClick = (user) => {
-    const typeLog = user.type_log.toLowerCase().trim();
-    const ameliored = user.ameliored.toLowerCase().trim();
-    const equipmentData = {
-      cadre: {
-        oui: [
-          "Baignoire",
-          "Douche",
-          "Climatisation central",
-          "Chauffage central",
-          "Lave-linge",
-          "Sèche-linge",
-          "Espaces de rangement (placards intégrés, dressing)",
-          "Réfrigérateur",
-          "Four à micro-ondes",
-          "Cuisinière électrique",
-          "Lave-vaisselle",
-          "Four",
-          "Balcon ou terasse spacieux",
-          "Jardins privés ou espaces verts personnels",
-          "Place de parking dédiée avec point de recharge pour véhicules électriques",
-          "Accès à des équipements de fitness en plein air",
-          "Wifi",
-          "Système de sécurité",
-        ],
-        non: [
-          "Douche",
-          "Four",
-          "Réfrigérateur",
-          "Four à micro-ondes",
-          "Cuisinière électrique",
-          "Chauffage électrique",
-          "Espaces de rangement basiques",
-          "Lave-linge",
-          "Petit balcon",
-          "Accès à un parking commun",
-          "Wifi",
-          "Système de sécurité",
-        ],
-      },
-      "agent de maitrise": {
-        oui: [
-          "Douche",
-          "Chauffage central",
-          "Lave-linge",
-          "Espaces de rangement suffisants",
-          "Réfrigérateur",
-          "Cuisinière électrique",
-          "Balcon",
-          "Place de parking partagée",
-          "Espaces verts communs",
-          "Wifi",
-          "Système de sécurité",
-        ],
-        non: [
-          "Douche",
-          "Réfrigérateur",
-          "Cuisinière à gaz",
-          "Chauffage au gaz",
-          "Rangement minimal",
-          "Accès à un parking commun",
-          "Wifi",
-          "Système de sécurité",
-          "Pas de balcon",
-        ],
-      },
-      ouvrier: {
-        oui: [
-          "Douche",
-          "Chauffage électrique",
-          "Espaces de rangement suffisants",
-          "Réfrigérateur",
-          "Cuisinière à gaz",
-          "Petit balcon",
-          "Espaces verts partagés",
-          "Parking commun",
-          "Wifi",
-          "Système de sécurité",
-        ],
-        non: [
-          "Douche",
-          "Chauffage au gaz",
-          "Réfrigérateur",
-          "Cuisinière à gaz",
-          "Rangement minimal",
-          "Accès à un parking commun",
-          "Système de sécurité",
-          "Wifi",
-          "Pas de balcon",
-        ],
-      },
-    };
-    const userEquipments = equipmentData[typeLog]?.[ameliored] || [];
-    setCurrentEquipments(userEquipments);
+  const handleDetailsIconClick = (equipmentNames) => {
+    setCurrentEquipments(equipmentNames);
     openEquipModal();
   };
 
@@ -279,9 +189,36 @@ const LogTable = ({ columns, rows, title }) => {
     return SvgComponent ? <SvgComponent className="inline-block mr-2" /> : null;
   };
 
+  // add new logement 
+  const [newLogement, setNewLogement] = useState({
+    no_logement: "",
+    occupe_par: "",
+    type_log: "",
+    ameliore: "",
+    nb_pieces: "",
+    superficie: "",
+  });
+
+  const handleAddLogement = () => {
+    //test if new logement empty dont call displach 
+    if (
+      newLogement.no_logement === "" ||
+      newLogement.occupe_par === "" ||
+      newLogement.type_log === "" ||
+      newLogement.ameliore === "" ||
+      newLogement.nb_pieces === "" ||
+      newLogement.superficie === ""
+    ) {
+      return;
+    }
+    dispatch(addLogementThunk(newLogement));
+    setAddModalOpen(false);
+  };
+
+
   const renderCell = React.useCallback(
-    (user, columnKey) => {
-      const cellValue = user[columnKey];
+    (item, columnKey) => {
+      const cellValue = item[columnKey];
 
       switch (columnKey) {
         case "equip":
@@ -312,14 +249,14 @@ const LogTable = ({ columns, rows, title }) => {
               >
                 <span
                   className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                  onClick={() => handleDetailsIconClick(user)}
-                >
+                  onClick={() => handleDetailsIconClick(item.equipment_names)}
+                  >
                   <EyeIcon />
                 </span>
               </Tooltip>
             </div>
-            
           );
+
         case "actions":
           return (
             <div className="relative flex items-center gap-2">
@@ -340,10 +277,10 @@ const LogTable = ({ columns, rows, title }) => {
                   <DropdownMenu
                     aria-label="Action event example"
                     onAction={(key) => {
-                      if (key === "details") handleDetails2IconClick(user);
-                      if (key === "equip") handleDetailsIconClick(user);
-                      if (key === "edit") handleEditIconClick(user);
-                      if (key === "delete") handleDeleteIconClick(user);
+                      if (key === "details") handleDetails2IconClick(item);
+                      if (key === "equip") handleDetailsIconClick(item);
+                      if (key === "edit") handleEditIconClick(item);
+                      if (key === "delete") handleDeleteIconClick(item);
                     }}
                   >
                     <DropdownItem key="details" startContent={<Eye2Icon />}>
@@ -374,7 +311,6 @@ const LogTable = ({ columns, rows, title }) => {
                 </Dropdown>
               ) : (
                 <>
-                
                   <Tooltip
                     content="Modifier"
                     delay={0}
@@ -400,7 +336,7 @@ const LogTable = ({ columns, rows, title }) => {
                   >
                     <span
                       className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                      onClick={() => handleEditIconClick(user)}
+                      onClick={() => handleEditIconClick(item)}
                     >
                       <EditIcon />
                     </span>
@@ -432,7 +368,7 @@ const LogTable = ({ columns, rows, title }) => {
                   >
                     <span
                       className="text-lg text-danger cursor-pointer active:opacity-50 "
-                      onClick={() => handleDeleteIconClick(user)}
+                      onClick={() => handleDeleteIconClick(item)}
                     >
                       <DeleteIcon />
                     </span>
@@ -518,6 +454,7 @@ const LogTable = ({ columns, rows, title }) => {
     </div>
   );
 
+  console.log(rows);
   return (
     <>
       <Table
@@ -760,7 +697,7 @@ const LogTable = ({ columns, rows, title }) => {
                 <Button color="danger" variant="flat" onPress={onClose}>
                   Close
                 </Button>
-                <Button color="primary" onPress={onClose}>
+                <Button color="primary" onPress={handleAddLogement}>
                   Enregistrer
                 </Button>
               </ModalFooter>
@@ -1025,7 +962,9 @@ const LogTable = ({ columns, rows, title }) => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="text-xl">Les équipements disponibles1</ModalHeader>
+              <ModalHeader className="text-xl">
+                Les équipements disponibles
+              </ModalHeader>
               <ModalBody>
                 <EquipmentSection
                   title="Salle de bain"

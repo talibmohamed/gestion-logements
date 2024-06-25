@@ -6,7 +6,7 @@ import LogTable from "./components/logTab.jsx";
 import Graph from "./components/graph.jsx";
 import "./Statics.scss";
 import { Card, CardBody } from "@nextui-org/react";
-import { columns, users } from "./components/logData.jsx";
+import { columns } from "./components/logData.jsx";
 
 const sampleData = [
   { label: "vacant", data: [12, 6, 20, 4, 20, 1], color: "#96A7FF" },
@@ -33,23 +33,25 @@ const Logement = () => {
   const logements = useSelector(state => state.logements.logements);
 
   useEffect(() => {
-    dispatch(fetchLogementsThunk()); // Dispatch fetch logements action on component mount
-  }, [dispatch]); // Ensure useEffect runs only once on component mount
+    dispatch(fetchLogementsThunk()); 
+  }, [dispatch]); 
 
   const transformLogementsData = (logements) => {
     return logements.map((logement) => ({
       id: logement.log_id,
-      num_de_log: `LOG${logement.log_id.toString().padStart(3, '0')}`,
-      nom: logement.nom, // Assuming nom is the concatenated name field from residant table
+      num_de_log: logement.log_id,
+      nom: logement.nom,
       type_log: logement.typelog,
       ameliored: logement.is_ameliore ? 'Oui' : 'Non',
       mc: `${logement.piece} pièces (${logement.mc}m²)`,
+      address: logement.address,
       quotaE: logement.quotas_electricite.toString(),
       quotaW: logement.quotas_eau.toString(),
+      equipment_names: logement.equipment_names,
     }));
   };
   
-  const transformedLogements = transformLogementsData(logements); // Transform logements data
+  const transformedLogements = transformLogementsData(logements); 
 
   return (
     <div className="container mx-auto">

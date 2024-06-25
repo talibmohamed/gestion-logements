@@ -128,7 +128,7 @@ export const fetchStatistics = async (jwt) => {
 // Function to fetch all logements
 export const fetchLogements = async (jwt) => {
   try {
-    const response = await axios.get(`${baseURL}/admin/alllogement`, {
+    const response = await axios.get(`${baseURL}/admin/logement`, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },

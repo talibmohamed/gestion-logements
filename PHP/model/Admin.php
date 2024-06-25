@@ -472,7 +472,7 @@ class admin
             // Fetch all logements with typelog_info details and resident information
             $sql = $connection->prepare('
                 SELECT 
-                    l.log_id, l.typelog, l.is_ameliore, l.mc, l.piece, 
+                    l.log_id, l.typelog, l.is_ameliore, l.mc, l.piece, l.address,
                     t.quotas_electricite, t.quotas_eau, t.equipement_ids,
                     r.res_id, CONCAT(r.nom, \' \', r.prenom) AS nom
                 FROM logement l
@@ -521,11 +521,58 @@ class admin
             ];
         }
     }
-    
-    
-    
-    
-    
+
+    //add logement
+    // public function addLogement($data)
+    // {
+    //     try {
+    //         $connection = $this->db->getConnection();
+    //         $typelog = $data['type_log'];
+    //         $is_ameliore = $data['ameliore'];
+    //         $mc = $data['mc'];
+    //         $piece = $data['piece'];
+
+    //         // Check if the logement already exists
+    //         $logementQuery = "
+    //             SELECT * 
+    //             FROM logement 
+    //             WHERE typelog = :typelog 
+    //               AND is_ameliore = :is_ameliore 
+    //               AND mc = :mc 
+    //               AND piece = :piece
+    //         ";
+    //         $stmt = $connection->prepare($logementQuery);
+    //         $stmt->bindParam(':typelog', $typelog, PDO::PARAM_STR);
+    //         $stmt->bindParam(':is_ameliore', $is_ameliore, PDO::PARAM_BOOL);
+    //         $stmt->bindParam(':mc', $mc, PDO::PARAM_INT);
+    //         $stmt->bindParam(':piece', $piece, PDO::PARAM_INT);
+    //         $stmt->execute();
+    //         $logement = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    //         if ($logement) {
+    //             return [
+    //                 'status' => 'error',
+    //                 'message' => 'Logement already exists'
+    //             ];
+    //         }
+
+    //         // Insert the new logement into the database
+    //         $insertQuery = "
+    //             INSERT INTO logement (typelog, is_ameliore, mc, piece) 
+    //             VALUES (:typelog, :is_ameliore, :mc, :piece)
+    //         ";
+    //         $stmt = $connection->prepare($insertQuery);
+    //         $stmt->bindParam(':typelog', $typelog, PDO::PARAM_STR);
+    //         $stmt->bindParam(':is_ameliore', $is_ameliore, PDO::PARAM_BOOL);
+    //         $stmt->bindParam(':mc', $mc, PDO::PARAM_INT);
+    //         $stmt->bindParam(':piece', $piece, PDO::PARAM_INT);
+    //         $stmt->execute();
+
+    //         // Retrieve the inserted logement's ID
+    //         $log_id = $connection->lastInsertId();
+
+    //         // Insert the typelog_info details into the database
+    //         $insertType
     
     
 }
