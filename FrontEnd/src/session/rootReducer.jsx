@@ -5,6 +5,7 @@ import userReducer from './userslice';
 import adminReducer from './adminslice';
 import factureReducer from './factureSlice';
 import statisticsReducer from "./statisticsSlice"; // Ensure correct import path
+import logementsReducer from "./logementSlice"
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -13,6 +14,7 @@ const rootReducer = combineReducers({
   admin: adminReducer,
   facture: factureReducer,
   statistics: statisticsReducer, // Include the new statistics reducer
+  logements: logementsReducer
 });
 
 export const resetStateReducer = (state, action) => {
@@ -24,6 +26,7 @@ export const resetStateReducer = (state, action) => {
       admin: undefined,
       facture: undefined,
       statistics: undefined, 
+      logements: undefined
     };
   }
   return rootReducer(state, action);

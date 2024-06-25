@@ -1,5 +1,3 @@
-// Overview.jsx
-
 import React, { useState, useEffect } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
@@ -8,18 +6,10 @@ import DataTable from "./components/oveTab";
 import "./Overview.scss";
 import { columns } from "./components/data";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchFactureThunk, fetchStatisticsThunk } from "../../../../session/thunks/adminthunk";
-
-const data1 = [
-  { id: "total-payé", label: "Total Payé", value: 42, color: "#96A7FF" },
-  { id: "total-en-retard", label: "Total En Retard", value: 20.1, color: "#5F284A" },
-  { id: "total-impayé", label: "Total Impayé", value: 38.5, color: "#282230" },
-];
-
-const data2 = [
-  { id: "total-occupé", label: "Total Occupé", value: 80, color: "#F9769D" },
-  { id: "total-vacant", label: "Total Vacant", value: 20, color: "#282230" },
-];
+import {
+  fetchFactureThunk,
+  fetchStatisticsThunk,
+} from "../../../../session/thunks/adminthunk";
 
 const Overview = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -55,9 +45,12 @@ const Overview = () => {
   }, []);
 
   useEffect(() => {
-    const filtered = factures.filter(
-      (facture) => facture.fac_etat === "retard" || facture.fac_etat === "attente"
-    ).slice(0, 6); // Adjusted to slice(0, 6)
+    const filtered = factures
+      .filter(
+        (facture) =>
+          facture.fac_etat === "En Retard" || facture.fac_etat === "En Attente"
+      )
+      .slice(0, 6); // Adjusted to slice(0, 6)
     setFilteredFactures(filtered);
   }, [factures]);
 
@@ -73,29 +66,103 @@ const Overview = () => {
     ttc: facture.fac_total,
   }));
 
+  // Extract statistics data for pie charts
+  const factureStatistics = [
+    {
+      id: "total-payé",
+      label: "Total Payé",
+      value: statistics?.facture?.total_paid_count || 0,
+      color: "#96A7FF",
+    },
+    {
+      id: "total-en-retard",
+      label: "Total En Retard",
+      value: statistics?.facture?.total_overdue_count || 0,
+      color: "#5F284A",
+    },
+    {
+      id: "total-impayé",
+      label: "Total Impayé",
+      value: statistics?.facture?.total_unpaid_count || 0,
+      color: "#282230",
+    },
+  ];
+
+  const logementStatistics = [
+    {
+      id: "total-occupé",
+      label: "Total Occupé",
+      value: statistics?.logement?.total_occupied_count || 0,
+      color: "#F9769D",
+    },
+    {
+      id: "total-vacant",
+      label: "Total Vacant",
+      value: statistics?.logement?.total_vacant_count || 0,
+      color: "#282230",
+    },
+  ];
+
+  // Label for factureStatistics to display the total of factures
+  const FactureStatisticsLabel =
+  (statistics?.facture?.total_paid_count || 0) +
+  (statistics?.facture?.total_overdue_count || 0) +
+  (statistics?.facture?.total_unpaid_count || 0) +
+  ' Factures';
+
+
+
+  // Label for logementStatistics pie chart
+
+  const totalLogements = statistics?.logement?.total_logements_count || 0;
+  const totalOccupied = statistics?.logement?.total_occupied_count || 0;
+  const occupiedPercentage = totalLogements > 0 ? (totalOccupied / totalLogements) * 100 : 0;
+
+  const logementStatisticsLabel = `${occupiedPercentage.toFixed(2)}%`;
+
   return (
     <div className="container mx-auto">
       {isMobile ? (
         <Carousel showArrows={false} showStatus={false} showThumbs={false}>
           <div className="carousel-item-wrapper">
-            <PieChartCard title="Statistique Des Factures" data={data1} />
+            <PieChartCard
+              title="Statistique Des Factures"
+              data={factureStatistics}
+              label={FactureStatisticsLabel}
+            />
           </div>
           <div className="carousel-item-wrapper">
-            <PieChartCard title="Statistique Des Logements" data={data2} />
+            <PieChartCard
+              title="Statistique Des Logements"
+              data={logementStatistics}
+              label={logementStatisticsLabel}
+            />
           </div>
         </Carousel>
       ) : (
         <div className="flex flex-wrap justify-around">
           <div className="w-full md:w-1/2 p-2">
-            <PieChartCard title="Statistique Des Factures" data={data1} />
+            <PieChartCard
+              title="Statistique Des Factures"
+              data={factureStatistics}
+              label={FactureStatisticsLabel}
+            />
           </div>
           <div className="w-full md:w-1/2 p-2">
-            <PieChartCard title="Statistique Des Logements" data={data2} />
+            <PieChartCard
+              title="Statistique Des Logements"
+              data={logementStatistics}
+              label={logementStatisticsLabel}
+            />
           </div>
         </div>
       )}
       <div className="w-full">
-        <DataTable columns={columns} rows={transformedFactures} title="Factures récentes" />
+        <DataTable
+          columns={columns}
+          rows={transformedFactures}
+          title="Factures récentes"
+        />
       </div>
     </div>
   );

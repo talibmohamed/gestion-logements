@@ -7,8 +7,10 @@ import { fetchNotifications } from "../services/adminapi";
 import {setNotifications } from "../notificationSlice"
 import { fetchFacture } from "../services/adminapi";
 import { setFacture } from "../factureSlice";
-import { fetchStatistics } from "../services/adminapi";
+import { fetchStatistics, fetchLogements } from "../services/adminapi";
 import { setStatistics, setStatisticsLoading, setStatisticsError } from '../statisticsSlice';
+import { setLogements } from "../logementSlice";
+
 
 // Thunk for admin login
 export const loginAdminThunk = createAsyncThunk(
@@ -124,6 +126,23 @@ export const fetchStatisticsThunk = createAsyncThunk(
     } catch (error) {
       dispatch(setStatisticsError(error.message)); // Dispatch error action with error message
       console.error('Error fetching statistics:', error);
+      throw error;
+    }
+  }
+);
+
+export const fetchLogementsThunk = createAsyncThunk(
+  'logements/fetchLogements',
+  async (_, { dispatch, getState }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token; // Assuming auth slice manages JWT token
+
+    try {
+      const response = await fetchLogements(jwt); // Call your API function to fetch logements
+      dispatch(setLogements(response.logements))
+      return response; // Return response if needed by the caller
+    } catch (error) {
+      console.error('Error fetching logements:', error);
       throw error;
     }
   }

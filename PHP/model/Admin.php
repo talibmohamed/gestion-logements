@@ -410,14 +410,14 @@ class admin
     
         // Facture Statistics
         // Calculate the number of paid factures for the current month
-        $paidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'payé' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
+        $paidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'Payée' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
         $paidStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
         $paidStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
         $paidStmt->execute();
         $paidCount = $paidStmt->fetchColumn();
     
         // Calculate the number of overdue factures for the current month
-        $overdueStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'retard' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
+        $overdueStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'En Attente' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
         $overdueStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
         $overdueStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
         $overdueStmt->execute();
@@ -431,7 +431,7 @@ class admin
         } else {
             $lastYear = $curyear;
         }
-        $unpaidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'impayé' AND DATE_PART('month', fac_date) = :lastMonth AND DATE_PART('year', fac_date) = :lastYear");
+        $unpaidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'En Retard' AND DATE_PART('month', fac_date) = :lastMonth AND DATE_PART('year', fac_date) = :lastYear");
         $unpaidStmt->bindValue(':lastMonth', $lastMonth, PDO::PARAM_INT);
         $unpaidStmt->bindValue(':lastYear', $lastYear, PDO::PARAM_INT);
         $unpaidStmt->execute();
@@ -461,6 +461,71 @@ class admin
         echo json_encode($response);
         exit; // Ensure no further output is appended
     }
+
+    //get all logement
+    public function getAllLogement()
+    {
+        try {
+            // Assuming $this->db is your database connection object
+            $connection = $this->db->getConnection();
+            
+            // Fetch all logements with typelog_info details and resident information
+            $sql = $connection->prepare('
+                SELECT 
+                    l.log_id, l.typelog, l.is_ameliore, l.mc, l.piece, 
+                    t.quotas_electricite, t.quotas_eau, t.equipement_ids,
+                    r.res_id, CONCAT(r.nom, \' \', r.prenom) AS nom
+                FROM logement l
+                JOIN typelog_info t ON l.typelog = t.typelog AND l.is_ameliore = t.is_ameliore
+                LEFT JOIN residant r ON l.log_id = r.log_id
+            ');
+            
+            $sql->execute();
+            $logements = $sql->fetchAll(PDO::FETCH_ASSOC);
+    
+            // Process each logement to fetch equipment names
+            foreach ($logements as &$logement) {
+                // Convert equipment_ids from string to array
+                $equipment_ids = trim($logement['equipement_ids'], '{}'); // Remove curly braces
+                $equipment_ids = explode(',', $equipment_ids); // Convert string to array of IDs
+                $equipment_ids = array_map('trim', $equipment_ids); // Trim whitespace from each ID
+                
+                if (!empty($equipment_ids)) {
+                    $equipment_names = [];
+                    foreach ($equipment_ids as $equip_id) {
+                        // Query to fetch equipment names from 'equipment' table
+                        $sqlEquip = $connection->prepare('SELECT equip_id, equip_type FROM equipement WHERE equip_id = :equip_id');
+                        $sqlEquip->bindParam(':equip_id', $equip_id, PDO::PARAM_INT);
+                        $sqlEquip->execute();
+                        $equip = $sqlEquip->fetch(PDO::FETCH_ASSOC);
+                        if ($equip) {
+                            $equipment_names[] = $equip['equip_type'];
+                        }
+                    }
+                    // Assign equipment names to the logement
+                    $logement['equipment_names'] = $equipment_names;
+                } else {
+                    // Handle case where no equipment_ids are found
+                    $logement['equipment_names'] = [];
+                }
+            }
+    
+            return [
+                'status' => 'success',
+                'logements' => $logements
+            ];
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+    
+    
+    
+    
+    
     
     
 }

@@ -124,3 +124,22 @@ export const fetchStatistics = async (jwt) => {
     throw error;
   }
 };
+
+// Function to fetch all logements
+export const fetchLogements = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/admin/alllogement`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  }
+  catch (error) {
+    console.error(
+      "Error in fetchLogements:",
+      error.response || error.message || error
+    );
+    throw error;
+  }
+}

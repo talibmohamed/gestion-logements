@@ -1025,7 +1025,7 @@ const LogTable = ({ columns, rows, title }) => {
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="text-xl">Les équipements disponibles</ModalHeader>
+              <ModalHeader className="text-xl">Les équipements disponibles1</ModalHeader>
               <ModalBody>
                 <EquipmentSection
                   title="Salle de bain"
