@@ -310,13 +310,14 @@ function route($uri, $method)
                     $adminController->addLogementAPI($data);
                 } elseif ($method === 'PUT') {
                     // For PUT method (update logement)
-                    // $data = json_decode(file_get_contents('php://input'), true);
-                    // $adminController->updateLogementAPI($data);
-                } elseif($method === 'DELETE')
-                {
+                    $data = json_decode(file_get_contents('php://input'), true);
+                    $adminController->updateLogementAPI($data);
+                } elseif ($method === 'DELETE') {
                     // For DELETE method (delete logement)
-                    // $data = json_decode(file_get_contents('php://input'), true);
-                    // $adminController->deleteLogementAPI($data);
+                    $parts = explode('/', $uri);
+                    $logement_id = intval(end($parts));
+                    $adminController = new AdminController();
+                    $adminController->deleteLogementAPI(['log_id' => $logement_id]);
                 } else {
                     http_response_code(405); // Method Not Allowed
                     echo json_encode([

@@ -159,3 +159,35 @@ export const addLogement = async (jwtToken, logementData) => {
     throw error;
   }
 };
+
+// Function to update a logement
+export const updateLogement = async (jwtToken, logementData) => {
+  try {
+    const response = await axios.put(`${baseURL}/admin/logement`, logementData, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwtToken}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error in updateLogement:', error);
+    throw error;
+  }
+};
+
+
+// Function to delete a logement
+export const deleteLogement = async (jwtToken, logId) => {
+  try {
+    const response = await axios.delete(`${baseURL}/admin/logement/${logId}`, {
+      headers: {
+        'Authorization': `Bearer ${jwtToken}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error in deleteLogement:', error);
+    throw error;
+  }
+};

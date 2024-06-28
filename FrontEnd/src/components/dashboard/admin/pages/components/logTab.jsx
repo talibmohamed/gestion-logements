@@ -36,7 +36,11 @@ import { VerticalDotsIcon } from "../Icons/VerticalDotsIcon";
 import TipsAndUpdatesOutlinedIcon from "@mui/icons-material/TipsAndUpdatesOutlined";
 import PropTypes from "prop-types";
 import { IconMappings } from "./svgMappings.jsx";
-import { addLogementThunk } from "../../../../../session/thunks/adminthunk.jsx";
+import {
+  addLogementThunk,
+  updateLogementThunk,
+  deleteLogementThunk,
+} from "../../../../../session/thunks/adminthunk.jsx";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "num_de_log",
@@ -58,6 +62,21 @@ const SMALL_DEVICE_COLUMNS = [
   "ameliored",
   "actions",
 ];
+
+// const transformLogementsData = (logements) => {
+//   return logements.map((logement) => ({
+//     id: logement.log_id,
+//     num_de_log: logement.log_id,
+//     nom: logement.nom,
+//     type_log: logement.typelog,
+//     ameliored: logement.is_ameliore ? "Oui" : "Non",
+//     mc: `${logement.piece} pièces (${logement.mc}m²)`,
+//     address: logement.address,
+//     quotaE: logement.quotas_electricite.toString(),
+//     quotaW: logement.quotas_eau.toString(),
+//     equipment_names: logement.equipment_names,
+//   }));
+// };
 
 const LogTable = ({ columns, rows, title }) => {
   // const [scrollBehavior, setScrollBehavior] = React.useState("inside");
@@ -99,8 +118,29 @@ const LogTable = ({ columns, rows, title }) => {
     onOpenChange: setDetails2ModalOpen,
   } = useDisclosure();
 
-  const [currentLogement, setCurrentLogement] = useState(null);
   const [currentEquipments, setCurrentEquipments] = useState([]);
+
+  const [newLogement, setNewLogement] = useState({
+    type_log: "",
+    ameliore: "",
+    nb_pieces: "",
+    superficie: "",
+    address: "",
+  });
+
+  const [currentLogement, setCurrentLogement] = useState({});
+
+  const handleEditClick = (logement) => {
+    setCurrentLogement({
+      log_id: logement.log_id,
+      num_de_log: logement.num_de_log,
+      type_log: logement.type_log,
+      is_ameliore: logement.is_ameliore,
+      piece: logement.piece,
+      mc: logement.mc,
+    });
+    setEditModalOpen(true);
+  };
 
   const pages = Math.ceil(rows.length / rowsPerPage);
 
@@ -194,15 +234,6 @@ const LogTable = ({ columns, rows, title }) => {
 
   const dispatch = useDispatch();
 
-  // add new logement
-  const [newLogement, setNewLogement] = useState({
-    type_log: "",
-    ameliore: "", 
-    nb_pieces: "",
-    superficie: "",
-    address: "",
-  });
-
   const handleAddLogement = async () => {
     // Validate all fields before dispatching
     if (
@@ -217,20 +248,19 @@ const LogTable = ({ columns, rows, title }) => {
     }
 
     // Convert ameliore to a boolean if it's a string "yes" or "no"
-    const amelioreBoolean = newLogement.ameliore === "yes" ? true : false;
+    const amelioreBoolean = newLogement.ameliore === "yes";
 
     // Prepare the data to dispatch
     const logementData = {
       type_log: newLogement.type_log,
-      ameliore: amelioreBoolean,
-      nb_pieces: parseInt(newLogement.nb_pieces), 
-      superficie: parseInt(newLogement.superficie),
+      is_ameliore: amelioreBoolean,
+      piece: parseInt(newLogement.nb_pieces),
+      mc: parseInt(newLogement.superficie),
       address: newLogement.address,
     };
 
     // Dispatch the action to add logement
     try {
-      // Dispatch the action to add logement
       const response = await dispatch(addLogementThunk(logementData));
 
       // Display success message
@@ -259,7 +289,6 @@ const LogTable = ({ columns, rows, title }) => {
         });
       }
 
-      
       // Clear the form or close modal after successful submission
       setAddModalOpen(false);
       setNewLogement({
@@ -272,6 +301,148 @@ const LogTable = ({ columns, rows, title }) => {
     } catch (error) {
       console.error("Error adding logement:", error);
       toast.error("An error occurred while adding logement", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+    }
+  };
+
+  const handleEditLogement = async () => {
+    // Validate all fields before dispatching
+    if (
+      currentLogement.log_id === "" ||
+      currentLogement.type_log === "" ||
+      currentLogement.ameliored === "" ||
+      currentLogement.piece === "" ||
+      currentLogement.mc === "" ||
+      currentLogement.address === ""
+    ) {
+      // Handle invalid form data
+      return;
+    }
+
+    console.log(currentLogement);
+
+    // Convert is_ameliore to a boolean if it's a string "yes" or "no"
+    const isAmelioreBoolean = currentLogement.is_ameliore === "yes";
+
+    // Prepare the data to dispatch
+    const logementData = {
+      log_id: currentLogement.num_de_log,
+      type_log: currentLogement.type_log,
+      is_ameliore: isAmelioreBoolean,
+      piece: parseInt(currentLogement.piece),
+      mc: parseInt(currentLogement.mc),
+      address: currentLogement.address,
+    };
+
+    //consol log logementData
+    console.log(logementData);
+
+    try {
+      const response = await dispatch(updateLogementThunk(logementData));
+
+      // Handle response
+      if (response && response.payload.status === "success") {
+        toast.success("Logement edited successfully", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      } else {
+        // Handle other statuses or errors
+        toast.error("Failed to edit logement", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      }
+
+      // Clear the form or close modal after successful submission
+      setEditModalOpen(false);
+    } catch (error) {
+      console.error("Error editing logement:", error);
+      toast.error("An error occurred while editing logement", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+    }
+  };
+
+  //delete a logement
+  const handleDeleteLogement = async () => {
+
+    // Get the logement ID
+    const log_id = currentLogement.num_de_log;
+
+    // Validate all fields before dispatching
+    if (!log_id) {
+      console.error(
+        "Invalid logement ID for deletion:",
+        log_id
+      );
+      return;
+    }
+
+    try {
+      //dispatch action to delete logement
+      const response = await dispatch(
+        deleteLogementThunk(log_id)
+      );
+
+      // Handle response
+      if (response && response.payload.status === "success") {
+        toast.success("Logement deleted successfully", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      } else {
+        // Handle other statuses or errors
+        toast.error("Failed to delete logement", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      }
+
+      // Clear the form or close modal after successful submission
+      setDeleteModalOpen(false);
+    } catch (error) {
+      console.error("Error deleting logement:", error);
+      toast.error("An error occurred while deleting logement", {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -445,6 +616,10 @@ const LogTable = ({ columns, rows, title }) => {
               )}
             </div>
           );
+
+        case "mc":
+          return `${item.piece} pièces (${item.mc}m²)`;
+
         default:
           return cellValue;
       }
@@ -522,7 +697,6 @@ const LogTable = ({ columns, rows, title }) => {
     </div>
   );
 
-  console.log(rows);
   return (
     <>
       <Table
@@ -571,7 +745,6 @@ const LogTable = ({ columns, rows, title }) => {
           closeButton: "hover:bg-white/5 active:bg-white/10",
         }}
       >
-
         <ModalContent>
           {(onClose) => (
             <>
@@ -586,16 +759,17 @@ const LogTable = ({ columns, rows, title }) => {
                     label="No logement"
                     className="max-w-sm"
                     classNames={{
-                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      label: "text-white/90",
                       input: [
-                        "bg-transparent",
+                        "bg-zinc-800",
                         "group-data-[has-value=true]:text-white/90",
                       ],
-                      innerWrapper: "bg-transparent",
+                      innerWrapper: "bg-zinc-800",
                       inputWrapper: [
                         "bg-zinc-800",
-                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[hover=true]:bg-zinc-800",
                         "group-data-[focus=true]:bg-zinc-800 ",
+                        "group-data-[focus=true]:border-zinc-400 ",
                         "!cursor-text",
                       ],
                     }}
@@ -862,6 +1036,7 @@ const LogTable = ({ columns, rows, title }) => {
                   />
 
                   <Input
+                    isDisabled
                     type="text"
                     label="No du logement"
                     placeholder="Entrer No du logement"
@@ -884,7 +1059,7 @@ const LogTable = ({ columns, rows, title }) => {
                     onChange={(e) =>
                       setCurrentLogement({
                         ...currentLogement,
-                        num_de_log: e.target.value,
+                        log_id: e.target.value,
                       })
                     }
                   />
@@ -895,7 +1070,7 @@ const LogTable = ({ columns, rows, title }) => {
                     type="text"
                     label="Profession/Type de Logement"
                     placeholder="Choisir le type de logement"
-                    defaultValue={currentLogement?.type_log}
+                    defaultValue={[currentLogement?.type_log]}
                     className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled=true]:text-zinc-400",
@@ -970,14 +1145,14 @@ const LogTable = ({ columns, rows, title }) => {
                     onChange={(e) =>
                       setCurrentLogement({
                         ...currentLogement,
-                        ameliored: e.target.value,
+                        is_ameliore: e.target.value,
                       })
                     }
                   >
-                    <SelectItem key="ouvrier" value="ouvrier">
+                    <SelectItem key="yes" value="yes">
                       Oui
                     </SelectItem>
-                    <SelectItem key="cadre" value="cadre">
+                    <SelectItem key="no" value="no">
                       Non
                     </SelectItem>
                   </Select>
@@ -1044,12 +1219,41 @@ const LogTable = ({ columns, rows, title }) => {
                     }
                   />
                 </div>
+                {/* address */}
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
+                  <Input
+                    type="text"
+                    label="Adresse"
+                    placeholder="Entrer l'adresse"
+                    defaultValue={currentLogement?.address}
+                    onChange={(e) =>
+                      setCurrentLogement({
+                        ...currentLogement,
+                        address: e.target.value,
+                      })
+                    }
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
+                  />
+                </div>
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="flat" onClick={onClose}>
                   Fermer
                 </Button>
-                <Button color="primary" onClick={handleEditIconClick}>
+                <Button color="primary" onClick={handleEditLogement}>
                   Sauvegarder
                 </Button>
               </ModalFooter>
@@ -1164,7 +1368,6 @@ const LogTable = ({ columns, rows, title }) => {
           )}
         </ModalContent>
       </Modal>
-
       <Modal
         size="sm"
         backdrop="blur"
@@ -1191,7 +1394,25 @@ const LogTable = ({ columns, rows, title }) => {
                 >
                   Fermer
                 </Button>
-                <Button color="primary">Continuer</Button>
+                {/* Check if currentLogement and num_de_log are defined */}
+                {currentLogement && currentLogement.num_de_log && (
+                  <Button
+                    color="primary"
+                    onClick={() => {
+                      console.log("Current Logement:", currentLogement);
+                      if (currentLogement && currentLogement.num_de_log) {
+                        handleDeleteLogement(currentLogement.num_de_log);
+                      } else {
+                        console.error(
+                          "Invalid logement ID for deletion:",
+                          currentLogement?.num_de_log
+                        );
+                      }
+                    }}
+                  >
+                    Continuer
+                  </Button>
+                )}
               </ModalFooter>
             </>
           )}

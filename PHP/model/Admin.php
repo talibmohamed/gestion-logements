@@ -528,13 +528,13 @@ class admin
         try {
             $connection = $this->db->getConnection();
             $type_log = $data['type_log'];
-            $ameliore = $data['ameliore'];
-            $nb_pieces = $data['nb_pieces'];
-            $superficie = $data['superficie'];
+            $is_ameliore = $data['is_ameliore'];
+            $piece = $data['piece'];
+            $mc = $data['mc'];
             $address = $data['address'];
 
             $sql = $connection->prepare('INSERT INTO logement (typelog, is_ameliore, piece, mc, address) VALUES (?, ?, ?, ?, ?)');
-            $sql->execute([$type_log, $ameliore, $nb_pieces, $superficie, $address]);
+            $sql->execute([$type_log, $is_ameliore, $piece, $mc, $address]);
 
             return [
                 'status' => 'success',
@@ -548,5 +548,116 @@ class admin
         }
     }
 
-    
+    // Update logement
+    public function updateLogement($data)
+    {
+        try {
+            // Establish database connection
+            $connection = $this->db->getConnection();
+
+            // Extract data from $data array
+            $log_id = $data['log_id'];
+            $type_log = $data['type_log'];
+            $is_ameliore = $data['is_ameliore']; // Ensure this is a boolean value
+            $piece = $data['piece'];
+            $mc = $data['mc'];
+            $address = $data['address'];
+
+            // Prepare SQL statement
+            $sql = $connection->prepare('UPDATE logement SET typelog = ?, is_ameliore = ?, piece = ?, mc = ?, address = ? WHERE log_id = ?');
+
+            // Execute SQL statement with data bindings
+            $sql->execute([$type_log, $is_ameliore, $piece, $mc, $address, $log_id]);
+
+            // Check if any rows were affected
+            $rowsAffected = $sql->rowCount();
+
+            if ($rowsAffected > 0) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Logement updated successfully'
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Logement not found or no changes made'
+                ];
+            }
+        } catch (PDOException $e) {
+            // Return error response if an exception occurs
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+
+    // Delete logement
+    public function deleteLogement($log_id)
+    {
+        try {
+            // Establish database connection
+            $connection = $this->db->getConnection();
+
+            // Check if the logement is vacant
+            $sql_check_vacant = $connection->prepare('SELECT is_vacant FROM logement WHERE log_id = ?');
+            $sql_check_vacant->execute([$log_id]);
+            $vacant_result = $sql_check_vacant->fetch(PDO::FETCH_ASSOC);
+
+            if (!$vacant_result || !$vacant_result['is_vacant']) {
+                // Logement is not vacant, cannot delete
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Logement cannot be deleted because it is not vacant']);
+                return;
+            }
+
+            // Prepare SQL statement to delete the logement
+            $sql_delete_logement = $connection->prepare('DELETE FROM logement WHERE log_id = ?');
+            $sql_delete_logement->execute([$log_id]);
+
+            // Check if any rows were affected
+            $rowsAffected = $sql_delete_logement->rowCount();
+
+            if ($rowsAffected > 0) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Logement deleted successfully'
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Logement not found or could not be deleted'
+                ];
+            }
+        } catch (PDOException $e) {
+            // Return error response if an exception occurs
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
