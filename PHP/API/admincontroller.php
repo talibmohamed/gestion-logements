@@ -153,14 +153,14 @@ class AdminController
     public function addLogementAPI($data)
     {
         if ($data && isset($data['type_log']) && isset($data['is_ameliore']) && isset($data['piece']) && isset($data['mc']) && isset($data['address'])) {
-            
+
             // Sanitize and validate inputs
             $type_log = htmlspecialchars($data['type_log'], ENT_QUOTES, 'UTF-8');
             $is_ameliore = filter_var($data['is_ameliore'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
             $piece = filter_var($data['piece'], FILTER_VALIDATE_INT);
             $mc = filter_var($data['mc'], FILTER_VALIDATE_FLOAT);
             $address = htmlspecialchars($data['address'], ENT_QUOTES, 'UTF-8');
-    
+
             if ($type_log && $is_ameliore !== null && $piece !== false && $mc !== false && $address) {
                 // Pass sanitized data to the model
                 $response = $this->admin->addLogement([
@@ -199,7 +199,7 @@ class AdminController
             $piece = filter_var($data['piece'], FILTER_VALIDATE_INT);
             $mc = filter_var($data['mc'], FILTER_VALIDATE_FLOAT);
             $address = htmlspecialchars($data['address'], ENT_QUOTES, 'UTF-8');
-    
+
             // Check if all inputs are valid
             if ($log_id !== false && $type_log && $is_ameliore !== null && $piece !== false && $mc !== false && $address) {
                 // Pass sanitized data to the model for update
@@ -211,7 +211,7 @@ class AdminController
                     'mc' => $mc,
                     'address' => $address
                 ]);
-    
+
                 // Respond with success message and HTTP 200 status
                 http_response_code(200);
                 echo json_encode($response);
@@ -226,34 +226,36 @@ class AdminController
             echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
         }
     }
-    
 
-// Delete logement
-public function deleteLogementAPI($data)
-{
-    // Check if required fields are present in $data
-    if (isset($data['log_id'])) {
-        // Sanitize and validate inputs
-        $log_id = filter_var($data['log_id'], FILTER_VALIDATE_INT);
 
-        // Check if log_id is valid
-        if ($log_id !== false && $log_id > 0) {
-            // Pass sanitized data to the model for deletion
-            $response = $this->admin->deleteLogement($log_id);
+    // Delete logement
+    public function deleteLogementAPI($data)
+    {
+        // Check if required fields are present in $data
+        if (isset($data['log_id'])) {
+            // Sanitize and validate inputs
+            $log_id = filter_var($data['log_id'], FILTER_VALIDATE_INT);
 
+            // Check if log_id is valid
+            if ($log_id !== false && $log_id > 0) {
+                // Pass sanitized data to the model for deletion
+                $response = $this->admin->deleteLogement($log_id);
+                // Respond with success message and HTTP 200 status
+                http_response_code(200);
+                echo json_encode($response);
+            } else {
+                // Respond with 400 Bad Request if log_id is invalid
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid log_id']);
+            }
         } else {
-            // Respond with 400 Bad Request if log_id is invalid
+            // Respond with 400 Bad Request if log_id is missing
             http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Invalid log_id']);
+            echo json_encode(['status' => 'error', 'message' => 'log_id parameter is required']);
         }
-    } else {
-        // Respond with 400 Bad Request if log_id is missing
-        http_response_code(400);
-        echo json_encode(['status' => 'error', 'message' => 'log_id parameter is required']);
     }
-}
-    
-    
+
+
 
 
 

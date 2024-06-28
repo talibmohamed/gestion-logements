@@ -393,25 +393,29 @@ const LogTable = ({ columns, rows, title }) => {
 
   //delete a logement
   const handleDeleteLogement = async () => {
-
     // Get the logement ID
     const log_id = currentLogement.num_de_log;
-
+  
     // Validate all fields before dispatching
     if (!log_id) {
-      console.error(
-        "Invalid logement ID for deletion:",
-        log_id
-      );
+      console.error("Invalid logement ID for deletion:", log_id);
       return;
     }
+  
+    // Prepare data for deletion
+    const data = {
+      log_id: log_id
+    };
 
+    console.log(data);
+
+  
     try {
-      //dispatch action to delete logement
-      const response = await dispatch(
-        deleteLogementThunk(log_id)
-      );
-
+      // Dispatch action to delete logement
+      const response = await dispatch(deleteLogementThunk(data));
+  
+      console.log(response);
+  
       // Handle response
       if (response && response.payload.status === "success") {
         toast.success("Logement deleted successfully", {
@@ -437,8 +441,8 @@ const LogTable = ({ columns, rows, title }) => {
           theme: "dark",
         });
       }
-
-      // Clear the form or close modal after successful submission
+  
+      // Clear the form or close modal after successful deletion
       setDeleteModalOpen(false);
     } catch (error) {
       console.error("Error deleting logement:", error);
@@ -454,6 +458,7 @@ const LogTable = ({ columns, rows, title }) => {
       });
     }
   };
+  
 
   const renderCell = React.useCallback(
     (item, columnKey) => {

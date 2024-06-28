@@ -314,10 +314,9 @@ function route($uri, $method)
                     $adminController->updateLogementAPI($data);
                 } elseif ($method === 'DELETE') {
                     // For DELETE method (delete logement)
-                    $parts = explode('/', $uri);
-                    $logement_id = intval(end($parts));
-                    $adminController = new AdminController();
-                    $adminController->deleteLogementAPI(['log_id' => $logement_id]);
+                    $data = json_decode(file_get_contents('php://input'), true);
+                    $adminController->deleteLogementAPI($data);
+
                 } else {
                     http_response_code(405); // Method Not Allowed
                     echo json_encode([

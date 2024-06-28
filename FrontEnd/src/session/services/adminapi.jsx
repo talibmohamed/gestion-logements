@@ -1,19 +1,19 @@
 // adminapi
-import axios from 'axios';
+import axios from "axios";
 
 const baseURL = "http://localhost/pfe/php/public/index.php/api/v1";
 
 // Function to log in admin
 export const loginadmin = async (email, password) => {
   try {
-    console.log("calling ")
+    console.log("calling ");
     const response = await axios.post(`${baseURL}/admin/login`, {
       email,
       password,
     });
 
-    //calling all facture thunk on login and consol log them 
-    
+    //calling all facture thunk on login and consol log them
+
     return response.data;
   } catch (error) {
     console.error(
@@ -78,17 +78,16 @@ export const fetchNotifications = async (jwt) => {
       },
     });
 
-    console.log(response.data)
+    console.log(response.data);
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.error(
       "Error in fetchNotifications:",
       error.response || error.message || error
     );
     throw error;
   }
-}
+};
 
 // Function to fetch all facture from /allfacture when passing a jwt
 export const fetchFacture = async (jwt) => {
@@ -99,16 +98,14 @@ export const fetchFacture = async (jwt) => {
       },
     });
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.error(
       "Error in fetchFacture:",
       error.response || error.message || error
     );
     throw error;
   }
-}
-
+};
 
 // Function to fetch statistics
 export const fetchStatistics = async (jwt) => {
@@ -120,7 +117,10 @@ export const fetchStatistics = async (jwt) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error in fetchStatistics:", error.response || error.message || error);
+    console.error(
+      "Error in fetchStatistics:",
+      error.response || error.message || error
+    );
     throw error;
   }
 };
@@ -134,28 +134,31 @@ export const fetchLogements = async (jwt) => {
       },
     });
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.error(
       "Error in fetchLogements:",
       error.response || error.message || error
     );
     throw error;
   }
-}
+};
 
 // Function to add a logement
 export const addLogement = async (jwtToken, logementData) => {
   try {
-    const response = await axios.post(`${baseURL}/admin/logement`, logementData, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${jwtToken}`
+    const response = await axios.post(
+      `${baseURL}/admin/logement`,
+      logementData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`,
+        },
       }
-    });
+    );
     return response.data;
   } catch (error) {
-    console.error('Error in addLogement:', error);
+    console.error("Error in addLogement:", error);
     throw error;
   }
 };
@@ -163,31 +166,36 @@ export const addLogement = async (jwtToken, logementData) => {
 // Function to update a logement
 export const updateLogement = async (jwtToken, logementData) => {
   try {
-    const response = await axios.put(`${baseURL}/admin/logement`, logementData, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${jwtToken}`
+    const response = await axios.put(
+      `${baseURL}/admin/logement`,
+      logementData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`,
+        },
       }
-    });
+    );
     return response.data;
   } catch (error) {
-    console.error('Error in updateLogement:', error);
+    console.error("Error in updateLogement:", error);
     throw error;
   }
 };
 
-
 // Function to delete a logement
-export const deleteLogement = async (jwtToken, logId) => {
+export const deleteLogement = async (jwtToken, data) => {
   try {
-    const response = await axios.delete(`${baseURL}/admin/logement/${logId}`, {
+    const response = await axios.delete(`${baseURL}/admin/logement`, {
       headers: {
-        'Authorization': `Bearer ${jwtToken}`
-      }
+        Authorization: `Bearer ${jwtToken}`,
+        "Content-Type": "application/json",
+      },
+      data: data, // Pass data object directly to Axios
     });
     return response.data;
   } catch (error) {
-    console.error('Error in deleteLogement:', error);
+    console.error("Error in deleteLogement:", error);
     throw error;
   }
 };
