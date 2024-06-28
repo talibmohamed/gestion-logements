@@ -378,7 +378,6 @@ InvoiceTable.propTypes = {
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       id_fac: PropTypes.string.isRequired,
-      nom: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
       mois: PropTypes.string.isRequired,
       echeance: PropTypes.string.isRequired,

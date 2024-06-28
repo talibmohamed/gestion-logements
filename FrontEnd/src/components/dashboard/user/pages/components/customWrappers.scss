@@ -30,17 +30,18 @@
     color: white;
   }
 
-  .data-\[hover\=true\]\:bg-default[data-hover=true]{
+  .data-\[hover\=true\]\:bg-default[data-hover="true"] {
     background-color: black !important;
   }
-  .data-\[hover\=true\]\:text-default-foreground[data-hover=true]{
+  .data-\[hover\=true\]\:text-default-foreground[data-hover="true"] {
     color: white !important;
   }
-  .data-\[hover\=true\]\:transition-colors[data-hover=true] {
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  .data-\[hover\=true\]\:transition-colors[data-hover="true"] {
+    transition-property: color, background-color, border-color,
+      text-decoration-color, fill, stroke;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 250ms;
-}
+  }
 }
 
 .datePicker {
@@ -48,28 +49,33 @@
     background-color: #27272a;
   }
 
-  .focus-within\:hover\:bg-default-100:hover:focus-within{
+  .focus-within\:hover\:bg-default-100:hover:focus-within {
     --tw-bg-opacity: 1;
     background-color: #27272a;
   }
 
-
   .text-default-600 {
     color: #a1a1aa;
   }
-  .data-\[editable\=true\]\:data-\[placeholder\=true\]\:text-foreground-500[data-placeholder=true][data-editable=true] {
+  .data-\[editable\=true\]\:data-\[placeholder\=true\]\:text-foreground-500[data-placeholder="true"][data-editable="true"] {
     color: #71717a;
   }
 
-  .data-\[editable\=true\]\:text-foreground[data-editable=true] {
+  .data-\[editable\=true\]\:text-foreground[data-editable="true"] {
     color: white;
   }
-
 }
 
-.recDesc{
-  .group[data-filled-within=true] .group-data-\[filled-within\=true\]\:text-foreground {
+.recDesc {
+  .group[data-filled-within="true"]
+    .group-data-\[filled-within\=true\]\:text-foreground {
     --tw-text-opacity: 1;
     color: white;
+  }
 }
+
+@media (max-width: 900px) {
+  .cMore {
+    display: none;
+  }
 }

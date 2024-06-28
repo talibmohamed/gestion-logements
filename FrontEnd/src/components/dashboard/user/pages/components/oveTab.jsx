@@ -153,6 +153,15 @@ const DataTable = ({ columns, rows, title }) => {
         <CardBody>
           <div className="card-header">
             {title && <h2 className="mb-4 table-title">{title}</h2>}
+            <Button
+                variant="light"
+                color="primary"
+                size="md"
+                className="mb-4 mr-1 cMore"
+                onClick={() => navigate('/dashboard/facture')}
+              >
+                Voir plus
+              </Button>
           </div>
           <Table
             aria-label="Example table with custom cells"
@@ -269,8 +278,7 @@ DataTable.propTypes = {
   rows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      id_res: PropTypes.string.isRequired,
-      nom: PropTypes.string.isRequired,
+      id_fac: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
       mois: PropTypes.string.isRequired,
       echeance: PropTypes.string.isRequired,

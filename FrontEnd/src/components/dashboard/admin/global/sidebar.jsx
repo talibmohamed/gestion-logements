@@ -112,6 +112,16 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
                 Accueil
               </MenuItem>
               <MenuItem
+                component={<Link to="/dashboard/residant" />}
+                icon={<HomeRoundedicon className="house-icon"/>}
+                className={
+                  location.pathname === "/dashboard/residant" ? "active tab" : "tab"
+                }
+                onClick={handleMenuItemClick}
+              >
+                Résidant
+              </MenuItem>
+              <MenuItem
                 component={<Link to="/dashboard/logement" />}
                 icon={<ApartmentOutlinedIcon className="pie-icon"/>}
                 className={
