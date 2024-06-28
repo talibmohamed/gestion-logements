@@ -1,14 +1,29 @@
 // features/admin/adminThunks.js
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { loginadmin, fetchAdminProfile, changePassword } from "../services/adminapi";
+import {
+  loginadmin,
+  fetchAdminProfile,
+  changePassword,
+} from "../services/adminapi";
 import { loginSuccess } from "../authentication";
 import { setAdmin } from "../adminslice";
 import { fetchNotifications } from "../services/adminapi";
-import {setNotifications } from "../notificationSlice"
+import { setNotifications } from "../notificationSlice";
 import { fetchFacture } from "../services/adminapi";
 import { setFacture } from "../factureSlice";
-import { fetchStatistics } from "../services/adminapi";
-import { setStatistics, setStatisticsLoading, setStatisticsError } from '../statisticsSlice';
+import {
+  fetchStatistics,
+  fetchLogements,
+  addLogement,
+  updateLogement,
+  deleteLogement,
+} from "../services/adminapi";
+import {
+  setStatistics,
+  setStatisticsLoading,
+  setStatisticsError,
+} from "../statisticsSlice";
+import { setLogements } from "../logementSlice";
 
 // Thunk for admin login
 export const loginAdminThunk = createAsyncThunk(
@@ -25,7 +40,7 @@ export const loginAdminThunk = createAsyncThunk(
         // Fetch notifications after successful login
         await dispatch(fetchNotificationsThunk());
       }
-      
+
       return userData;
     } catch (error) {
       console.error("Error logging in:", error);
@@ -36,7 +51,7 @@ export const loginAdminThunk = createAsyncThunk(
 
 // Thunk to fetch admin profile data where the jwt in in the authentication slice
 export const fetchAdminProfileThunk = createAsyncThunk(
-  'admin/fetchAdminProfile',
+  "admin/fetchAdminProfile",
   async (_, { dispatch, getState }) => {
     try {
       // Extract the JWT token from the state
@@ -49,11 +64,10 @@ export const fetchAdminProfileThunk = createAsyncThunk(
 
       dispatch(setAdmin(userProfileData.admin));
 
-      // display the admin state 
+      // display the admin state
       console.log(getState().admin);
-
     } catch (error) {
-      console.error('Error fetching user profile:', error);
+      console.error("Error fetching user profile:", error);
       throw error;
     }
   }
@@ -66,7 +80,7 @@ export const changePasswordThunk = createAsyncThunk(
     const state = getState();
     const jwt = state.auth.jwt_token;
     try {
-      const response = await changePassword(jwt, password, confirmedPassword );
+      const response = await changePassword(jwt, password, confirmedPassword);
       return response;
     } catch (error) {
       console.error("Error changing password:", error);
@@ -75,16 +89,16 @@ export const changePasswordThunk = createAsyncThunk(
   }
 );
 
-// Thunk to fetch all notifications 
+// Thunk to fetch all notifications
 export const fetchNotificationsThunk = createAsyncThunk(
   "notifications/fetchNotifications",
-  async (_, { getState, dispatch }) => { 
+  async (_, { getState, dispatch }) => {
     const state = getState();
     const jwt = state.auth.jwt_token;
     try {
       const response = await fetchNotifications(jwt);
-      dispatch(setNotifications(response.notifications)); 
-      return response; 
+      dispatch(setNotifications(response.notifications));
+      return response;
     } catch (error) {
       console.error("Error fetching notifications:", error);
       throw error;
@@ -92,9 +106,9 @@ export const fetchNotificationsThunk = createAsyncThunk(
   }
 );
 
-// Thunk to get all facture when passing a jwt 
+// Thunk to get all facture when passing a jwt
 export const fetchFactureThunk = createAsyncThunk(
-  'facture/fetchFacture',
+  "facture/fetchFacture",
   async (_, { getState, dispatch }) => {
     const state = getState();
     const jwt = state.auth.jwt_token;
@@ -104,14 +118,14 @@ export const fetchFactureThunk = createAsyncThunk(
       dispatch(setFacture(response.factures));
       return response;
     } catch (error) {
-      console.error('Error fetching facture:', error);
+      console.error("Error fetching facture:", error);
       throw error;
     }
   }
 );
 
 export const fetchStatisticsThunk = createAsyncThunk(
-  'statistics/fetchStatistics',
+  "statistics/fetchStatistics",
   async (_, { dispatch, getState }) => {
     const state = getState();
     const jwt = state.auth.jwt_token;
@@ -123,8 +137,83 @@ export const fetchStatisticsThunk = createAsyncThunk(
       return response; // Return response if needed by the caller
     } catch (error) {
       dispatch(setStatisticsError(error.message)); // Dispatch error action with error message
-      console.error('Error fetching statistics:', error);
+      console.error("Error fetching statistics:", error);
       throw error;
     }
   }
 );
+
+export const fetchLogementsThunk = createAsyncThunk(
+  "logements/fetchLogements",
+  async (_, { dispatch, getState }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token; // Assuming auth slice manages JWT token
+
+    try {
+      const response = await fetchLogements(jwt); // Call your API function to fetch logements
+      dispatch(setLogements(response.logements));
+      return response; // Return response if needed by the caller
+    } catch (error) {
+      console.error("Error fetching logements:", error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to add a new logement
+export const addLogementThunk = createAsyncThunk(
+  "logements/addLogement",
+  async (logement, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    try {
+      const response = await addLogement(jwt, logement);
+      // fetch all logements again to update the state
+      dispatch(fetchLogementsThunk());
+      return response;
+    } catch (error) {
+      console.error("Error adding logement:", error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to update an existing logement
+export const updateLogementThunk = createAsyncThunk(
+  "logements/updateLogement",
+  async (logement, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    try {
+      const response = await updateLogement(jwt, logement);
+      // Fetch all logements again to update the state
+      dispatch(fetchLogementsThunk());
+      return response;
+    } catch (error) {
+      console.error("Error updating logement:", error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to delete a logement
+export const deleteLogementThunk = createAsyncThunk(
+  'logements/deleteLogement',
+  async (logId, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    try {
+      const response = await deleteLogement(jwt, logId);
+      // Fetch all logements again to update the state
+      dispatch(fetchLogementsThunk());
+      return response;
+    } catch (error) {
+      console.error('Error deleting logement:', error);
+      throw error;
+    }
+  }
+);
+

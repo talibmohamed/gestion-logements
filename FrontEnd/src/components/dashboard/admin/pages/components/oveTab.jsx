@@ -33,13 +33,13 @@ import { DeleteIcon } from "../Icons/DeleteIcon";
 import { EditIcon } from "../Icons/EditIcon";
 
 const statusColorMap = {
-  "en retard": "primary",
-  "en attente": "warning",
-  payée: "secondary",
+  "En Retard": "primary",
+  "En Attente": "warning",
+  Payée: "secondary",
 };
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id_fac",
+  "id",
   "nom",
   "type",
   "mois",

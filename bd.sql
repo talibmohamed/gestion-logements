@@ -4,15 +4,24 @@ CREATE TABLE equipement (
     equip_type VARCHAR(100) NOT NULL
 );
 
+
 CREATE TABLE logement (
-    log_id      SERIAL PRIMARY KEY,
-    typelog     VARCHAR(40) NOT NULL,
+    log_id          SERIAL PRIMARY KEY,
+    typelog         VARCHAR(40) NOT NULL,
+    is_ameliore     BOOLEAN NOT NULL,
+    description     VARCHAR(250),
+    mc              INT NOT NULL,
+    piece           INT NOT NULL,
+    is_vacant       BOOLEAN DEFAULT true
+);
+
+CREATE TABLE typelog_info (
+    typelog_id SERIAL PRIMARY KEY,
+    typelog VARCHAR(40) NOT NULL,
     is_ameliore BOOLEAN NOT NULL,
-    description VARCHAR(250),
-    mc          INT NOT NULL,
-    piece       INT NOT NULL,
-    equip_ids   INT[],
-    is_vacant BOOLEAN DEFAULT true
+    quotas_electricite INT,
+    quotas_eau INT,
+    equipement_ids INT[]  -- Example array of equipment IDs
 );
 
 CREATE TABLE admin (
@@ -193,6 +202,8 @@ CREATE USER admin_user WITH PASSWORD 'admin_password';
 GRANT admin_role TO admin_user;
 
 GRANT SELECT, USAGE ON SEQUENCE residant_res_id_seq TO admin_role;
+GRANT USAGE, SELECT ON SEQUENCE logement_log_id_seq TO admin_role;
+
 
 
 

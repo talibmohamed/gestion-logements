@@ -396,33 +396,33 @@ class admin
         $connection = $this->db->getConnection();
         $curmois = date('n'); // Current month
         $curyear = date('Y'); // Current year
-    
+
         // Logement Statistics
         // Prepare and execute the query to count all logements
         $allStmt = $connection->prepare("SELECT COUNT(*) FROM logement");
         $allStmt->execute();
         $allLogements = $allStmt->fetchColumn();
-    
+
         // Prepare and execute the query to count vacant logements
         $vacantStmt = $connection->prepare("SELECT COUNT(*) FROM logement WHERE is_vacant = true");
         $vacantStmt->execute();
         $vacantLogements = $vacantStmt->fetchColumn();
-    
+
         // Facture Statistics
         // Calculate the number of paid factures for the current month
-        $paidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'payé' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
+        $paidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'Payée' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
         $paidStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
         $paidStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
         $paidStmt->execute();
         $paidCount = $paidStmt->fetchColumn();
-    
+
         // Calculate the number of overdue factures for the current month
-        $overdueStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'retard' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
+        $overdueStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'En Attente' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
         $overdueStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
         $overdueStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
         $overdueStmt->execute();
         $overdueCount = $overdueStmt->fetchColumn();
-    
+
         // Calculate the number of unpaid factures for the previous month
         $lastMonth = $curmois - 1;
         if ($lastMonth == 0) {
@@ -431,12 +431,12 @@ class admin
         } else {
             $lastYear = $curyear;
         }
-        $unpaidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'impayé' AND DATE_PART('month', fac_date) = :lastMonth AND DATE_PART('year', fac_date) = :lastYear");
+        $unpaidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'En Retard' AND DATE_PART('month', fac_date) = :lastMonth AND DATE_PART('year', fac_date) = :lastYear");
         $unpaidStmt->bindValue(':lastMonth', $lastMonth, PDO::PARAM_INT);
         $unpaidStmt->bindValue(':lastYear', $lastYear, PDO::PARAM_INT);
         $unpaidStmt->execute();
         $unpaidCount = $unpaidStmt->fetchColumn();
-    
+
         // Combine results into a single associative array
         $response = array(
             'statistics' => array(
@@ -453,14 +453,211 @@ class admin
                 )
             )
         );
-    
+
         // Set the content type header to application/json
         header('Content-Type: application/json');
-    
+
         // Return the JSON response
         echo json_encode($response);
         exit; // Ensure no further output is appended
     }
-    
-    
+
+    //get all logement
+    public function getAllLogement()
+    {
+        try {
+            // Assuming $this->db is your database connection object
+            $connection = $this->db->getConnection();
+
+            // Fetch all logements with typelog_info details and resident information
+            $sql = $connection->prepare('
+                SELECT 
+                    l.log_id, l.typelog, l.is_ameliore, l.mc, l.piece, l.address,
+                    t.quotas_electricite, t.quotas_eau, t.equipement_ids,
+                    r.res_id, CONCAT(r.nom, \' \', r.prenom) AS nom
+                FROM logement l
+                JOIN typelog_info t ON l.typelog = t.typelog AND l.is_ameliore = t.is_ameliore
+                LEFT JOIN residant r ON l.log_id = r.log_id
+            ');
+
+            $sql->execute();
+            $logements = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+            // Process each logement to fetch equipment names
+            foreach ($logements as &$logement) {
+                // Convert equipment_ids from string to array
+                $equipment_ids = trim($logement['equipement_ids'], '{}'); // Remove curly braces
+                $equipment_ids = explode(',', $equipment_ids); // Convert string to array of IDs
+                $equipment_ids = array_map('trim', $equipment_ids); // Trim whitespace from each ID
+
+                if (!empty($equipment_ids)) {
+                    $equipment_names = [];
+                    foreach ($equipment_ids as $equip_id) {
+                        // Query to fetch equipment names from 'equipment' table
+                        $sqlEquip = $connection->prepare('SELECT equip_id, equip_type FROM equipement WHERE equip_id = :equip_id');
+                        $sqlEquip->bindParam(':equip_id', $equip_id, PDO::PARAM_INT);
+                        $sqlEquip->execute();
+                        $equip = $sqlEquip->fetch(PDO::FETCH_ASSOC);
+                        if ($equip) {
+                            $equipment_names[] = $equip['equip_type'];
+                        }
+                    }
+                    // Assign equipment names to the logement
+                    $logement['equipment_names'] = $equipment_names;
+                } else {
+                    // Handle case where no equipment_ids are found
+                    $logement['equipment_names'] = [];
+                }
+            }
+
+            return [
+                'status' => 'success',
+                'logements' => $logements
+            ];
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    //add logement
+    public function addLogement($data)
+    {
+        try {
+            $connection = $this->db->getConnection();
+            $type_log = $data['type_log'];
+            $is_ameliore = $data['is_ameliore'];
+            $piece = $data['piece'];
+            $mc = $data['mc'];
+            $address = $data['address'];
+
+            $sql = $connection->prepare('INSERT INTO logement (typelog, is_ameliore, piece, mc, address) VALUES (?, ?, ?, ?, ?)');
+            $sql->execute([$type_log, $is_ameliore, $piece, $mc, $address]);
+
+            return [
+                'status' => 'success',
+                'message' => 'Logement added successfully'
+            ];
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    // Update logement
+    public function updateLogement($data)
+    {
+        try {
+            // Establish database connection
+            $connection = $this->db->getConnection();
+
+            // Extract data from $data array
+            $log_id = $data['log_id'];
+            $type_log = $data['type_log'];
+            $is_ameliore = $data['is_ameliore']; // Ensure this is a boolean value
+            $piece = $data['piece'];
+            $mc = $data['mc'];
+            $address = $data['address'];
+
+            // Prepare SQL statement
+            $sql = $connection->prepare('UPDATE logement SET typelog = ?, is_ameliore = ?, piece = ?, mc = ?, address = ? WHERE log_id = ?');
+
+            // Execute SQL statement with data bindings
+            $sql->execute([$type_log, $is_ameliore, $piece, $mc, $address, $log_id]);
+
+            // Check if any rows were affected
+            $rowsAffected = $sql->rowCount();
+
+            if ($rowsAffected > 0) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Logement updated successfully'
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Logement not found or no changes made'
+                ];
+            }
+        } catch (PDOException $e) {
+            // Return error response if an exception occurs
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+
+    // Delete logement
+    public function deleteLogement($log_id)
+    {
+        try {
+            // Establish database connection
+            $connection = $this->db->getConnection();
+
+            // Check if the logement is vacant
+            $sql_check_vacant = $connection->prepare('SELECT is_vacant FROM logement WHERE log_id = ?');
+            $sql_check_vacant->execute([$log_id]);
+            $vacant_result = $sql_check_vacant->fetch(PDO::FETCH_ASSOC);
+
+            if (!$vacant_result || !$vacant_result['is_vacant']) {
+                // Logement is not vacant, cannot delete
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Logement cannot be deleted because it is not vacant']);
+                return;
+            }
+
+            // Prepare SQL statement to delete the logement
+            $sql_delete_logement = $connection->prepare('DELETE FROM logement WHERE log_id = ?');
+            $sql_delete_logement->execute([$log_id]);
+
+            // Check if any rows were affected
+            $rowsAffected = $sql_delete_logement->rowCount();
+
+            if ($rowsAffected > 0) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Logement deleted successfully'
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Logement not found or could not be deleted'
+                ];
+            }
+        } catch (PDOException $e) {
+            // Return error response if an exception occurs
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

@@ -1,4 +1,4 @@
-// api.js
+// adminapi
 import axios from 'axios';
 
 const baseURL = "http://localhost/pfe/php/public/index.php/api/v1";
@@ -121,6 +121,73 @@ export const fetchStatistics = async (jwt) => {
     return response.data;
   } catch (error) {
     console.error("Error in fetchStatistics:", error.response || error.message || error);
+    throw error;
+  }
+};
+
+// Function to fetch all logements
+export const fetchLogements = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/admin/logement`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  }
+  catch (error) {
+    console.error(
+      "Error in fetchLogements:",
+      error.response || error.message || error
+    );
+    throw error;
+  }
+}
+
+// Function to add a logement
+export const addLogement = async (jwtToken, logementData) => {
+  try {
+    const response = await axios.post(`${baseURL}/admin/logement`, logementData, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwtToken}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error in addLogement:', error);
+    throw error;
+  }
+};
+
+// Function to update a logement
+export const updateLogement = async (jwtToken, logementData) => {
+  try {
+    const response = await axios.put(`${baseURL}/admin/logement`, logementData, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwtToken}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error in updateLogement:', error);
+    throw error;
+  }
+};
+
+
+// Function to delete a logement
+export const deleteLogement = async (jwtToken, logId) => {
+  try {
+    const response = await axios.delete(`${baseURL}/admin/logement/${logId}`, {
+      headers: {
+        'Authorization': `Bearer ${jwtToken}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error in deleteLogement:', error);
     throw error;
   }
 };
