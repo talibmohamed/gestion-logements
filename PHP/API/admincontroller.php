@@ -149,28 +149,41 @@ class AdminController
         }
     }
 
-    // //add logement
-    // public function addLogementAPI($data)
-    // {
-    //     //i will get     type_log: "",
-    // // ameliore: "",
-    // // nb_pieces: "",
-    // // superficie: "",
+    //add logement
+    public function addLogementAPI($data)
+    {
+        if ($data && isset($data['type_log']) && isset($data['ameliore']) && isset($data['nb_pieces']) && isset($data['superficie']) && isset($data['address'])) {
+            
+            // Sanitize and validate inputs
+            $type_log = htmlspecialchars($data['type_log'], ENT_QUOTES, 'UTF-8');
+            $ameliore = filter_var($data['ameliore'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            $nb_pieces = filter_var($data['nb_pieces'], FILTER_VALIDATE_INT);
+            $superficie = filter_var($data['superficie'], FILTER_VALIDATE_FLOAT);
+            $address = htmlspecialchars($data['address'], ENT_QUOTES, 'UTF-8');
+    
+            if ($type_log && $ameliore !== null && $nb_pieces !== false && $superficie !== false && $address) {
+                // Pass sanitized data to the model
+                $response = $this->admin->addLogement([
+                    'type_log' => $type_log,
+                    'ameliore' => $ameliore,
+                    'nb_pieces' => $nb_pieces,
+                    'superficie' => $superficie,
+                    'address' => $address
+                ]);
+                http_response_code(200);
+                echo json_encode($response);
+            } else {
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid input data11']);
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data22']);
+        }
+    }
+    
+    
 
-    //     if ($data && isset($data['type_log']) && isset($data['ameliore']) && isset($data['nb_pieces']) && isset($data['superficie'])) {
-    //         $type_log = $data['type_log'];
-    //         $ameliore = $data['ameliore'];
-    //         $nb_pieces = $data['nb_pieces'];
-    //         $superficie = $data['superficie'];
-    //         $response = $this->admin->addLogement($type_log, $ameliore, $nb_pieces, $superficie);
-    //         http_response_code(200);
-    //         echo json_encode($response);
-    //     } else {
-    //         http_response_code(400);
-    //         echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
-    //     }
-        
-    // }
 
 
     //the web socket controller 

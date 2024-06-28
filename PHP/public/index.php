@@ -294,35 +294,44 @@ function route($uri, $method)
             }
             break;
 
-    case '/api/v1/admin/logement':
-        $jwtHandler = new JwtHandler();
-        $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-        $jwt_token = str_replace('Bearer ', '', $jwt_token);
-        $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+        case '/api/v1/admin/logement':
+            $jwtHandler = new JwtHandler();
+            $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+            $jwt_token = str_replace('Bearer ', '', $jwt_token);
+            $token_info = $jwtHandler->verifyJwtToken($jwt_token);
 
-        if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
-            $adminController = new AdminController();
+            if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
+                $adminController = new AdminController();
 
-            if ($method === 'GET') {
-                $adminController->getAllLogmentAPI($jwt_token);
-            } elseif ($method === 'POST') {
-                $data = json_decode(file_get_contents('php://input'), true);
-                $adminController->addLogementAPI($data);
+                if ($method === 'GET') {
+                    $adminController->getAllLogmentAPI($jwt_token);
+                } elseif ($method === 'POST') {
+                    $data = json_decode(file_get_contents('php://input'), true);
+                    $adminController->addLogementAPI($data);
+                } elseif ($method === 'PUT') {
+                    // For PUT method (update logement)
+                    // $data = json_decode(file_get_contents('php://input'), true);
+                    // $adminController->updateLogementAPI($data);
+                } elseif($method === 'DELETE')
+                {
+                    // For DELETE method (delete logement)
+                    // $data = json_decode(file_get_contents('php://input'), true);
+                    // $adminController->deleteLogementAPI($data);
+                } else {
+                    http_response_code(405); // Method Not Allowed
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Method Not Allowed',
+                    ]);
+                }
             } else {
-                http_response_code(405);
+                http_response_code(401); // Unauthorized
                 echo json_encode([
                     'status' => 'error',
-                    'message' => 'Method Not Allowed',
+                    'message' => 'Unauthorized',
                 ]);
             }
-        } else {
-            http_response_code(401);
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ]);
-        }
-        break;
+            break;
 
 
         default:

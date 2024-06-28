@@ -7,6 +7,7 @@ import Graph from "./components/graph.jsx";
 import "./Statics.scss";
 import { Card, CardBody } from "@nextui-org/react";
 import { columns } from "./components/logData.jsx";
+import { ToastContainer } from "react-toastify";
 
 const sampleData = [
   { label: "vacant", data: [12, 6, 20, 4, 20, 1], color: "#96A7FF" },
@@ -68,6 +69,7 @@ const Logement = () => {
 
         <Graph title="Graphe linéaire des logements" data={sampleData} />
       </div>
+      <ToastContainer />
     </div>
   );
 };

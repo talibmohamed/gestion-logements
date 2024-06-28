@@ -396,18 +396,18 @@ class admin
         $connection = $this->db->getConnection();
         $curmois = date('n'); // Current month
         $curyear = date('Y'); // Current year
-    
+
         // Logement Statistics
         // Prepare and execute the query to count all logements
         $allStmt = $connection->prepare("SELECT COUNT(*) FROM logement");
         $allStmt->execute();
         $allLogements = $allStmt->fetchColumn();
-    
+
         // Prepare and execute the query to count vacant logements
         $vacantStmt = $connection->prepare("SELECT COUNT(*) FROM logement WHERE is_vacant = true");
         $vacantStmt->execute();
         $vacantLogements = $vacantStmt->fetchColumn();
-    
+
         // Facture Statistics
         // Calculate the number of paid factures for the current month
         $paidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'Payée' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
@@ -415,14 +415,14 @@ class admin
         $paidStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
         $paidStmt->execute();
         $paidCount = $paidStmt->fetchColumn();
-    
+
         // Calculate the number of overdue factures for the current month
         $overdueStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'En Attente' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
         $overdueStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
         $overdueStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
         $overdueStmt->execute();
         $overdueCount = $overdueStmt->fetchColumn();
-    
+
         // Calculate the number of unpaid factures for the previous month
         $lastMonth = $curmois - 1;
         if ($lastMonth == 0) {
@@ -436,7 +436,7 @@ class admin
         $unpaidStmt->bindValue(':lastYear', $lastYear, PDO::PARAM_INT);
         $unpaidStmt->execute();
         $unpaidCount = $unpaidStmt->fetchColumn();
-    
+
         // Combine results into a single associative array
         $response = array(
             'statistics' => array(
@@ -453,10 +453,10 @@ class admin
                 )
             )
         );
-    
+
         // Set the content type header to application/json
         header('Content-Type: application/json');
-    
+
         // Return the JSON response
         echo json_encode($response);
         exit; // Ensure no further output is appended
@@ -468,7 +468,7 @@ class admin
         try {
             // Assuming $this->db is your database connection object
             $connection = $this->db->getConnection();
-            
+
             // Fetch all logements with typelog_info details and resident information
             $sql = $connection->prepare('
                 SELECT 
@@ -479,17 +479,17 @@ class admin
                 JOIN typelog_info t ON l.typelog = t.typelog AND l.is_ameliore = t.is_ameliore
                 LEFT JOIN residant r ON l.log_id = r.log_id
             ');
-            
+
             $sql->execute();
             $logements = $sql->fetchAll(PDO::FETCH_ASSOC);
-    
+
             // Process each logement to fetch equipment names
             foreach ($logements as &$logement) {
                 // Convert equipment_ids from string to array
                 $equipment_ids = trim($logement['equipement_ids'], '{}'); // Remove curly braces
                 $equipment_ids = explode(',', $equipment_ids); // Convert string to array of IDs
                 $equipment_ids = array_map('trim', $equipment_ids); // Trim whitespace from each ID
-                
+
                 if (!empty($equipment_ids)) {
                     $equipment_names = [];
                     foreach ($equipment_ids as $equip_id) {
@@ -509,7 +509,7 @@ class admin
                     $logement['equipment_names'] = [];
                 }
             }
-    
+
             return [
                 'status' => 'success',
                 'logements' => $logements
@@ -523,56 +523,30 @@ class admin
     }
 
     //add logement
-    // public function addLogement($data)
-    // {
-    //     try {
-    //         $connection = $this->db->getConnection();
-    //         $typelog = $data['type_log'];
-    //         $is_ameliore = $data['ameliore'];
-    //         $mc = $data['mc'];
-    //         $piece = $data['piece'];
+    public function addLogement($data)
+    {
+        try {
+            $connection = $this->db->getConnection();
+            $type_log = $data['type_log'];
+            $ameliore = $data['ameliore'];
+            $nb_pieces = $data['nb_pieces'];
+            $superficie = $data['superficie'];
+            $address = $data['address'];
 
-    //         // Check if the logement already exists
-    //         $logementQuery = "
-    //             SELECT * 
-    //             FROM logement 
-    //             WHERE typelog = :typelog 
-    //               AND is_ameliore = :is_ameliore 
-    //               AND mc = :mc 
-    //               AND piece = :piece
-    //         ";
-    //         $stmt = $connection->prepare($logementQuery);
-    //         $stmt->bindParam(':typelog', $typelog, PDO::PARAM_STR);
-    //         $stmt->bindParam(':is_ameliore', $is_ameliore, PDO::PARAM_BOOL);
-    //         $stmt->bindParam(':mc', $mc, PDO::PARAM_INT);
-    //         $stmt->bindParam(':piece', $piece, PDO::PARAM_INT);
-    //         $stmt->execute();
-    //         $logement = $stmt->fetch(PDO::FETCH_ASSOC);
+            $sql = $connection->prepare('INSERT INTO logement (typelog, is_ameliore, piece, mc, address) VALUES (?, ?, ?, ?, ?)');
+            $sql->execute([$type_log, $ameliore, $nb_pieces, $superficie, $address]);
 
-    //         if ($logement) {
-    //             return [
-    //                 'status' => 'error',
-    //                 'message' => 'Logement already exists'
-    //             ];
-    //         }
+            return [
+                'status' => 'success',
+                'message' => 'Logement added successfully'
+            ];
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 
-    //         // Insert the new logement into the database
-    //         $insertQuery = "
-    //             INSERT INTO logement (typelog, is_ameliore, mc, piece) 
-    //             VALUES (:typelog, :is_ameliore, :mc, :piece)
-    //         ";
-    //         $stmt = $connection->prepare($insertQuery);
-    //         $stmt->bindParam(':typelog', $typelog, PDO::PARAM_STR);
-    //         $stmt->bindParam(':is_ameliore', $is_ameliore, PDO::PARAM_BOOL);
-    //         $stmt->bindParam(':mc', $mc, PDO::PARAM_INT);
-    //         $stmt->bindParam(':piece', $piece, PDO::PARAM_INT);
-    //         $stmt->execute();
-
-    //         // Retrieve the inserted logement's ID
-    //         $log_id = $connection->lastInsertId();
-
-    //         // Insert the typelog_info details into the database
-    //         $insertType
-    
     
 }

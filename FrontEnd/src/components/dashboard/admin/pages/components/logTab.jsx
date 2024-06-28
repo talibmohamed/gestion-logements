@@ -1,4 +1,8 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import {
   Table,
   TableHeader,
@@ -32,8 +36,7 @@ import { VerticalDotsIcon } from "../Icons/VerticalDotsIcon";
 import TipsAndUpdatesOutlinedIcon from "@mui/icons-material/TipsAndUpdatesOutlined";
 import PropTypes from "prop-types";
 import { IconMappings } from "./svgMappings.jsx";
-
-console.log();
+import { addLogementThunk } from "../../../../../session/thunks/adminthunk.jsx";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "num_de_log",
@@ -189,32 +192,97 @@ const LogTable = ({ columns, rows, title }) => {
     return SvgComponent ? <SvgComponent className="inline-block mr-2" /> : null;
   };
 
-  // add new logement 
+  const dispatch = useDispatch();
+
+  // add new logement
   const [newLogement, setNewLogement] = useState({
-    no_logement: "",
-    occupe_par: "",
     type_log: "",
-    ameliore: "",
+    ameliore: "", 
     nb_pieces: "",
     superficie: "",
+    address: "",
   });
 
-  const handleAddLogement = () => {
-    //test if new logement empty dont call displach 
+  const handleAddLogement = async () => {
+    // Validate all fields before dispatching
     if (
-      newLogement.no_logement === "" ||
-      newLogement.occupe_par === "" ||
       newLogement.type_log === "" ||
       newLogement.ameliore === "" ||
       newLogement.nb_pieces === "" ||
-      newLogement.superficie === ""
+      newLogement.superficie === "" ||
+      newLogement.address === ""
     ) {
+      // Handle invalid form data
       return;
     }
-    dispatch(addLogementThunk(newLogement));
-    setAddModalOpen(false);
-  };
 
+    // Convert ameliore to a boolean if it's a string "yes" or "no"
+    const amelioreBoolean = newLogement.ameliore === "yes" ? true : false;
+
+    // Prepare the data to dispatch
+    const logementData = {
+      type_log: newLogement.type_log,
+      ameliore: amelioreBoolean,
+      nb_pieces: parseInt(newLogement.nb_pieces), 
+      superficie: parseInt(newLogement.superficie),
+      address: newLogement.address,
+    };
+
+    // Dispatch the action to add logement
+    try {
+      // Dispatch the action to add logement
+      const response = await dispatch(addLogementThunk(logementData));
+
+      // Display success message
+      if (response && response.payload.status === "success") {
+        toast.success("Logement added successfully", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      } else {
+        // Handle other statuses or errors
+        toast.error("Failed to add logement", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      }
+
+      
+      // Clear the form or close modal after successful submission
+      setAddModalOpen(false);
+      setNewLogement({
+        type_log: "",
+        ameliore: "",
+        nb_pieces: "",
+        superficie: "",
+        address: "",
+      });
+    } catch (error) {
+      console.error("Error adding logement:", error);
+      toast.error("An error occurred while adding logement", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+    }
+  };
 
   const renderCell = React.useCallback(
     (item, columnKey) => {
@@ -250,7 +318,7 @@ const LogTable = ({ columns, rows, title }) => {
                 <span
                   className="text-lg text-default-400 cursor-pointer active:opacity-50"
                   onClick={() => handleDetailsIconClick(item.equipment_names)}
-                  >
+                >
                   <EyeIcon />
                 </span>
               </Tooltip>
@@ -503,6 +571,7 @@ const LogTable = ({ columns, rows, title }) => {
           closeButton: "hover:bg-white/5 active:bg-white/10",
         }}
       >
+
         <ModalContent>
           {(onClose) => (
             <>
@@ -510,11 +579,11 @@ const LogTable = ({ columns, rows, title }) => {
                 Ajouter Un Logement
               </ModalHeader>
               <ModalBody>
-                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4 ">
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Input
+                    isDisabled
                     type="text"
                     label="No logement"
-                    placeholder="Entrer le no du logement"
                     className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
@@ -582,10 +651,10 @@ const LogTable = ({ columns, rows, title }) => {
                         "text-white/90",
                       ],
                     }}
-                    defaultValue={currentLogement?.type_log}
+                    value={newLogement.type_log}
                     onChange={(e) =>
-                      setCurrentLogement({
-                        ...currentLogement,
+                      setNewLogement({
+                        ...newLogement,
                         type_log: e.target.value,
                       })
                     }
@@ -597,10 +666,9 @@ const LogTable = ({ columns, rows, title }) => {
                       Cadre
                     </SelectItem>
                     <SelectItem key="agent" value="agent">
-                      Agent de maitrise
+                      Agent de maîtrise
                     </SelectItem>
                   </Select>
-
                   <Select
                     type="text"
                     label="Amelioré"
@@ -629,27 +697,34 @@ const LogTable = ({ columns, rows, title }) => {
                         "text-white/90",
                       ],
                     }}
-                    defaultValue={currentLogement?.type_log}
+                    value={newLogement.ameliore}
                     onChange={(e) =>
-                      setCurrentLogement({
-                        ...currentLogement,
-                        type_log: e.target.value,
+                      setNewLogement({
+                        ...newLogement,
+                        ameliore: e.target.value,
                       })
                     }
                   >
-                    <SelectItem key="ouvrier" value="ouvrier">
+                    <SelectItem key="yes" value="yes">
                       Oui
                     </SelectItem>
-                    <SelectItem key="cadre" value="cadre">
+                    <SelectItem key="no" value="no">
                       Non
                     </SelectItem>
                   </Select>
                 </div>
                 <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Input
-                    type="text"
+                    type="number"
                     label="Nombre de pièces"
                     placeholder="Entrer le nombre de pièces"
+                    value={newLogement.nb_pieces}
+                    onChange={(e) =>
+                      setNewLogement({
+                        ...newLogement,
+                        nb_pieces: e.target.value,
+                      })
+                    }
                     className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
@@ -667,15 +742,50 @@ const LogTable = ({ columns, rows, title }) => {
                     }}
                   />
                   <Input
-                    type="text"
+                    type="number"
                     label="Superficie"
                     placeholder="Entrer la superficie"
+                    value={newLogement.superficie}
+                    onChange={(e) =>
+                      setNewLogement({
+                        ...newLogement,
+                        superficie: e.target.value,
+                      })
+                    }
                     endContent={
                       <div className="pointer-events-none flex items-center">
                         <span className="text-default-400 text-small">m²</span>
                       </div>
                     }
                     className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
+                  />
+                </div>
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
+                  <Input
+                    type="text"
+                    label="Adresse"
+                    placeholder="Entrer l'adresse"
+                    value={newLogement.address}
+                    onChange={(e) =>
+                      setNewLogement({
+                        ...newLogement,
+                        address: e.target.value,
+                      })
+                    }
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [

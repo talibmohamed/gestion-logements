@@ -202,6 +202,8 @@ CREATE USER admin_user WITH PASSWORD 'admin_password';
 GRANT admin_role TO admin_user;
 
 GRANT SELECT, USAGE ON SEQUENCE residant_res_id_seq TO admin_role;
+GRANT USAGE, SELECT ON SEQUENCE logement_log_id_seq TO admin_role;
+
 
 
 

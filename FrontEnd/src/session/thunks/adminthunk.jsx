@@ -7,7 +7,7 @@ import { fetchNotifications } from "../services/adminapi";
 import {setNotifications } from "../notificationSlice"
 import { fetchFacture } from "../services/adminapi";
 import { setFacture } from "../factureSlice";
-import { fetchStatistics, fetchLogements } from "../services/adminapi";
+import { fetchStatistics, fetchLogements, addLogement } from "../services/adminapi";
 import { setStatistics, setStatisticsLoading, setStatisticsError } from '../statisticsSlice';
 import { setLogements } from "../logementSlice";
 
@@ -143,6 +143,25 @@ export const fetchLogementsThunk = createAsyncThunk(
       return response; // Return response if needed by the caller
     } catch (error) {
       console.error('Error fetching logements:', error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to add a new logement
+export const addLogementThunk = createAsyncThunk(
+  'logements/addLogement',
+  async (logement, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    try {
+      const response = await addLogement(jwt, logement);
+      // fetch all logements again to update the state
+      dispatch(fetchLogementsThunk());
+      return response;
+    } catch (error) {
+      console.error('Error adding logement:', error);
       throw error;
     }
   }

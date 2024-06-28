@@ -1,4 +1,4 @@
-// api.js
+// adminapi
 import axios from 'axios';
 
 const baseURL = "http://localhost/pfe/php/public/index.php/api/v1";
@@ -143,3 +143,19 @@ export const fetchLogements = async (jwt) => {
     throw error;
   }
 }
+
+// Function to add a logement
+export const addLogement = async (jwtToken, logementData) => {
+  try {
+    const response = await axios.post(`${baseURL}/admin/logement`, logementData, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${jwtToken}`
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error in addLogement:', error);
+    throw error;
+  }
+};
