@@ -297,6 +297,21 @@ class AdminController
         }
     }
 
+    //get all user
+    public function getAllResidantAPI($jwt)
+    {
+        if ($jwt) {
+            $response = $this->admin->getAllResidant();
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
+        }
+    }
+
+
+
 
 
 

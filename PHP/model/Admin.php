@@ -397,18 +397,18 @@ class admin
         $connection = $this->db->getConnection();
         $curmois = date('n'); // Current month
         $curyear = date('Y'); // Current year
-    
+
         // Logement Statistics
         // Prepare and execute the query to count all logements
         $allStmt = $connection->prepare("SELECT COUNT(*) FROM logement");
         $allStmt->execute();
         $allLogements = $allStmt->fetchColumn();
-    
+
         // Prepare and execute the query to count logements by statut
         $statutStmt = $connection->prepare("SELECT statut, COUNT(*) AS count FROM logement GROUP BY statut");
         $statutStmt->execute();
         $statutCounts = $statutStmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
         // Facture Statistics
         // Calculate the number of paid factures for the current month
         $paidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'Payée' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
@@ -416,14 +416,14 @@ class admin
         $paidStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
         $paidStmt->execute();
         $paidCount = $paidStmt->fetchColumn();
-    
+
         // Calculate the number of overdue factures for the current month
         $overdueStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'En Attente' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
         $overdueStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
         $overdueStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
         $overdueStmt->execute();
         $overdueCount = $overdueStmt->fetchColumn();
-    
+
         // Calculate the number of unpaid factures for the previous month
         $lastMonth = $curmois - 1;
         if ($lastMonth == 0) {
@@ -437,13 +437,13 @@ class admin
         $unpaidStmt->bindValue(':lastYear', $lastYear, PDO::PARAM_INT);
         $unpaidStmt->execute();
         $unpaidCount = $unpaidStmt->fetchColumn();
-    
+
         // Combine results into a single associative array
         $logementStats = array();
         foreach ($statutCounts as $statutCount) {
             $logementStats[$statutCount['statut']] = $statutCount['count'];
         }
-    
+
         $response = array(
             'statistics' => array(
                 'facture' => array(
@@ -458,22 +458,22 @@ class admin
                 )
             )
         );
-    
+
         // Set the content type header to application/json
         header('Content-Type: application/json');
-    
+
         // Return the JSON response
         echo json_encode($response);
         exit; // Ensure no further output is appended
     }
-    
+
 
     public function getAllLogement()
     {
         try {
             // Assuming $this->db is your database connection object
             $connection = $this->db->getConnection();
-    
+
             // Fetch all logements with typelog_info details, resident information, and equipment names
             $sql = $connection->prepare('
                 SELECT 
@@ -488,17 +488,17 @@ class admin
                 LEFT JOIN equipement e ON e.equip_id = u.equip_id
                 GROUP BY l.log_id, t.quotas_electricite, t.quotas_eau, r.res_id, r.nom, r.prenom
             ');
-    
+
             $sql->execute();
             $logements = $sql->fetchAll(PDO::FETCH_ASSOC);
-    
+
             // Decode JSON arrays back to PHP arrays
             foreach ($logements as &$logement) {
                 if (isset($logement['equipment_names'])) {
                     $logement['equipment_names'] = json_decode($logement['equipment_names']);
                 }
             }
-    
+
             return [
                 'status' => 'success',
                 'logements' => $logements
@@ -510,7 +510,7 @@ class admin
             ];
         }
     }
-    
+
 
 
 
@@ -634,6 +634,36 @@ class admin
                     'message' => 'Logement not found or could not be deleted'
                 ];
             }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    // Get all residant
+    public function getAllResidant()
+    {
+        try {
+            // Assuming $this->db is your database connection object
+            $connection = $this->db->getConnection();
+
+            // Fetch all residants with logement information
+            $sql = $connection->prepare('
+                SELECT 
+                    r.res_id, r.nom, r.prenom, r.email, r.telephone, r.profession, r.cin, l.address
+                FROM residant r
+                JOIN logement l ON r.log_id = l.log_id
+            ');
+
+            $sql->execute();
+            $residants = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+            return [
+                'status' => 'success',
+                'residants' => $residants
+            ];
         } catch (PDOException $e) {
             return [
                 'status' => 'error',

@@ -177,28 +177,28 @@ function route($uri, $method)
             }
             break;
 
-        case '/api/v1/admin/user':
-            if ($method === 'POST') {
-                $jwtHandler = new JwtHandler();
-                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-                $jwt_token = str_replace('Bearer ', '', $jwt_token);
-                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+        // case '/api/v1/admin/user':
+        //     if ($method === 'POST') {
+        //         $jwtHandler = new JwtHandler();
+        //         $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        //         $jwt_token = str_replace('Bearer ', '', $jwt_token);
+        //         $token_info = $jwtHandler->verifyJwtToken($jwt_token);
 
-                if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
-                    $adminController = new AdminController();
-                    $adminController->addUserAPI($data);
-                } else {
-                    http_response_code(401); // Unauthorized
-                    echo json_encode([
-                        'status' => 'error',
-                        'message' => 'Unauthorized',
-                    ]);
-                }
-            } else {
-                http_response_code(405);
-                echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
-            }
-            break;
+        //         if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
+        //             $adminController = new AdminController();
+        //             $adminController->addUserAPI($data);
+        //         } else {
+        //             http_response_code(401); // Unauthorized
+        //             echo json_encode([
+        //                 'status' => 'error',
+        //                 'message' => 'Unauthorized',
+        //             ]);
+        //         }
+        //     } else {
+        //         http_response_code(405);
+        //         echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+        //     }
+        //     break;
 
         case '/api/v1/admin/allnotification':
             if ($method === 'GET') {
@@ -316,6 +316,46 @@ function route($uri, $method)
                     // For DELETE method (delete logement)
                     $data = json_decode(file_get_contents('php://input'), true);
                     $adminController->deleteLogementAPI($data);
+
+                } else {
+                    http_response_code(405); // Method Not Allowed
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Method Not Allowed',
+                    ]);
+                }
+            } else {
+                http_response_code(401); // Unauthorized
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Unauthorized',
+                ]);
+            }
+            break;
+
+            //do the same to residants
+        case '/api/v1/admin/residant':
+            $jwtHandler = new JwtHandler();
+            $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+            $jwt_token = str_replace('Bearer ', '', $jwt_token);
+            $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+
+            if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
+                $adminController = new AdminController();
+
+                if ($method === 'GET') {
+                    $adminController->getAllResidantAPI($jwt_token);
+                // } elseif ($method === 'POST') {
+                //     $data = json_decode(file_get_contents('php://input'), true);
+                //     $adminController->addResidentAPI($data);
+                // } elseif ($method === 'PUT') {
+                //     // For PUT method (update resident)
+                //     $data = json_decode(file_get_contents('php://input'), true);
+                //     $adminController->updateResidentAPI($data);
+                // } elseif ($method === 'DELETE') {
+                //     // For DELETE method (delete resident)
+                //     $data = json_decode(file_get_contents('php://input'), true);
+                //     $adminController->deleteResidentAPI($data);
 
                 } else {
                     http_response_code(405); // Method Not Allowed
