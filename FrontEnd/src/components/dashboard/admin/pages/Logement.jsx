@@ -44,6 +44,7 @@ const Logement = () => {
       nom: logement.nom,
       type_log: logement.typelog,
       ameliored: logement.is_ameliore ? 'Oui' : 'Non',
+      statut: logement.statut,
       piece: logement.piece,
       mc: logement.mc,
       address: logement.address,

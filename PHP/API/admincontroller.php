@@ -149,67 +149,51 @@ class AdminController
         }
     }
 
-    //add logement
+    // Add logement via API
     public function addLogementAPI($data)
     {
-        if ($data && isset($data['type_log']) && isset($data['is_ameliore']) && isset($data['piece']) && isset($data['mc']) && isset($data['address'])) {
-
+        // Check if all required fields are present
+        if (
+            isset($data['type_log']) &&
+            isset($data['is_ameliore']) &&
+            isset($data['piece']) &&
+            isset($data['mc']) &&
+            isset($data['address']) &&
+            isset($data['statut'])
+        ) {
             // Sanitize and validate inputs
             $type_log = htmlspecialchars($data['type_log'], ENT_QUOTES, 'UTF-8');
             $is_ameliore = filter_var($data['is_ameliore'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
             $piece = filter_var($data['piece'], FILTER_VALIDATE_INT);
             $mc = filter_var($data['mc'], FILTER_VALIDATE_FLOAT);
             $address = htmlspecialchars($data['address'], ENT_QUOTES, 'UTF-8');
+            $statut = htmlspecialchars($data['statut'], ENT_QUOTES, 'UTF-8');
 
-            if ($type_log && $is_ameliore !== null && $piece !== false && $mc !== false && $address) {
-                // Pass sanitized data to the model
+            // Validate statut against enum values
+            $allowed_statuts = ['disponible', 'en_maintenance', 'occupé', 'non_disponible', 'autre'];
+            if (!in_array($statut, $allowed_statuts)) {
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid statut value']);
+                return;
+            }
+
+            // Ensure boolean values are correctly interpreted
+            if ($is_ameliore === null) {
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid is_ameliore value']);
+                return;
+            }
+
+            // Check if all inputs are valid
+            if ($type_log && $piece !== false && $mc !== false && $address) {
+                // Pass sanitized data to the model for insertion
                 $response = $this->admin->addLogement([
                     'type_log' => $type_log,
                     'is_ameliore' => $is_ameliore,
                     'piece' => $piece,
                     'mc' => $mc,
-                    'address' => $address
-                ]);
-                http_response_code(200);
-                echo json_encode($response);
-            } else {
-                http_response_code(400);
-                echo json_encode(['status' => 'error', 'message' => 'Invalid input data11']);
-            }
-        } else {
-            http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data22']);
-        }
-    }
-    public function updateLogementAPI($data)
-    {
-        // Check if required fields are present in $data
-        if (
-            isset($data['log_id']) &&
-            isset($data['type_log']) &&
-            isset($data['is_ameliore']) &&
-            isset($data['piece']) &&
-            isset($data['mc']) &&
-            isset($data['address'])
-        ) {
-            // Sanitize and validate inputs
-            $log_id = filter_var($data['log_id'], FILTER_VALIDATE_INT);
-            $type_log = htmlspecialchars($data['type_log'], ENT_QUOTES, 'UTF-8');
-            $is_ameliore = filter_var($data['is_ameliore'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-            $piece = filter_var($data['piece'], FILTER_VALIDATE_INT);
-            $mc = filter_var($data['mc'], FILTER_VALIDATE_FLOAT);
-            $address = htmlspecialchars($data['address'], ENT_QUOTES, 'UTF-8');
-
-            // Check if all inputs are valid
-            if ($log_id !== false && $type_log && $is_ameliore !== null && $piece !== false && $mc !== false && $address) {
-                // Pass sanitized data to the model for update
-                $response = $this->admin->updateLogement([
-                    'log_id' => $log_id,
-                    'type_log' => $type_log,
-                    'is_ameliore' => $is_ameliore,
-                    'piece' => $piece,
-                    'mc' => $mc,
-                    'address' => $address
+                    'address' => $address,
+                    'statut' => $statut
                 ]);
 
                 // Respond with success message and HTTP 200 status
@@ -228,7 +212,65 @@ class AdminController
     }
 
 
-    // Delete logement
+    public function updateLogementAPI($data)
+    {
+        // Check if required fields are present in $data
+        if (
+            isset($data['log_id']) &&
+            isset($data['type_log']) &&
+            isset($data['is_ameliore']) &&
+            isset($data['piece']) &&
+            isset($data['mc']) &&
+            isset($data['address']) &&
+            isset($data['statut'])
+        ) {
+            // Sanitize and validate inputs
+            $log_id = filter_var($data['log_id'], FILTER_VALIDATE_INT);
+            $type_log = htmlspecialchars($data['type_log'], ENT_QUOTES, 'UTF-8');
+            $is_ameliore = filter_var($data['is_ameliore'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            $piece = filter_var($data['piece'], FILTER_VALIDATE_INT);
+            $mc = filter_var($data['mc'], FILTER_VALIDATE_FLOAT);
+            $address = htmlspecialchars($data['address'], ENT_QUOTES, 'UTF-8');
+            $statut = htmlspecialchars($data['statut'], ENT_QUOTES, 'UTF-8');
+
+            // Validate statut against enum values
+            $allowed_statuts = ['disponible', 'en_maintenance', 'occupé', 'non_disponible'];
+            if (!in_array($statut, $allowed_statuts)) {
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid statut value']);
+                return;
+            }
+
+            // Check if all inputs are valid
+            if ($log_id !== false && $type_log && $is_ameliore !== null && $piece !== false && $mc !== false && $address) {
+                // Pass sanitized data to the model for update
+                $response = $this->admin->updateLogement([
+                    'log_id' => $log_id,
+                    'type_log' => $type_log,
+                    'is_ameliore' => $is_ameliore,
+                    'piece' => $piece,
+                    'mc' => $mc,
+                    'address' => $address,
+                    'statut' => $statut
+                ]);
+
+                // Respond with success message and HTTP 200 status
+                http_response_code(200);
+                echo json_encode($response);
+            } else {
+                // Respond with 400 Bad Request if input validation fails
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid input data']);
+            }
+        } else {
+            // Respond with 400 Bad Request if required fields are missing
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
+        }
+    }
+
+
+    // Delete logement API
     public function deleteLogementAPI($data)
     {
         // Check if required fields are present in $data

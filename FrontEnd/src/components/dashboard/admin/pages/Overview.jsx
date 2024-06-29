@@ -88,37 +88,35 @@ const Overview = () => {
     },
   ];
 
-  const logementStatistics = [
-    {
-      id: "total-occupé",
-      label: "Total Occupé",
-      value: statistics?.logement?.total_occupied_count || 0,
-      color: "#F9769D",
-    },
-    {
-      id: "total-vacant",
-      label: "Total Vacant",
-      value: statistics?.logement?.total_vacant_count || 0,
-      color: "#282230",
-    },
-  ];
+  // Calculate logement statistics dynamically
+  const logementStatuses = ["disponible", "en_maintenance", "occupé", "non_disponible", "autre"];
+  const colors = {
+    "disponible": "#28a745", // Green
+    "en_maintenance": "#ffc107", // Yellow
+    "occupé": "#F9769D", // Pink
+    "non_disponible": "#dc3545", // Red
+    "autre": "#6c757d" // Grey
+  };
+
+  const totalLogements = statistics?.logement?.total_logements_count || 0;
+  const logementStatistics = logementStatuses.map((statut) => ({
+    id: `total-${statut}`,
+    label: `Total ${statut.charAt(0).toUpperCase() + statut.slice(1)}`,
+    value: statistics?.logement?.[statut] || 0,
+    color: colors[statut],
+  }));
+
+  // Calculate occupied percentage for label
+  const totalOccupied = statistics?.logement?.occupé || 0;
+  const occupiedPercentage = totalLogements > 0 ? (totalOccupied / totalLogements) * 100 : 0;
+  const logementStatisticsLabel = `${totalLogements} Logements`;
 
   // Label for factureStatistics to display the total of factures
   const FactureStatisticsLabel =
-  (statistics?.facture?.total_paid_count || 0) +
-  (statistics?.facture?.total_overdue_count || 0) +
-  (statistics?.facture?.total_unpaid_count || 0) +
-  ' Factures';
-
-
-
-  // Label for logementStatistics pie chart
-
-  const totalLogements = statistics?.logement?.total_logements_count || 0;
-  const totalOccupied = statistics?.logement?.total_occupied_count || 0;
-  const occupiedPercentage = totalLogements > 0 ? (totalOccupied / totalLogements) * 100 : 0;
-
-  const logementStatisticsLabel = `${occupiedPercentage.toFixed(2)}%`;
+    (statistics?.facture?.total_paid_count || 0) +
+    (statistics?.facture?.total_overdue_count || 0) +
+    (statistics?.facture?.total_unpaid_count || 0) +
+    ' Factures';
 
   return (
     <div className="container mx-auto">

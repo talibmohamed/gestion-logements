@@ -186,7 +186,7 @@ class admin
                 FROM logement 
                 WHERE typelog = :typelog 
                   AND is_ameliore = :is_ameliore 
-                  AND is_vacant = TRUE
+                  AND statut = 'disponible'
                 ORDER BY log_id 
                 LIMIT 1;
             ";
@@ -199,7 +199,7 @@ class admin
             if (!$logement) {
                 return [
                     'status' => 'error1',
-                    'message' => 'No vacant logement found that matches the criteria.'
+                    'message' => 'Aucun logement disponible trouvé correspondant aux critères.'
                 ];
             }
 
@@ -241,33 +241,33 @@ class admin
             $stmt->execute([$login_token, $res_id]);
 
             // Mark the logement as occupied
-            $updateQuery = "UPDATE logement SET is_vacant = false WHERE log_id = ?";
+            $updateQuery = "UPDATE logement SET statut = 'occupé' WHERE log_id = ?";
             $stmt = $connection->prepare($updateQuery);
             $stmt->execute([$logement['log_id']]);
 
             // Send email with login link and credentials
             $loginLink = "http://localhost:5173/form?login_token=$login_token";
-            $subject = 'Your account information';
-            $body = "<p>Dear {$userData['nom']} {$userData['prenom']},</p>
-                     <p>Your account has been created successfully. You can login using the following link:</p>
-                     <p><a href='$loginLink'>Log in to your account</a></p>
-                     <p>Your login credentials are:</p>
-                     <p>Email: {$userData['email']}</p>
-                     <p>Password: $password</p>
-                     <p>Make sure to change your password after logging in.</p>
-                     <p>Best regards,</p>
+            $subject = 'Vos informations de compte';
+            $body = "<p>Cher/Chère {$userData['nom']} {$userData['prenom']},</p>
+                     <p>Votre compte a été créé avec succès. Vous pouvez vous connecter en utilisant le lien suivant :</p>
+                     <p><a href='$loginLink'>Connectez-vous à votre compte</a></p>
+                     <p>Vos identifiants de connexion sont :</p>
+                     <p>Email : {$userData['email']}</p>
+                     <p>Mot de passe : $password</p>
+                     <p>Assurez-vous de changer votre mot de passe après vous être connecté.</p>
+                     <p>Cordialement,</p>
                      <p>houselytics</p>";
 
             if (!sendEmail($userData['email'], $userData['nom'], $userData['prenom'], $subject, $body)) {
                 return [
                     'status' => 'error',
-                    'message' => 'Failed to send email.'
+                    'message' => 'Échec de l\'envoi de l\'email.'
                 ];
             }
 
             return [
                 'status' => 'success',
-                'message' => 'User added successfully. Email sent with login link and credentials.',
+                'message' => 'Utilisateur ajouté avec succès. Email envoyé avec le lien de connexion et les identifiants.',
             ];
         } catch (PDOException $e) {
             return [
@@ -281,6 +281,7 @@ class admin
             ];
         }
     }
+
 
     // Get all admin notifications
     public function getAllnotifications($jwt)
@@ -396,18 +397,18 @@ class admin
         $connection = $this->db->getConnection();
         $curmois = date('n'); // Current month
         $curyear = date('Y'); // Current year
-
+    
         // Logement Statistics
         // Prepare and execute the query to count all logements
         $allStmt = $connection->prepare("SELECT COUNT(*) FROM logement");
         $allStmt->execute();
         $allLogements = $allStmt->fetchColumn();
-
-        // Prepare and execute the query to count vacant logements
-        $vacantStmt = $connection->prepare("SELECT COUNT(*) FROM logement WHERE is_vacant = true");
-        $vacantStmt->execute();
-        $vacantLogements = $vacantStmt->fetchColumn();
-
+    
+        // Prepare and execute the query to count logements by statut
+        $statutStmt = $connection->prepare("SELECT statut, COUNT(*) AS count FROM logement GROUP BY statut");
+        $statutStmt->execute();
+        $statutCounts = $statutStmt->fetchAll(PDO::FETCH_ASSOC);
+    
         // Facture Statistics
         // Calculate the number of paid factures for the current month
         $paidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'Payée' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
@@ -415,14 +416,14 @@ class admin
         $paidStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
         $paidStmt->execute();
         $paidCount = $paidStmt->fetchColumn();
-
+    
         // Calculate the number of overdue factures for the current month
         $overdueStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'En Attente' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
         $overdueStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
         $overdueStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
         $overdueStmt->execute();
         $overdueCount = $overdueStmt->fetchColumn();
-
+    
         // Calculate the number of unpaid factures for the previous month
         $lastMonth = $curmois - 1;
         if ($lastMonth == 0) {
@@ -436,8 +437,13 @@ class admin
         $unpaidStmt->bindValue(':lastYear', $lastYear, PDO::PARAM_INT);
         $unpaidStmt->execute();
         $unpaidCount = $unpaidStmt->fetchColumn();
-
+    
         // Combine results into a single associative array
+        $logementStats = array();
+        foreach ($statutCounts as $statutCount) {
+            $logementStats[$statutCount['statut']] = $statutCount['count'];
+        }
+    
         $response = array(
             'statistics' => array(
                 'facture' => array(
@@ -446,70 +452,53 @@ class admin
                     'total_unpaid_count' => $unpaidCount,
                     'last_update_date' => date('Y-m-d H:i:s') // Current date in standard format
                 ),
-                'logement' => array(
-                    'total_logements_count' => $allLogements,
-                    'total_occupied_count' => $allLogements - $vacantLogements,
-                    'total_vacant_count' => $vacantLogements
+                'logement' => array_merge(
+                    ['total_logements_count' => $allLogements],
+                    $logementStats
                 )
             )
         );
-
+    
         // Set the content type header to application/json
         header('Content-Type: application/json');
-
+    
         // Return the JSON response
         echo json_encode($response);
         exit; // Ensure no further output is appended
     }
+    
 
-    //get all logement
     public function getAllLogement()
     {
         try {
             // Assuming $this->db is your database connection object
             $connection = $this->db->getConnection();
-
-            // Fetch all logements with typelog_info details and resident information
+    
+            // Fetch all logements with typelog_info details, resident information, and equipment names
             $sql = $connection->prepare('
                 SELECT 
-                    l.log_id, l.typelog, l.is_ameliore, l.mc, l.piece, l.address,
-                    t.quotas_electricite, t.quotas_eau, t.equipement_ids,
-                    r.res_id, CONCAT(r.nom, \' \', r.prenom) AS nom
+                    l.log_id, l.typelog, l.is_ameliore, l.mc, l.piece, l.address, l.statut,
+                    t.quotas_electricite, t.quotas_eau,
+                    r.res_id, CONCAT(r.nom, \' \', r.prenom) AS nom,
+                    json_agg(e.equip_type) FILTER (WHERE e.equip_type IS NOT NULL) AS equipment_names
                 FROM logement l
                 JOIN typelog_info t ON l.typelog = t.typelog AND l.is_ameliore = t.is_ameliore
                 LEFT JOIN residant r ON l.log_id = r.log_id
+                LEFT JOIN unnest(t.equipement_ids) WITH ORDINALITY AS u(equip_id) ON TRUE
+                LEFT JOIN equipement e ON e.equip_id = u.equip_id
+                GROUP BY l.log_id, t.quotas_electricite, t.quotas_eau, r.res_id, r.nom, r.prenom
             ');
-
+    
             $sql->execute();
             $logements = $sql->fetchAll(PDO::FETCH_ASSOC);
-
-            // Process each logement to fetch equipment names
+    
+            // Decode JSON arrays back to PHP arrays
             foreach ($logements as &$logement) {
-                // Convert equipment_ids from string to array
-                $equipment_ids = trim($logement['equipement_ids'], '{}'); // Remove curly braces
-                $equipment_ids = explode(',', $equipment_ids); // Convert string to array of IDs
-                $equipment_ids = array_map('trim', $equipment_ids); // Trim whitespace from each ID
-
-                if (!empty($equipment_ids)) {
-                    $equipment_names = [];
-                    foreach ($equipment_ids as $equip_id) {
-                        // Query to fetch equipment names from 'equipment' table
-                        $sqlEquip = $connection->prepare('SELECT equip_id, equip_type FROM equipement WHERE equip_id = :equip_id');
-                        $sqlEquip->bindParam(':equip_id', $equip_id, PDO::PARAM_INT);
-                        $sqlEquip->execute();
-                        $equip = $sqlEquip->fetch(PDO::FETCH_ASSOC);
-                        if ($equip) {
-                            $equipment_names[] = $equip['equip_type'];
-                        }
-                    }
-                    // Assign equipment names to the logement
-                    $logement['equipment_names'] = $equipment_names;
-                } else {
-                    // Handle case where no equipment_ids are found
-                    $logement['equipment_names'] = [];
+                if (isset($logement['equipment_names'])) {
+                    $logement['equipment_names'] = json_decode($logement['equipment_names']);
                 }
             }
-
+    
             return [
                 'status' => 'success',
                 'logements' => $logements
@@ -521,26 +510,37 @@ class admin
             ];
         }
     }
+    
 
-    //add logement
+
+
+    // Add logement
     public function addLogement($data)
     {
         try {
+            // Establish database connection
             $connection = $this->db->getConnection();
+
+            // Extract data from $data array
             $type_log = $data['type_log'];
-            $is_ameliore = $data['is_ameliore'];
+            $is_ameliore = $data['is_ameliore'] ? 'TRUE' : 'FALSE'; // Ensure this is correctly passed as a boolean value
             $piece = $data['piece'];
             $mc = $data['mc'];
             $address = $data['address'];
+            $statut = $data['statut']; // Ensure you pass statut from $data
 
-            $sql = $connection->prepare('INSERT INTO logement (typelog, is_ameliore, piece, mc, address) VALUES (?, ?, ?, ?, ?)');
-            $sql->execute([$type_log, $is_ameliore, $piece, $mc, $address]);
+            // Prepare SQL statement
+            $sql = $connection->prepare('INSERT INTO logement (typelog, is_ameliore, piece, mc, address, statut) VALUES (?, ?, ?, ?, ?, ?)');
+
+            // Execute SQL statement with data bindings
+            $sql->execute([$type_log, $is_ameliore, $piece, $mc, $address, $statut]);
 
             return [
                 'status' => 'success',
                 'message' => 'Logement added successfully'
             ];
         } catch (PDOException $e) {
+            // Return error response if an exception occurs
             return [
                 'status' => 'error',
                 'message' => $e->getMessage()
@@ -548,7 +548,10 @@ class admin
         }
     }
 
-    // Update logement
+
+
+
+    // Method to update logement in the database
     public function updateLogement($data)
     {
         try {
@@ -558,16 +561,17 @@ class admin
             // Extract data from $data array
             $log_id = $data['log_id'];
             $type_log = $data['type_log'];
-            $is_ameliore = $data['is_ameliore']; // Ensure this is a boolean value
+            $is_ameliore = $data['is_ameliore'] ? 'TRUE' : 'FALSE'; // Ensure this is correctly passed as a boolean value
             $piece = $data['piece'];
             $mc = $data['mc'];
             $address = $data['address'];
+            $statut = $data['statut'];
 
             // Prepare SQL statement
-            $sql = $connection->prepare('UPDATE logement SET typelog = ?, is_ameliore = ?, piece = ?, mc = ?, address = ? WHERE log_id = ?');
+            $sql = $connection->prepare('UPDATE logement SET typelog = ?, is_ameliore = ?, piece = ?, mc = ?, address = ?, statut = ? WHERE log_id = ?');
 
             // Execute SQL statement with data bindings
-            $sql->execute([$type_log, $is_ameliore, $piece, $mc, $address, $log_id]);
+            $sql->execute([$type_log, $is_ameliore, $piece, $mc, $address, $statut, $log_id]);
 
             // Check if any rows were affected
             $rowsAffected = $sql->rowCount();
@@ -600,15 +604,15 @@ class admin
             // Establish database connection
             $connection = $this->db->getConnection();
 
-            // Check if the logement is vacant
-            $sql_check_vacant = $connection->prepare('SELECT is_vacant FROM logement WHERE log_id = ?');
-            $sql_check_vacant->execute([$log_id]);
-            $vacant_result = $sql_check_vacant->fetch(PDO::FETCH_ASSOC);
+            // Check if the logement is occupé
+            $sql_check_statut = $connection->prepare('SELECT statut FROM logement WHERE log_id = ?');
+            $sql_check_statut->execute([$log_id]);
+            $statut_result = $sql_check_statut->fetch(PDO::FETCH_ASSOC);
 
-            if (!$vacant_result || !$vacant_result['is_vacant']) {
-                // Logement is not vacant, cannot delete
+            if (!$statut_result || $statut_result['statut'] === 'occupé') {
+                // Logement is occupied, cannot delete
                 http_response_code(400);
-                echo json_encode(['status' => 'error', 'message' => 'Logement cannot be deleted because it is not vacant']);
+                echo json_encode(['status' => 'error', 'message' => 'Logement cannot be deleted because it is occupied']);
                 return;
             }
 
@@ -631,33 +635,10 @@ class admin
                 ];
             }
         } catch (PDOException $e) {
-            // Return error response if an exception occurs
             return [
                 'status' => 'error',
                 'message' => $e->getMessage()
             ];
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

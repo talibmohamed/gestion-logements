@@ -47,6 +47,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "nom",
   "type_log",
   "ameliored",
+  "statut",
   "mc",
   "address",
   "quotaE",
@@ -123,6 +124,7 @@ const LogTable = ({ columns, rows, title }) => {
   const [newLogement, setNewLogement] = useState({
     type_log: "",
     ameliore: "",
+    statut: "",
     nb_pieces: "",
     superficie: "",
     address: "",
@@ -138,6 +140,7 @@ const LogTable = ({ columns, rows, title }) => {
       is_ameliore: logement.is_ameliore,
       piece: logement.piece,
       mc: logement.mc,
+      address: logement.address,
     });
     setEditModalOpen(true);
   };
@@ -239,6 +242,7 @@ const LogTable = ({ columns, rows, title }) => {
     if (
       newLogement.type_log === "" ||
       newLogement.ameliore === "" ||
+      newLogement.statut == "" ||
       newLogement.nb_pieces === "" ||
       newLogement.superficie === "" ||
       newLogement.address === ""
@@ -254,10 +258,13 @@ const LogTable = ({ columns, rows, title }) => {
     const logementData = {
       type_log: newLogement.type_log,
       is_ameliore: amelioreBoolean,
+      statut: newLogement.statut,
       piece: parseInt(newLogement.nb_pieces),
       mc: parseInt(newLogement.superficie),
       address: newLogement.address,
     };
+
+    console.log(logementData);
 
     // Dispatch the action to add logement
     try {
@@ -318,6 +325,7 @@ const LogTable = ({ columns, rows, title }) => {
     if (
       currentLogement.log_id === "" ||
       currentLogement.type_log === "" ||
+      currentLogement.statut === "" ||
       currentLogement.ameliored === "" ||
       currentLogement.piece === "" ||
       currentLogement.mc === "" ||
@@ -336,6 +344,7 @@ const LogTable = ({ columns, rows, title }) => {
     const logementData = {
       log_id: currentLogement.num_de_log,
       type_log: currentLogement.type_log,
+      statut: currentLogement.statut,
       is_ameliore: isAmelioreBoolean,
       piece: parseInt(currentLogement.piece),
       mc: parseInt(currentLogement.mc),
@@ -393,29 +402,46 @@ const LogTable = ({ columns, rows, title }) => {
 
   //delete a logement
   const handleDeleteLogement = async () => {
+    const statut = currentLogement.statut;
+
+    if (statut === "occupé") {
+      setDeleteModalOpen(false);
+
+      toast.error("Logement occupé, impossible de le supprimer", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+      return;
+    }
+
     // Get the logement ID
     const log_id = currentLogement.num_de_log;
-  
+
     // Validate all fields before dispatching
     if (!log_id) {
       console.error("Invalid logement ID for deletion:", log_id);
       return;
     }
-  
+
     // Prepare data for deletion
     const data = {
-      log_id: log_id
+      log_id: log_id,
     };
 
     console.log(data);
 
-  
     try {
       // Dispatch action to delete logement
       const response = await dispatch(deleteLogementThunk(data));
-  
+
       console.log(response);
-  
+
       // Handle response
       if (response && response.payload.status === "success") {
         toast.success("Logement deleted successfully", {
@@ -441,7 +467,7 @@ const LogTable = ({ columns, rows, title }) => {
           theme: "dark",
         });
       }
-  
+
       // Clear the form or close modal after successful deletion
       setDeleteModalOpen(false);
     } catch (error) {
@@ -458,7 +484,6 @@ const LogTable = ({ columns, rows, title }) => {
       });
     }
   };
-  
 
   const renderCell = React.useCallback(
     (item, columnKey) => {
@@ -980,6 +1005,58 @@ const LogTable = ({ columns, rows, title }) => {
                       ],
                     }}
                   />
+                  <Select
+                    type="text"
+                    label="Statut"
+                    placeholder="Choisir le statut"
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled=true]:text-zinc-400",
+                      value: "group-data-[has-value=true]:text-white/90",
+                      trigger: [
+                        "bg-zinc-800",
+                        "text-white/90",
+                        "placeholder:text-white/60",
+                        "data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800",
+                        "group-data-[focus=true]:border-zinc-400",
+                      ],
+                      content: [
+                        "bg-zinc-800",
+                        "text-white/90",
+                        "border-zinc-800",
+                      ],
+                      popoverContent: ["bg-zinc-800", "text-white/90"],
+                      listboxWrapper: [
+                        "bg-zinc-800",
+                        "!cursor-text",
+                        "text-white/90",
+                      ],
+                    }}
+                    value={newLogement?.statut}
+                    onChange={(e) =>
+                      setNewLogement({
+                        ...newLogement,
+                        statut: e.target.value,
+                      })
+                    }
+                  >
+                    <SelectItem key="disponible" value="disponible">
+                      disponible
+                    </SelectItem>
+                    <SelectItem key="occupé" value="occupé">
+                      occupé
+                    </SelectItem>
+                    <SelectItem key="non_disponible" value="non_disponible">
+                      non disponible
+                    </SelectItem>
+                    <SelectItem key="en_maintenance" value="en_maintenance">
+                      en maintenance
+                    </SelectItem>
+                    <SelectItem key="autre" value="autre">
+                      autre
+                    </SelectItem>
+                  </Select>
                 </div>
               </ModalBody>
               <ModalFooter>
@@ -1252,6 +1329,57 @@ const LogTable = ({ columns, rows, title }) => {
                       ],
                     }}
                   />
+                  <Select
+                    type="text"
+                    label="Statut"
+                    placeholder="Choisir le statut"
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled=true]:text-zinc-400",
+                      value: "group-data-[has-value=true]:text-white/90",
+                      trigger: [
+                        "bg-zinc-800",
+                        "text-white/90",
+                        "placeholder:text-white/60",
+                        "data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800",
+                        "group-data-[focus=true]:border-zinc-400",
+                      ],
+                      content: [
+                        "bg-zinc-800",
+                        "text-white/90",
+                        "border-zinc-800",
+                      ],
+                      popoverContent: ["bg-zinc-800", "text-white/90"],
+                      listboxWrapper: [
+                        "bg-zinc-800",
+                        "!cursor-text",
+                        "text-white/90",
+                      ],
+                    }}
+                    onChange={(e) =>
+                      setCurrentLogement({
+                        ...currentLogement,
+                        statut: e.target.value,
+                      })
+                    }
+                  >
+                    <SelectItem key="disponible" value="disponible">
+                      disponible
+                    </SelectItem>
+                    <SelectItem key="occupé" value="occupé">
+                      occupé
+                    </SelectItem>
+                    <SelectItem key="non_disponible" value="non_disponible">
+                      non disponible
+                    </SelectItem>
+                    <SelectItem key="en_maintenance" value="en_maintenance">
+                      en maintenance
+                    </SelectItem>
+                    <SelectItem key="autre" value="autre">
+                      autre
+                    </SelectItem>
+                  </Select>
                 </div>
               </ModalBody>
               <ModalFooter>

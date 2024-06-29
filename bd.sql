@@ -4,6 +4,7 @@ CREATE TABLE equipement (
     equip_type VARCHAR(100) NOT NULL
 );
 
+CREATE TYPE statut_logement AS ENUM ('disponible', 'en_maintenance', 'occupé', 'non_disponible', 'autre');
 
 CREATE TABLE logement (
     log_id          SERIAL PRIMARY KEY,
@@ -12,7 +13,8 @@ CREATE TABLE logement (
     description     VARCHAR(250),
     mc              INT NOT NULL,
     piece           INT NOT NULL,
-    is_vacant       BOOLEAN DEFAULT true
+    is_vacant       BOOLEAN DEFAULT true,
+    statut          statut_logement DEFAULT 'disponible'
 );
 
 CREATE TABLE typelog_info (
@@ -225,4 +227,21 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES
 -- Step 5: Create a user and assign the resident_role to this user
 CREATE USER resident_user WITH PASSWORD 'resident_password';
 GRANT resident_role TO resident_user;
+
+
+
+
+
+
+
+
+-- Index for typelog column
+CREATE INDEX idx_typelog ON logement (typelog);
+
+-- Index for is_ameliore column
+CREATE INDEX idx_is_ameliore ON logement (is_ameliore);
+
+-- Index for log_id column
+CREATE INDEX idx_log_id ON logement (log_id);
+
 
