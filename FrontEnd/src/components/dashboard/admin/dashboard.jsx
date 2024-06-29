@@ -4,7 +4,6 @@ import { Routes, Route } from "react-router-dom";
 import Topbar from "./global/topbar";
 import SidebarComponent from "./global/sidebar"; 
 import Overview from "./pages/Overview";
-import Residant from "./pages/Residant";
 import Logement from "./pages/Logement";
 import Facture from "./pages/Facture";
 import Reclamation from "./pages/Reclamation";
@@ -36,7 +35,6 @@ const AdminDashboard = () => {
         <div className="content">
           <Routes>
             <Route path="/" element={<Overview />} />
-            {/* <Route path="residant" element={<Residant />} /> */}
             <Route path="logement" element={<Logement />} />
             <Route path="facture" element={<Facture />} />
             <Route path="reclamation" element={<Reclamation />} />
