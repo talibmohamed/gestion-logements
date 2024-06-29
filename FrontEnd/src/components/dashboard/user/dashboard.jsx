@@ -29,6 +29,7 @@ const AdminDashboard = () => {
         toggled={toggled}
         setToggled={setToggled}
         setBroken={setBroken}
+        className="sidebar"
       />
       <div className="main-content">
         <Topbar broken={broken} toggled={toggled} setToggled={setToggled} />

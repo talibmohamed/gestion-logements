@@ -161,6 +161,15 @@ const DataTable = ({ columns, rows, title }) => {
         <CardBody>
           <div className="card-header">
             {title && <h2 className="mb-4 table-title">{title}</h2>}
+             <Button
+                variant="light"
+                color="primary"
+                size="md"
+                className="mb-4 mr-1 cMore"
+                onClick={() => navigate('/dashboard/facture')}
+              >
+                Voir plus
+              </Button>
           </div>
           <Table
             aria-label="Example table with custom cells"

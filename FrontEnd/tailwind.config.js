@@ -48,6 +48,7 @@ module.exports = {
               foreground: "#d3d3d3",
             }, 
             focus: "#f9769d",
+            danger: "#e53170"
           },
         },
       },

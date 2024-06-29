@@ -501,23 +501,23 @@ const ReclaCard = ({ title }) => {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mx-4 mb-6">
             <Card
-              className="max-w-full"
+              className="max-w-full bg-black bg-opacity-20 backdrop-blur-sm"
               isPressable
               onPress={() =>
                 handleComplaintConfirmation("Problèmes de maintenance")
               }
             >
               <CardHeader className="flex gap-3 justify-center">
-                <BuildOutlinedIcon />
+                <BuildOutlinedIcon sx={{ color:"#ff8906" }}/>
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold 2xl: text-base">
+                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl: text-base ">
                     Problèmes de maintenance
                   </h3>
                 </div>
               </CardHeader>
               <Divider />
               <CardBody>
-                <p className="text-base text-justify font-normal mx-2.5">
+                <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
                   Des réclamations concernant des problèmes de plomberie
                   (fuites, robinets qui fuient), des pannes électriques, des
                   dysfonctionnements des appareils électroménagers fournis par
@@ -555,23 +555,23 @@ const ReclaCard = ({ title }) => {
             </Modal>
 
             <Card
-              className="max-w-full"
+              className="max-w-full bg-black bg-opacity-30 backdrop-blur-sm"
               isPressable
               onPress={() =>
                 handleComplaintConfirmation("Infestations de parasites")
               }
             >
               <CardHeader className="flex gap-3 justify-center">
-                <BugReportOutlinedIcon />
+                <BugReportOutlinedIcon  sx={{ color:"#ff8906" }}/>
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold 2xl: text-base">
+                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl: text-base">
                     Infestations de parasites
                   </h3>
                 </div>
               </CardHeader>
               <Divider />
               <CardBody>
-                <p className="text-base text-justify font-normal mx-2.5">
+                <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
                   Des problèmes avec des insectes, des rongeurs ou d'autres
                   parasites peuvent nécessiter une intervention du propriétaire
                   pour les éliminer.
@@ -608,19 +608,19 @@ const ReclaCard = ({ title }) => {
             </Modal>
 
             <Card
-              className="max-w-full"
+              className="max-w-full bg-black bg-opacity-40 backdrop-blur-sm"
               isPressable
               onPress={() => handleComplaintConfirmation("Défauts structurels")}
             >
               <CardHeader className="flex gap-3 justify-center">
-                <HomeRepairServiceOutlinedIcon />
+                <HomeRepairServiceOutlinedIcon sx={{ color:"#ff8906" }}/>
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold 2xl: text-base">Défauts structurels</h3>
+                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl: text-base">Défauts structurels</h3>
                 </div>
               </CardHeader>
               <Divider />
               <CardBody>
-                <p className="text-base text-justify font-normal mx-2.5">
+                <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
                   Des fissures dans les murs, des problèmes de toiture, des
                   portes ou fenêtres qui ne se ferment pas correctement, etc.
                 </p>
@@ -655,7 +655,7 @@ const ReclaCard = ({ title }) => {
             </Modal>
 
             <Card
-              className="max-w-full"
+              className="max-w-full bg-black bg-opacity-20 backdrop-blur-sm"
               isPressable
               onPress={() =>
                 handleComplaintConfirmation(
@@ -664,16 +664,16 @@ const ReclaCard = ({ title }) => {
               }
             >
               <CardHeader className="flex gap-3 justify-center">
-                <KitchenOutlinedIcon />
+                <KitchenOutlinedIcon  sx={{ color:"#ff8906" }}/>
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold 2xl: text-base">
+                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl: text-base">
                     Questions liées aux équipements fournis
                   </h3>
                 </div>
               </CardHeader>
               <Divider />
               <CardBody>
-                <p className="text-base text-justify font-normal mx-2.5">
+                <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
                   Des réclamations concernant des équipements manquants ou des
                   appareils endommagés fournis par le propriétaire, comme des
                   meubles, des appareils électroménagers, etc.
@@ -707,7 +707,7 @@ const ReclaCard = ({ title }) => {
             </Modal>
 
             <Card
-              className="max-w-full"
+              className="max-w-full bg-black bg-opacity-30 backdrop-blur-sm"
               isPressable
               onPress={() =>
                 handleComplaintConfirmation(
@@ -716,16 +716,16 @@ const ReclaCard = ({ title }) => {
               }
             >
               <CardHeader className="flex gap-3 justify-center">
-                <WaterDamageOutlinedIcon />
+                <WaterDamageOutlinedIcon  sx={{ color:"#ff8906" }}/>
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold 2xl: text-base">
+                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl: text-base">
                     Problèmes d'humidité ou de moisissure
                   </h3>
                 </div>
               </CardHeader>
               <Divider />
               <CardBody>
-                <p className="text-base text-justify font-normal mx-2.5">
+                <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
                   Des réclamations concernant des problèmes d'humidité excessive
                   ou de moisissure dans le logement.
                 </p>
@@ -758,23 +758,23 @@ const ReclaCard = ({ title }) => {
             </Modal>
 
             <Card
-              className="max-w-full"
+              className="max-w-full bg-black bg-opacity-40 backdrop-blur-sm"
               isPressable
               onPress={() =>
                 handleComplaintConfirmation("Problèmes de voisinage")
               }
             >
               <CardHeader className="flex gap-3 justify-center">
-                <PeopleAltOutlinedIcon />
+                <PeopleAltOutlinedIcon sx={{ color:"#ff8906" }}/>
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold 2xl: text-base">
+                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl: text-base">
                     Problèmes de voisinage
                   </h3>
                 </div>
               </CardHeader>
               <Divider />
               <CardBody>
-                <p className="text-base text-justify font-normal mx-2.5">
+                <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
                   Des réclamations concernant le bruit excessif des voisins, des
                   conflits de voisinage, etc.
                 </p>
@@ -807,19 +807,19 @@ const ReclaCard = ({ title }) => {
             </Modal>
 
             <Card
-              className="col-start-2"
+              className="col-start-2 bg-black bg-opacity-30 backdrop-blur-sm"
               isPressable
               onPress={() => handleComplaintConfirmation("Autres problèmes")}
             >
               <CardHeader className="flex gap-3 justify-center">
-                <ReportProblemOutlinedIcon />
+                <ReportProblemOutlinedIcon sx={{ color:"#ff8906" }} />
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold 2xl: text-base">Autres problèmes</h3>
+                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl: text-base ">Autres problèmes</h3>
                 </div>
               </CardHeader>
               <Divider />
               <CardBody>
-                <p className="text-base text-justify font-normal mx-2.5">
+                <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
                   Pour signaler d'autres types de problèmes non mentionnés
                   ci-dessus.
                 </p>

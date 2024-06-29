@@ -45,7 +45,7 @@ const Logement = () => {
           className="border-none bg-background/15 white:bg-default-100/50 card-wrapper custom-card-wrapper w-full over"
           shadow="sm"
         >
-          <CardBody>
+          <CardBody className="mb-6">
             <LogSection title="Logements" />
           </CardBody>
         </Card>
