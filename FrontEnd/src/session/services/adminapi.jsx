@@ -199,3 +199,79 @@ export const deleteLogement = async (jwtToken, data) => {
     throw error;
   }
 };
+
+// Function to fetch all residants
+export const fetchResidants = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/admin/residant`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error in fetchResidants:",
+      error.response || error.message || error
+    );
+    throw error;
+  }
+};
+
+// Function to add a residant
+export const addResidant = async (jwtToken, residantData) => {
+  try {
+    const response = await axios.post(
+      `${baseURL}/admin/residant`,
+      residantData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error in addResidant:", error);
+    throw error;
+  }
+};
+
+
+// Function to update a residant
+export const updateResidant = async (jwtToken, residantData) => {
+  try {
+    const response = await axios.put(
+      `${baseURL}/admin/residant`,
+      residantData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error in updateResidant:", error);
+    throw error;
+  }
+};
+
+// Function to delete a residant
+export const deleteResidant = async (jwtToken, data) => {
+  try {
+    const response = await axios.delete(`${baseURL}/admin/residant`, {
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        "Content-Type": "application/json",
+      },
+      data: data, // Pass data object directly to Axios
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error in deleteResidant:", error);
+    throw error;
+  }
+};

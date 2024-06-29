@@ -19,11 +19,18 @@ import {
   deleteLogement,
 } from "../services/adminapi";
 import {
+  fetchResidants,
+  addResidant,
+  updateResidant,
+  deleteResidant,
+} from "../services/adminapi";
+import {
   setStatistics,
   setStatisticsLoading,
   setStatisticsError,
 } from "../statisticsSlice";
 import { setLogements } from "../logementSlice";
+import { setResidants } from "../residantSlice.jsx";
 
 // Thunk for admin login
 export const loginAdminThunk = createAsyncThunk(
@@ -221,3 +228,80 @@ export const deleteLogementThunk = createAsyncThunk(
   }
 );
 
+export const fetchResidantsThunk = createAsyncThunk(
+  "residants/fetchResidants",
+  async (_, { dispatch, getState }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token; // Assuming auth slice manages JWT token
+
+    try {
+      const response = await fetchResidants(jwt); // Call your API function to fetch residants
+      dispatch(setResidants(response.residants));
+      return response; // Return response if needed by the caller
+    } catch (error) {
+      console.error("Error fetching residants:", error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to add a new residant
+export const addResidantThunk = createAsyncThunk(
+  "residants/addResidant",
+  async (residant, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    try {
+      const response = await addResidant(jwt, residant);
+      // fetch all residants again to update the state
+      dispatch(fetchResidantsThunk());
+      return response;
+    } catch (error) {
+      console.error("Error adding residant:", error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to update an existing residant
+export const updateResidantThunk = createAsyncThunk(
+  "residants/updateResidant",
+  async (residant, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    try {
+      const response = await updateResidant(jwt, residant);
+      // Fetch all residants again to update the state
+      dispatch(fetchResidantsThunk());
+      return response;
+    } catch (error) {
+      console.error("Error updating residant:", error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to delete a residant
+export const deleteResidantThunk = createAsyncThunk(
+  'residants/deleteResidant',
+  async (data, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    console.log(jwt);
+
+    try {
+      const response = await deleteResidant(jwt, data);
+      // Fetch all residants again to update the state
+      dispatch(fetchResidantsThunk());
+      console.log(response);
+      return response; // Ensure to return the response from deleteresidant
+
+    } catch (error) {
+      console.error('Error deleting residant:', error);
+      throw error;
+    }
+  }
+);
