@@ -201,15 +201,19 @@ export const updateLogementThunk = createAsyncThunk(
 // Thunk to delete a logement
 export const deleteLogementThunk = createAsyncThunk(
   'logements/deleteLogement',
-  async (logId, { getState, dispatch }) => {
+  async (data, { getState, dispatch }) => {
     const state = getState();
     const jwt = state.auth.jwt_token;
 
+    console.log(jwt);
+
     try {
-      const response = await deleteLogement(jwt, logId);
+      const response = await deleteLogement(jwt, data);
       // Fetch all logements again to update the state
       dispatch(fetchLogementsThunk());
-      return response;
+      console.log(response);
+      return response; // Ensure to return the response from deleteLogement
+
     } catch (error) {
       console.error('Error deleting logement:', error);
       throw error;
