@@ -247,7 +247,7 @@ function route($uri, $method)
             }
             break;
 
-            //get all facture
+            //facture
         case '/api/v1/admin/facture':
             if ($method === 'GET') {
                 $jwtHandler = new JwtHandler();

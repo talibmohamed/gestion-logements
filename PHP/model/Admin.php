@@ -236,52 +236,7 @@ class admin
         }
     }
 
-    //get all facture 
-    public function getAllfacture($jwt)
-    {
-        try {
-            $jwtHandler = new JwtHandler();
-            $token_info = $jwtHandler->verifyJwtToken($jwt);
 
-            if ($token_info['valid']) {
-                $connection = $this->db->getConnection();
-                $sql = $connection->prepare("
-                    SELECT 
-                        f.fac_id, 
-                        f.res_id, 
-                        (r.nom || ' ' || r.prenom) AS nom,
-                        f.fac_type, 
-                        f.fac_date, 
-                        f.fac_echeance, 
-                        f.fac_etat, 
-                        f.fac_total 
-                    FROM 
-                        facture f
-                    JOIN 
-                        residant r 
-                    ON 
-                        f.res_id = r.res_id
-                ");
-                $sql->execute();
-                $factures = $sql->fetchAll(PDO::FETCH_ASSOC);
-
-                return [
-                    'status' => 'success',
-                    'factures' => $factures
-                ];
-            } else {
-                return [
-                    'status' => 'error',
-                    'message' => 'Invalid token'
-                ];
-            }
-        } catch (PDOException $e) {
-            return [
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ];
-        }
-    }
 
     public function getStatistics()
     {
@@ -302,14 +257,14 @@ class admin
 
         // Facture Statistics
         // Calculate the number of paid factures for the current month
-        $paidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'Payée' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
+        $paidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'payée' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
         $paidStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
         $paidStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
         $paidStmt->execute();
         $paidCount = $paidStmt->fetchColumn();
 
         // Calculate the number of overdue factures for the current month
-        $overdueStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'En Attente' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
+        $overdueStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'en attente' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
         $overdueStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
         $overdueStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
         $overdueStmt->execute();
@@ -323,7 +278,7 @@ class admin
         } else {
             $lastYear = $curyear;
         }
-        $unpaidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'En Retard' AND DATE_PART('month', fac_date) = :lastMonth AND DATE_PART('year', fac_date) = :lastYear");
+        $unpaidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'en retard' AND DATE_PART('month', fac_date) = :lastMonth AND DATE_PART('year', fac_date) = :lastYear");
         $unpaidStmt->bindValue(':lastMonth', $lastMonth, PDO::PARAM_INT);
         $unpaidStmt->bindValue(':lastYear', $lastYear, PDO::PARAM_INT);
         $unpaidStmt->execute();
@@ -947,4 +902,107 @@ class admin
             ];
         }
     }
+
+
+    //get all facture 
+    public function getAllfacture($jwt)
+    {
+        try {
+            $jwtHandler = new JwtHandler();
+            $token_info = $jwtHandler->verifyJwtToken($jwt);
+
+            if ($token_info['valid']) {
+                $connection = $this->db->getConnection();
+                $sql = $connection->prepare("
+                    SELECT 
+                        f.fac_id, 
+                        f.res_id, 
+                        (r.nom || ' ' || r.prenom) AS nom,
+                        f.fac_type, 
+                        f.fac_date, 
+                        f.fac_echeance, 
+                        f.fac_etat, 
+                        f.fac_total 
+                    FROM 
+                        facture f
+                    JOIN 
+                        residant r 
+                    ON 
+                        f.res_id = r.res_id
+                ");
+                $sql->execute();
+                $factures = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+                return [
+                    'status' => 'success',
+                    'factures' => $factures
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Invalid token'
+                ];
+            }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    // Add facture
+    public function addFacture($data)
+    {
+        try {
+            $connection = $this->db->getConnection();
+            $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // Extract data from $data array
+            $res_id = $data['res_id'];
+            $fac_type = $data['fac_type'];
+            $fac_date = $data['fac_date'];
+            $fac_echeance = $data['fac_echeance'];
+            $fac_etat = $data['fac_etat'];
+            $fac_total = $data['fac_total'];
+
+            //check if user id exist 
+            $stmt = $connection->prepare("SELECT COUNT(*) FROM residant WHERE res_id = ?");
+            $stmt->execute([$res_id]);
+            if ($stmt->fetchColumn() == 0) {
+                return [
+                    'status' => 'error',
+                    'message' => 'User not found.'
+                ];
+            }
+
+            // Prepare SQL statement with named placeholders
+            $sql = $connection->prepare('INSERT INTO facture (res_id, fac_type, fac_date, fac_echeance, fac_etat, fac_total) VALUES (:res_id, :fac_type, :fac_date, :fac_echeance, :fac_etat, :fac_total)');
+
+            // Execute SQL statement with data bindings
+            $sql->execute([
+                ':res_id' => $res_id,
+                ':fac_type' => $fac_type,
+                ':fac_date' => $fac_date,
+                ':fac_echeance' => $fac_echeance,
+                ':fac_etat' => $fac_etat,
+                ':fac_total' => $fac_total
+            ]);
+
+            // Close the connection
+            $connection = null;
+
+            return [
+                'status' => 'success',
+                'message' => 'Facture added successfully'
+            ];
+        } catch (PDOException $e) {
+            // Return error response if an exception occurs
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+    
 }

@@ -56,13 +56,16 @@ CREATE TABLE password_reset_tokens (
 
 CREATE TYPE fac_etat_enum AS ENUM ('payée', 'en retard', 'en attente');
 
+CREATE TYPE fac_type_enum AS ENUM ('electricite', 'eau');
+
+
 
 CREATE TABLE facture (
     fac_id       SERIAL PRIMARY KEY,
     fac_date     DATE,
-    fac_type     VARCHAR(255),
+    fac_type     fac_type_enum,
     fac_total    DOUBLE PRECISION,
-    fac_etat     fac_etat_enum DEFAULT 'en attente', -- Default value set here
+    fac_etat     fac_etat_enum DEFAULT 'en attente',
     fac_echeance DATE,
     res_id       INT,
     FOREIGN KEY (res_id)
