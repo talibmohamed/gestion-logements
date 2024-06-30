@@ -6,9 +6,9 @@ const columns = [
   { name: "Prenom", uid: "prenom", sortable: true },
   { name: "cin", uid: "cin"},
   { name: "Email", uid: "email" },
+  { name: "Telephone", uid: "telephone" },
   { name: "Profession", uid: "profession" },
   { name: "Ameliore", uid: "Ameliored", sortable: true },
-  { name: "Telephone", uid: "telephone" },
   { name: "Actions", uid: "actions" },
 ];
 export { columns };

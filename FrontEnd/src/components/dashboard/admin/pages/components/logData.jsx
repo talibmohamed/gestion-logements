@@ -9,7 +9,6 @@ const columns = [
   { name: "Electricité (kWh / mois) ", uid: "quotaE" },
   { name: "Eau (m³ / mois)", uid: "quotaW" },
   { name: "Statut", uid: "statut", sortable: true },
-
   { name: "Equipements", uid: "equip" },
   { name: "Actions", uid: "actions" },
 ];

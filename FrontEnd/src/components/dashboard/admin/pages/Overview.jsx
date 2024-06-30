@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import PieChartCard from "./components/pie";
+import Graph from "./components/graph.jsx";
 import DataTable from "./components/oveTab";
 import "./Overview.scss";
 import { columns } from "./components/data";
@@ -10,6 +11,13 @@ import {
   fetchFactureThunk,
   fetchStatisticsThunk,
 } from "../../../../session/thunks/adminthunk";
+
+
+const sampleData = [
+  { label: "vacant", data: [12, 6, 20, 4, 20, 1], color: "#96A7FF" },
+  { label: "non-vacant", data: [10, 2, 8, 16, 0, 4], color: "#f9769d" },
+];
+
 
 const Overview = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -156,11 +164,12 @@ const Overview = () => {
         </div>
       )}
       <div className="w-full">
-        <DataTable
+        {/* <DataTable
           columns={columns}
           rows={transformedFactures}
           title="Factures récentes"
-        />
+        /> */}
+         <Graph title="Graphe linéaire des logements" data={sampleData} />
       </div>
     </div>
   );

@@ -17,6 +17,7 @@ import {
 import { FaFileInvoiceDollar } from "react-icons/fa6";
 import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
 import logo from "./logo.svg";
+import GroupsIcon from '@mui/icons-material/Groups';
 
 const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
   const location = useLocation();
@@ -113,7 +114,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               </MenuItem>
               <MenuItem
                 component={<Link to="/dashboard/residant" />}
-                icon={<HomeRoundedicon className="house-icon"/>}
+                icon={<GroupsIcon className="grp-icon"/>}
                 className={
                   location.pathname === "/dashboard/residant" ? "active tab" : "tab"
                 }
