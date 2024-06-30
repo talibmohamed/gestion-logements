@@ -46,9 +46,9 @@ const INITIAL_VISIBLE_COLUMNS = [
   "prenom",
   "cin",
   "email",
+  "telephone",
   "profession",
   "ameliored",
-  "telephone",
   "actions",
 ];
 
@@ -57,9 +57,9 @@ const SMALL_DEVICE_COLUMNS = [
   "prenom",
   "cin",
   "email",
+  "telephone",
   "profession",
   "ameliored",
-  "telephone",
   "actions",
 ];
 
@@ -103,9 +103,9 @@ const ResidantTable = ({ columns, rows, title }) => {
     prenom: "",
     cin: "",
     email: "",
+    telephone: "",
     profession: "",
     ameliore: "",
-    telephone: "",
   });
 
   const [currentResidant, setCurrentResidant] = useState({});
@@ -116,9 +116,9 @@ const ResidantTable = ({ columns, rows, title }) => {
       prenom: residant.prenom,
       cin: residant.cin,
       email: residant.email,
+      telephone: residant.telephone,
       profession: residant.profession,
       is_ameliore: residant.is_ameliore,
-      telephone: residant.telephone,
     });
     setEditModalOpen(true);
   };
@@ -232,9 +232,9 @@ const ResidantTable = ({ columns, rows, title }) => {
       prenom: newResidant.prenom,
       cin: newResidant.cin,
       email: newResidant.email,
+      telephone: newResidant.telephone,
       profession: newResidant.profession,
       is_ameliore: amelioreBoolean,
-      telephone: newResidant.telephone,
     };
   
     console.log(residantData);
@@ -345,6 +345,7 @@ const ResidantTable = ({ columns, rows, title }) => {
       prenom: currentResidant.prenom,
       cin: currentResidant.cin,
       email: currentResidant.email,
+      telephone: currentResidant.telephone,
       profession: currentResidant.profession,
       is_ameliore: isAmelioreBoolean,
       telephone: currentResidant.telephone,
@@ -1098,7 +1099,7 @@ const ResidantTable = ({ columns, rows, title }) => {
                     onChange={(e) =>
                       setCurrentResidant({
                         ...currentResidant,
-                        prenom: e.target.value,
+                        profession: e.target.value,
                       })
                     }
                   >
@@ -1324,15 +1325,15 @@ ResidantTable.propTypes = {
   ).isRequired,
   rows: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      res_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       nom: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       prenom: PropTypes.string.isRequired,
       cin: PropTypes.string.isRequired,
       email: PropTypes.string.isRequired,
-      profession: PropTypes.string.isRequired,
-      ameliored: PropTypes.string,
       telephone: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
         .isRequired,
+      profession: PropTypes.string.isRequired,
+      ameliored: PropTypes.string,
       actions: PropTypes.string,
     })
   ).isRequired,

@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchLogementsThunk } from '../../../../session/thunks/adminthunk.jsx';
+import { fetchLogementsThunk } from "../../../../session/thunks/adminthunk.jsx";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import LogTable from "./components/logTab.jsx";
-import Graph from "./components/graph.jsx";
+import ConsumTable from "./components/consommation.jsx";
+// import Graph from "./components/graph.jsx";
 import "./Statics.scss";
 import { Card, CardBody } from "@nextui-org/react";
 import { columns } from "./components/logData.jsx";
 import { ToastContainer } from "react-toastify";
+import { columnsc, usersc } from "./components/consumData.jsx";
 
-const sampleData = [
-  { label: "vacant", data: [12, 6, 20, 4, 20, 1], color: "#96A7FF" },
-  { label: "non-vacant", data: [10, 2, 8, 16, 0, 4], color: "#f9769d" },
-];
+// const sampleData = [
+//   { label: "vacant", data: [12, 6, 20, 4, 20, 1], color: "#96A7FF" },
+//   { label: "non-vacant", data: [10, 2, 8, 16, 0, 4], color: "#f9769d" },
+// ];
 
 const Logement = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -31,11 +33,11 @@ const Logement = () => {
   }, []);
 
   const dispatch = useDispatch();
-  const logements = useSelector(state => state.logements.logements);
+  const logements = useSelector((state) => state.logements.logements);
 
   useEffect(() => {
-    dispatch(fetchLogementsThunk()); 
-  }, [dispatch]); 
+    dispatch(fetchLogementsThunk());
+  }, [dispatch]);
 
   const transformLogementsData = (logements) => {
     return logements.map((logement) => ({
@@ -43,7 +45,7 @@ const Logement = () => {
       num_de_log: logement.log_id,
       nom: logement.nom,
       type_log: logement.typelog,
-      ameliored: logement.is_ameliore ? 'Oui' : 'Non',
+      ameliored: logement.is_ameliore ? "Oui" : "Non",
       statut: logement.statut,
       piece: logement.piece,
       mc: logement.mc,
@@ -53,8 +55,8 @@ const Logement = () => {
       equipment_names: logement.equipment_names,
     }));
   };
-  
-  const transformedLogements = transformLogementsData(logements); 
+
+  const transformedLogements = transformLogementsData(logements);
 
   return (
     <div className="container mx-auto">
@@ -65,11 +67,23 @@ const Logement = () => {
           shadow="sm"
         >
           <CardBody>
-            <LogTable columns={columns} rows={transformedLogements} title="Logements" />
+            <LogTable
+              columns={columns}
+              rows={transformedLogements}
+              title="Logements"
+            />
           </CardBody>
         </Card>
-
-        <Graph title="Graphe linéaire des logements" data={sampleData} />
+        {/* <Graph title="Graphe linéaire des logements" data={sampleData} /> */}
+        <Card
+          isBlurred
+          className="border-none bg-background/15 white:bg-default-100/50 card-wrapper custom-card-wrapper w-full over"
+          shadow="sm"
+        >
+          <CardBody>
+            <ConsumTable columns={columnsc} rows={usersc} title="Consommation" />
+          </CardBody>
+        </Card>
       </div>
       <ToastContainer />
     </div>
