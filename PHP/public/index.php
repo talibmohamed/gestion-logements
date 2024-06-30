@@ -248,7 +248,7 @@ function route($uri, $method)
             break;
 
             //get all facture
-        case '/api/v1/admin/allfacture':
+        case '/api/v1/admin/facture':
             if ($method === 'GET') {
                 $jwtHandler = new JwtHandler();
                 $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
@@ -265,6 +265,10 @@ function route($uri, $method)
                         'message' => 'Unauthorized',
                     ]);
                 }
+            } else if ($method === 'POST') {
+                $data = json_decode(file_get_contents('php://input'), true);
+                $adminController = new AdminController();
+                $adminController->addFactureAPI($data);
             } else {
                 http_response_code(405);
                 echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);

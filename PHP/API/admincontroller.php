@@ -85,18 +85,6 @@ class AdminController
         }
     }
 
-    //get all facture 
-    public function getAllfactureAPI($jwt)
-    {
-        if ($jwt) {
-            $response = $this->admin->getAllfacture($jwt);
-            http_response_code(200);
-            echo json_encode($response);
-        } else {
-            http_response_code(400);
-            echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
-        }
-    }
 
     //get statistics
     public function getStatisticsAPI()
@@ -453,6 +441,60 @@ class AdminController
         }
     }
 
+
+        //get all facture 
+        public function getAllfactureAPI($jwt)
+        {
+            if ($jwt) {
+                $response = $this->admin->getAllfacture($jwt);
+                http_response_code(200);
+                echo json_encode($response);
+            } else {
+                http_response_code(400);
+                echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
+            }
+        }
+
+        //add facture 
+        // public function addFactureAPI($data)
+        // {
+        //     // Check if all required fields are present
+        //     if (
+        //         isset($data['montant']) &&
+        //         isset($data['date']) &&
+        //         isset($data['res_id']) &&
+        //         isset($data['log_id'])
+        //     ) {
+        //         // Sanitize and validate inputs
+        //         $montant = filter_var($data['montant'], FILTER_VALIDATE_FLOAT);
+        //         $date = htmlspecialchars($data['date'], ENT_QUOTES, 'UTF-8');
+        //         $res_id = filter_var($data['res_id'], FILTER_VALIDATE_INT);
+        //         $log_id = filter_var($data['log_id'], FILTER_VALIDATE_INT);
+
+        //         // Check if all inputs are valid
+        //         if ($montant !== false && $date && $res_id !== false && $log_id !== false) {
+        //             // Pass sanitized data to the model for insertion
+        //             $response = $this->admin->addFacture([
+        //                 'montant' => $montant,
+        //                 'date' => $date,
+        //                 'res_id' => $res_id,
+        //                 'log_id' => $log_id
+        //             ]);
+
+        //             // Respond with success message and HTTP 200 status
+        //             http_response_code(200);
+        //             echo json_encode($response);
+        //         } else {
+        //             // Respond with 400 Bad Request if input validation fails
+        //             http_response_code(400);
+        //             echo json_encode(['status' => 'error', 'message' => 'Invalid input data']);
+        //         }
+        //     } else {
+        //         // Respond with 400 Bad Request if required fields are missing
+        //         http_response_code(400);
+        //         echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
+        //     }
+        // }
 
 
 

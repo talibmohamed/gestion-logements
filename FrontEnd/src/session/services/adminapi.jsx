@@ -92,7 +92,7 @@ export const fetchNotifications = async (jwt) => {
 // Function to fetch all facture from /allfacture when passing a jwt
 export const fetchFacture = async (jwt) => {
   try {
-    const response = await axios.get(`${baseURL}/admin/allfacture`, {
+    const response = await axios.get(`${baseURL}/admin/facture`, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },

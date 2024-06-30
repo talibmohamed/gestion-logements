@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import {
   Table,
   TableHeader,
@@ -48,9 +50,9 @@ const INITIAL_VISIBLE_COLUMNS = [
 const SMALL_DEVICE_COLUMNS = ["nom", "type", "echeance", "status", "actions"];
 
 const statusColorMap = {
-  Payée: "secondary",
-  "En Retard": "primary",
-  "En Attente": "warning",
+  payée: "secondary",
+  "en retard": "primary",
+  "en attente": "warning",
 };
 
 const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
@@ -125,16 +127,16 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
     let filteredUsers = [...rows];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((user) =>
-        user.nom.toLowerCase().includes(filterValue.toLowerCase())
+      filteredUsers = filteredUsers.filter((item) =>
+        item.nom.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
     if (
       statusFilter !== "all" &&
       Array.from(statusFilter).length !== statusOptions.length
     ) {
-      filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.status)
+      filteredUsers = filteredUsers.filter((item) =>
+        Array.from(statusFilter).includes(item.status)
       );
     }
 
@@ -179,9 +181,19 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
     setCurrentInvoice({ ...currentInvoice, status });
   };
 
+  const residants = useSelector((state) => {
+    return state.residants.residants.map((resident) => ({
+      res_id: resident.res_id,
+      nom: resident.nom,
+      prenom: resident.prenom,
+    }));
+  });
+
+  console.log(residants);
+
   const renderCell = React.useCallback(
-    (user, columnKey) => {
-      const cellValue = user[columnKey];
+    (item, columnKey) => {
+      const cellValue = item[columnKey];
 
       switch (columnKey) {
         case "role":
@@ -194,7 +206,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
           return (
             <Chip
               className="capitalize"
-              color={statusColorMap[user.status]}
+              color={statusColorMap[item.status]}
               size="sm"
               variant="flat"
             >
@@ -221,9 +233,9 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                   <DropdownMenu
                     aria-label="Action event example"
                     onAction={(key) => {
-                      if (key === "details") handleDetailsIconClick(user);
-                      if (key === "edit") handleEditIconClick(user);
-                      if (key === "delete") handleDeleteIconClick(user);
+                      if (key === "details") handleDetailsIconClick(item);
+                      if (key === "edit") handleEditIconClick(item);
+                      if (key === "delete") handleDeleteIconClick(item);
                     }}
                   >
                     <DropdownItem key="details" startContent={<EyeIcon />}>
@@ -269,7 +281,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                   >
                     <span
                       className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                      onClick={() => handleDetailsIconClick(user)}
+                      onClick={() => handleDetailsIconClick(item)}
                     >
                       <EyeIcon />
                     </span>
@@ -299,7 +311,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                   >
                     <span
                       className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                      onClick={() => handleEditIconClick(user)}
+                      onClick={() => handleEditIconClick(item)}
                     >
                       <EditIcon />
                     </span>
@@ -331,7 +343,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                   >
                     <span
                       className="text-lg text-danger cursor-pointer active:opacity-50"
-                      onClick={() => handleDeleteIconClick(user)}
+                      onClick={() => handleDeleteIconClick(item)}
                     >
                       <DeleteIcon />
                     </span>
@@ -405,9 +417,9 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                               popoverContent: ["bg-zinc-800", "text-white/90"],
                             }}
                           >
-                            {(user) => (
-                              <AutocompleteItem key={user.id}>
-                                {user.nom}
+                            {(item) => (
+                              <AutocompleteItem key={item.id}>
+                                {item.nom}
                               </AutocompleteItem>
                             )}
                           </Autocomplete>
@@ -598,10 +610,10 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
           )}
         </TableHeader>
         <TableBody emptyContent={"No users found"} items={sortedItems}>
-          {(user) => (
-            <TableRow key={user.id}>
+          {(item) => (
+            <TableRow key={item.id}>
               {(columnKey) => (
-                <TableCell>{renderCell(user, columnKey)}</TableCell>
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
               )}
             </TableRow>
           )}
