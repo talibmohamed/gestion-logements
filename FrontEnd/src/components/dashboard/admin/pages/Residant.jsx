@@ -26,8 +26,8 @@ const Residant = () => {
     }, []);
   
     const dispatch = useDispatch();
-    const residants = useSelector(state => state.residants.residants || []);
-
+    const residantsState = useSelector(state => state.residants);
+    const residants = residantsState?.residants || [];
   
     useEffect(() => {
       dispatch(fetchResidantsThunk()); 
@@ -61,6 +61,7 @@ const Residant = () => {
           </CardBody>
         </Card>
       </div>
+      <ToastContainer />
     </div>
   );
 };

@@ -15,7 +15,7 @@ function sendEmail($recipientEmail, $recipientNom, $recipientPrenom, $subject, $
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port = 587;
 
-        // email credentials
+        // Email credentials
         $mail->Username = 'houselytics.help@gmail.com'; 
         $mail->Password = 'hnzb lxwq ddsl ahqf'; 
 
@@ -25,6 +25,8 @@ function sendEmail($recipientEmail, $recipientNom, $recipientPrenom, $subject, $
 
         // Content
         $mail->isHTML(true); 
+        $mail->CharSet = 'UTF-8';
+        $mail->Encoding = 'base64'; 
         $mail->Subject = $subject; 
         $mail->Body = $body; 
         $mail->AltBody = strip_tags($body); 
@@ -36,6 +38,5 @@ function sendEmail($recipientEmail, $recipientNom, $recipientPrenom, $subject, $
         return false;
     }
 }
-
 
 ?>

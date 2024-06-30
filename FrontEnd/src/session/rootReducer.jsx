@@ -4,8 +4,11 @@ import notificationReducer from './notificationSlice';
 import userReducer from './userslice';
 import adminReducer from './adminslice';
 import factureReducer from './factureSlice';
-import statisticsReducer from "./statisticsSlice"; // Ensure correct import path
+import statisticsReducer from "./statisticsSlice"; 
 import logementsReducer from "./logementSlice"
+import residantssReducer from "./residantSlice"
+
+
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -13,8 +16,9 @@ const rootReducer = combineReducers({
   user: userReducer,
   admin: adminReducer,
   facture: factureReducer,
-  statistics: statisticsReducer, // Include the new statistics reducer
-  logements: logementsReducer
+  statistics: statisticsReducer, 
+  logements: logementsReducer,
+  residants: residantssReducer
 });
 
 export const resetStateReducer = (state, action) => {
@@ -26,7 +30,8 @@ export const resetStateReducer = (state, action) => {
       admin: undefined,
       facture: undefined,
       statistics: undefined, 
-      logements: undefined
+      logements: undefined,
+      residants: undefined
     };
   }
   return rootReducer(state, action);

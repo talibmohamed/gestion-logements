@@ -231,6 +231,7 @@ export const addResidant = async (jwtToken, residantData) => {
         },
       }
     );
+    console.log(response);
     return response.data;
   } catch (error) {
     console.error("Error in addResidant:", error);
@@ -252,6 +253,7 @@ export const updateResidant = async (jwtToken, residantData) => {
         },
       }
     );
+    console.log(response);
     return response.data;
   } catch (error) {
     console.error("Error in updateResidant:", error);

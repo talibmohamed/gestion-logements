@@ -172,115 +172,6 @@ class admin
         }
     }
 
-    // API endpoint function to handle admin adding a user 
-    public function addUserAndSendEmail($userData)
-    {
-        try {
-            $connection = $this->db->getConnection();
-
-            $typelog = $userData['profession'];
-            $is_ameliore = $userData['is_ameliore'];
-
-            $logementQuery = "
-                SELECT * 
-                FROM logement 
-                WHERE typelog = :typelog 
-                  AND is_ameliore = :is_ameliore 
-                  AND statut = 'disponible'
-                ORDER BY log_id 
-                LIMIT 1;
-            ";
-            $stmt = $connection->prepare($logementQuery);
-            $stmt->bindParam(':typelog', $typelog, PDO::PARAM_STR);
-            $stmt->bindParam(':is_ameliore', $is_ameliore, PDO::PARAM_BOOL);
-            $stmt->execute();
-            $logement = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$logement) {
-                return [
-                    'status' => 'error1',
-                    'message' => 'Aucun logement disponible trouvé correspondant aux critères.'
-                ];
-            }
-
-            $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            $password = '';
-            for ($i = 0; $i < 10; $i++) {
-                $password .= $characters[rand(0, strlen($characters) - 1)];
-            }
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-            $fields = ['email', 'password', 'nom', 'prenom', 'cin', 'telephone', 'profession', 'log_id'];
-            $values = [
-                $userData['email'],
-                $hashedPassword,
-                $userData['nom'],
-                $userData['prenom'],
-                $userData['cin'],
-                $userData['telephone'] ?? null,
-                $userData['profession'],
-                $logement['log_id']
-            ];
-
-            // Insert user data into the database
-            $placeholders = rtrim(str_repeat('?,', count($fields)), ',');
-            $query = "INSERT INTO residant (" . implode(',', $fields) . ") VALUES (" . $placeholders . ")";
-            $stmt = $connection->prepare($query);
-            $stmt->execute($values);
-
-            // Retrieve the inserted user's ID
-            $res_id = $connection->lastInsertId();
-
-            // Generate the jwt login token and store it in login_token in residant table with user id
-            $jwtHandler = new JwtHandler();
-            $login_token = $jwtHandler->generateJwtToken($res_id, 'residant');
-
-            // Update the user's login_token in the database
-            $updateTokenQuery = "UPDATE residant SET login_token = ? WHERE res_id = ?";
-            $stmt = $connection->prepare($updateTokenQuery);
-            $stmt->execute([$login_token, $res_id]);
-
-            // Mark the logement as occupied
-            $updateQuery = "UPDATE logement SET statut = 'occupé' WHERE log_id = ?";
-            $stmt = $connection->prepare($updateQuery);
-            $stmt->execute([$logement['log_id']]);
-
-            // Send email with login link and credentials
-            $loginLink = "http://localhost:5173/form?login_token=$login_token";
-            $subject = 'Vos informations de compte';
-            $body = "<p>Cher/Chère {$userData['nom']} {$userData['prenom']},</p>
-                     <p>Votre compte a été créé avec succès. Vous pouvez vous connecter en utilisant le lien suivant :</p>
-                     <p><a href='$loginLink'>Connectez-vous à votre compte</a></p>
-                     <p>Vos identifiants de connexion sont :</p>
-                     <p>Email : {$userData['email']}</p>
-                     <p>Mot de passe : $password</p>
-                     <p>Assurez-vous de changer votre mot de passe après vous être connecté.</p>
-                     <p>Cordialement,</p>
-                     <p>houselytics</p>";
-
-            if (!sendEmail($userData['email'], $userData['nom'], $userData['prenom'], $subject, $body)) {
-                return [
-                    'status' => 'error',
-                    'message' => 'Échec de l\'envoi de l\'email.'
-                ];
-            }
-
-            return [
-                'status' => 'success',
-                'message' => 'Utilisateur ajouté avec succès. Email envoyé avec le lien de connexion et les identifiants.',
-            ];
-        } catch (PDOException $e) {
-            return [
-                'status' => 'error2',
-                'message' => $e->getMessage()
-            ];
-        } catch (Exception $e) {
-            return [
-                'status' => 'error3',
-                'message' => $e->getMessage()
-            ];
-        }
-    }
 
 
     // Get all admin notifications
@@ -668,6 +559,391 @@ class admin
             return [
                 'status' => 'error',
                 'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    public function addResident($userData)
+    {
+        try {
+            $connection = $this->db->getConnection();
+
+            $userData['is_ameliore'] = $userData['is_ameliore'] ? 'TRUE' : 'FALSE';
+
+            // Check if email already exists
+            $stmt = $connection->prepare("SELECT COUNT(*) FROM residant WHERE email = ?");
+            $stmt->execute([$userData['email']]);
+            if ($stmt->fetchColumn() > 0) {
+                return [
+                    'status' => 'alert',
+                    'message' => 'Un utilisateur avec cet email existe déjà.'
+                ];
+            }
+
+            // Find available logement
+            $stmt = $connection->prepare("
+                SELECT * 
+                FROM logement 
+                WHERE typelog = :typelog 
+                  AND is_ameliore = :is_ameliore 
+                  AND statut = 'disponible'
+                ORDER BY log_id 
+                LIMIT 1
+            ");
+            $stmt->execute([
+                ':typelog' => $userData['profession'],
+                ':is_ameliore' => $userData['is_ameliore']
+            ]);
+            $logement = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$logement) {
+                return [
+                    'status' => 'alert',
+                    'message' => 'Aucun logement disponible trouvé correspondant aux critères.'
+                ];
+            }
+
+            // Generate random password
+            $password = bin2hex(random_bytes(5));
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+            // Insert user data into the database
+            $stmt = $connection->prepare("
+                INSERT INTO residant (email, password, nom, prenom, cin, telephone, profession, log_id)
+                VALUES (:email, :password, :nom, :prenom, :cin, :telephone, :profession, :log_id)
+            ");
+            $stmt->execute([
+                ':email' => $userData['email'],
+                ':password' => $hashedPassword,
+                ':nom' => $userData['nom'],
+                ':prenom' => $userData['prenom'],
+                ':cin' => $userData['cin'],
+                ':telephone' => $userData['telephone'] ?? null,
+                ':profession' => $userData['profession'],
+                ':log_id' => $logement['log_id']
+            ]);
+
+            $res_id = $connection->lastInsertId();
+
+            // Generate JWT token and update login token
+            $jwtHandler = new JwtHandler();
+            $login_token = $jwtHandler->generateJwtToken($res_id, 'residant');
+
+            $stmt = $connection->prepare("UPDATE residant SET login_token = ? WHERE res_id = ?");
+            $stmt->execute([$login_token, $res_id]);
+
+            // Mark the logement as occupied
+            $stmt = $connection->prepare("UPDATE logement SET statut = 'occupé' WHERE log_id = ?");
+            $stmt->execute([$logement['log_id']]);
+
+            // Send email with login link and credentials
+            $loginLink = "http://localhost:5173/form?login_token=$login_token";
+            $subject = 'Vos informations de compte';
+            $body = "
+            <html>
+            <head>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: 20px auto;
+                        padding: 20px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        background-color: #f9f9f9;
+                    }
+                    h2 {
+                        font-size: 24px;
+                        color: #333;
+                    }
+                    p {
+                        margin: 10px 0;
+                    }
+                    a {
+                        color: #007bff;
+                        text-decoration: none;
+                    }
+                    a:hover {
+                        text-decoration: underline;
+                    }
+                    .footer {
+                        margin-top: 20px;
+                        font-size: 14px;
+                        color: #555;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <h2>Cher/Chère " . htmlentities($userData['nom'], ENT_QUOTES, 'UTF-8') . " " . htmlentities($userData['prenom'], ENT_QUOTES, 'UTF-8') . ",</h2>
+                    <p>Votre compte a été créé avec succès. Vous pouvez vous connecter en utilisant le lien suivant :</p>
+                    <p><a href='$loginLink'>Connectez-vous à votre compte</a></p>
+                    <p>Vos identifiants de connexion sont :</p>
+                    <ul>
+                        <li><strong>Email :</strong> " . htmlentities($userData['email'], ENT_QUOTES, 'UTF-8') . "</li>
+                        <li><strong>Mot de passe :</strong> $password</li>
+                    </ul>
+                    <p>Assurez-vous de changer votre mot de passe après vous être connecté.</p>
+                    <p>Cordialement,<br>houselytics</p>
+                    <p class='footer'>Ceci est un email automatique, merci de ne pas y répondre.</p>
+                </div>
+            </body>
+            </html>
+        ";
+
+            if (!sendEmail($userData['email'], $userData['nom'], $userData['prenom'], $subject, $body)) {
+                error_log('Failed to send email after adding resident.');
+                return [
+                    'status' => 'error',
+                    'message' => 'Résidant créé. Échec de l\'envoi de l\'email.'
+                ];
+            }
+
+            return [
+                'status' => 'success',
+                'message' => 'Utilisateur ajouté. Email envoyé avec le lien de connexion et les identifiants.',
+            ];
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => 'Erreur de base de données: ' . $e->getMessage()
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => 'Erreur: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    // Model method to update resident in the database
+    public function updateResident($userData)
+    {
+        try {
+            $connection = $this->db->getConnection();
+
+            $userData['is_ameliore'] = $userData['is_ameliore'] ? 'TRUE' : 'FALSE';
+
+            // Check if the resident exists and fetch current data
+            $stmt = $connection->prepare("
+            SELECT r.*, l.is_ameliore
+            FROM residant r
+            JOIN logement l ON r.log_id = l.log_id
+            WHERE r.res_id = ?
+        ");
+            $stmt->execute([$userData['res_id']]);
+            $resident = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$resident) {
+                return [
+                    'status' => 'error',
+                    'message' => 'Resident not found.',
+                ];
+            }
+
+            // Check if the new email already exists (except for the current resident)
+            if ($resident['email'] !== $userData['email']) {
+                $stmt = $connection->prepare("SELECT COUNT(*) FROM residant WHERE email = ?");
+                $stmt->execute([$userData['email']]);
+                if ($stmt->fetchColumn() > 0) {
+                    return [
+                        'status' => 'error',
+                        'message' => 'An account with this email already exists.',
+                    ];
+                }
+            }
+
+            // Check if profession or is_ameliore has changed
+            $professionChanged = $resident['profession'] !== $userData['profession'];
+            $amelioChanged = (bool)$resident['is_ameliore'] !== (bool)$userData['is_ameliore'];
+
+            // Prepare update data
+            $updateData = [
+                'email' => $userData['email'],
+                'nom' => $userData['nom'],
+                'prenom' => $userData['prenom'],
+                'cin' => $userData['cin'],
+                'telephone' => $userData['telephone'] ?? null,
+                'profession' => $userData['profession'],
+                'log_id' => $resident['log_id'],
+                'res_id' => $userData['res_id']
+            ];
+
+            // Only update profession and is_ameliore if changed and a suitable logement is found
+            if ($professionChanged || $amelioChanged) {
+                // Find available logement for the new profession and is_ameliore status
+                $stmt = $connection->prepare("
+                SELECT * 
+                FROM logement 
+                WHERE typelog = :typelog 
+                  AND is_ameliore = :is_ameliore 
+                  AND statut = 'disponible'
+                ORDER BY log_id 
+                LIMIT 1
+            ");
+                $stmt->execute([
+                    ':typelog' => $userData['profession'],
+                    ':is_ameliore' => $userData['is_ameliore']
+                ]);
+                $newLogement = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($newLogement) {
+                    // Update resident's logement assignment
+                    $updateData['log_id'] = $newLogement['log_id'];
+
+                    // Mark the old logement as available
+                    $stmt = $connection->prepare("UPDATE logement SET statut = 'disponible' WHERE log_id = ?");
+                    $stmt->execute([$resident['log_id']]);
+                } else {
+                    // No suitable logement found, handle accordingly (e.g., notify resident)
+                    return [
+                        'status' => 'alert',
+                        'message' => 'No suitable logement available for the updated profession and amelioration status.',
+                    ];
+                }
+            }
+
+            // Update resident's data
+            $stmt = $connection->prepare("
+            UPDATE residant 
+            SET email = :email, 
+                nom = :nom, 
+                prenom = :prenom, 
+                cin = :cin, 
+                telephone = :telephone, 
+                profession = :profession, 
+                log_id = :log_id
+            WHERE res_id = :res_id
+        ");
+            $stmt->execute($updateData);
+
+            return [
+                'status' => 'success',
+                'message' => 'Resident updated successfully.',
+            ];
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error11',
+                'message' => 'Database error: ' . $e->getMessage(),
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error22',
+                'message' => 'Error: ' . $e->getMessage(),
+            ];
+        }
+    }
+
+    // Delete resident
+
+    // Assuming this is within your AdminController or similar class
+
+    // Delete resident API
+    public function deleteResidentAPI($data)
+    {
+        // Check if required fields are present in $data
+        if (isset($data['res_id'])) {
+            // Sanitize and validate inputs
+            $res_id = filter_var($data['res_id'], FILTER_VALIDATE_INT);
+
+            // Check if res_id is valid
+            if ($res_id !== false && $res_id > 0) {
+                try {
+                    // Connect to database (assuming $this->db->getConnection() is your database connection)
+                    $connection = $this->db->getConnection();
+
+                    // Check if the resident exists
+                    $stmt = $connection->prepare("SELECT * FROM residant WHERE res_id = ?");
+                    $stmt->execute([$res_id]);
+                    $resident = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if (!$resident) {
+                        http_response_code(404); // Not Found
+                        echo json_encode(['status' => 'error', 'message' => 'Resident not found.']);
+                        return;
+                    }
+
+                    // Perform deletion
+                    $stmt = $connection->prepare("DELETE FROM residant WHERE res_id = ?");
+                    $stmt->execute([$res_id]);
+
+                    // Check if deletion was successful
+                    if ($stmt->rowCount() > 0) {
+                        http_response_code(200); // OK
+                        echo json_encode(['status' => 'success', 'message' => 'Resident deleted successfully.']);
+                    } else {
+                        http_response_code(500); // Internal Server Error
+                        echo json_encode(['status' => 'error', 'message' => 'Failed to delete resident.']);
+                    }
+                } catch (PDOException $e) {
+                    http_response_code(500); // Internal Server Error
+                    echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
+                }
+            } else {
+                // Respond with 400 Bad Request if res_id is invalid
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid res_id']);
+            }
+        } else {
+            // Respond with 400 Bad Request if res_id is missing
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'res_id parameter is required']);
+        }
+    }
+
+    // Method to delete a resident from the database
+    public function deleteResident($res_id)
+    {
+        try {
+            $connection = $this->db->getConnection();
+
+            // Check if the resident exists
+            $stmt = $connection->prepare("SELECT log_id FROM residant WHERE res_id = ?");
+            $stmt->execute([$res_id]);
+            $log_id = $stmt->fetchColumn();
+
+            if (!$log_id) {
+                return [
+                    'status' => 'error',
+                    'message' => 'Resident not found.',
+                ];
+            }
+
+            // Start a transaction
+            $connection->beginTransaction();
+
+            // Update the logement to mark it as disponible
+            $stmt = $connection->prepare("UPDATE logement SET statut = 'disponible' WHERE log_id = ?");
+            $stmt->execute([$log_id]);
+
+            // Delete the resident
+            $stmt = $connection->prepare("DELETE FROM residant WHERE res_id = ?");
+            $stmt->execute([$res_id]);
+
+            // Commit the transaction
+            $connection->commit();
+
+            return [
+                'status' => 'success',
+                'message' => 'Resident deleted successfully.',
+            ];
+        } catch (PDOException $e) {
+            // Rollback transaction on database error
+            $connection->rollBack();
+            return [
+                'status' => 'error',
+                'message' => 'Database error: ' . $e->getMessage(),
+            ];
+        } catch (Exception $e) {
+            // Rollback transaction on generic exception
+            $connection->rollBack();
+            return [
+                'status' => 'error',
+                'message' => 'Error: ' . $e->getMessage(),
             ];
         }
     }

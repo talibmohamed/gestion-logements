@@ -6,34 +6,17 @@ CREATE TABLE equipement (
 
 CREATE TYPE statut_logement AS ENUM ('disponible', 'en_maintenance', 'occupé', 'non_disponible', 'autre');
 
+CREATE TYPE typelog_enum AS ENUM ('cadre', 'ouvrier', 'agent de maitrise');
+
 CREATE TABLE logement (
     log_id          SERIAL PRIMARY KEY,
-    typelog         VARCHAR(40) NOT NULL,
+    typelog         typelog_enum NOT NULL,
     is_ameliore     BOOLEAN NOT NULL,
     description     VARCHAR(250),
     mc              INT NOT NULL,
     piece           INT NOT NULL,
     is_vacant       BOOLEAN DEFAULT true,
     statut          statut_logement DEFAULT 'disponible'
-);
-
-CREATE TABLE typelog_info (
-    typelog_id SERIAL PRIMARY KEY,
-    typelog VARCHAR(40) NOT NULL,
-    is_ameliore BOOLEAN NOT NULL,
-    quotas_electricite INT,
-    quotas_eau INT,
-    equipement_ids INT[]  -- Example array of equipment IDs
-);
-
-CREATE TABLE admin (
-    adm_id        SERIAL PRIMARY KEY,
-    nom           VARCHAR(40),
-    prenom        VARCHAR(40),
-    email         VARCHAR(250) UNIQUE,
-    telephone     VARCHAR(15),
-    password      VARCHAR(250),
-    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE residant (
@@ -52,14 +35,24 @@ CREATE TABLE residant (
         REFERENCES logement (log_id)
 );
 
+
+CREATE TABLE admin (
+    adm_id        SERIAL PRIMARY KEY,
+    nom           VARCHAR(40),
+    prenom        VARCHAR(40),
+    email         VARCHAR(250) UNIQUE,
+    telephone     VARCHAR(15),
+    password      VARCHAR(250),
+    date_creation TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE password_reset_tokens (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL,
     token VARCHAR(255) NOT NULL,
     expires_at TIMESTAMP NOT NULL,
-    FOREIGN KEY (email) REFERENCES residant (email)
+    FOREIGN KEY (email) REFERENCES residant (email) ON DELETE CASCADE
 );
-
 
 CREATE TABLE facture (
     fac_id       SERIAL PRIMARY KEY,
@@ -71,7 +64,7 @@ CREATE TABLE facture (
     fac_echeance DATE,
     res_id       INT,
     FOREIGN KEY (res_id)
-        REFERENCES residant (res_id)
+        REFERENCES residant (res_id) ON DELETE CASCADE
 );
 
 CREATE TABLE consommation (
@@ -83,9 +76,9 @@ CREATE TABLE consommation (
     res_id     INT,
     log_id     INT,
     FOREIGN KEY (res_id)
-        REFERENCES residant (res_id),
+        REFERENCES residant (res_id) ON DELETE CASCADE,
     FOREIGN KEY (log_id)
-        REFERENCES logement (log_id)
+        REFERENCES logement (log_id) ON DELETE CASCADE
 );
 
 CREATE TABLE reclamation (
@@ -98,9 +91,9 @@ CREATE TABLE reclamation (
     log_id         INT,
     message        VARCHAR(255),
     FOREIGN KEY (res_id)
-        REFERENCES residant (res_id),
+        REFERENCES residant (res_id) ON DELETE CASCADE,
     FOREIGN KEY (log_id)
-        REFERENCES logement (log_id)
+        REFERENCES logement (log_id) ON DELETE CASCADE
 );
 
 CREATE TABLE notification (
@@ -111,8 +104,18 @@ CREATE TABLE notification (
     is_read BOOLEAN DEFAULT FALSE,
     res_id INT,
     adm_id INT,
-    FOREIGN KEY (res_id) REFERENCES residant (res_id),
-    FOREIGN KEY (adm_id) REFERENCES admin (adm_id)
+    FOREIGN KEY (res_id) REFERENCES residant (res_id) ON DELETE CASCADE,
+    FOREIGN KEY (adm_id) REFERENCES admin (adm_id) ON DELETE CASCADE
+);
+
+CREATE TABLE typelog_info (
+    typelog_id serial,
+    typelog typelog_enum not null,
+    is_ameliore boolean not null,
+    quotas_electricite integer null,
+    quotas_eau integer null,
+    equipement_ids integer[] null,
+    PRIMARY KEY (typelog_id)
 );
 
 

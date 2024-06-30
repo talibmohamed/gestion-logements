@@ -205,24 +205,27 @@ const ResidantTable = ({ columns, rows, title }) => {
 
   const dispatch = useDispatch();
 
+
   const handleAddResidant = async () => {
     // Validate all fields before dispatching
     if (
-      newResidant.nom === "" ||
-      newResidant.prenom === "" ||
-      newResidant.cin == "" ||
-      newResidant.email === "" ||
-      newResidant.profession === "" ||
-      newResidant.ameliore === "" ||
-      newResidant.telephone === ""
+      newResidant.nom === '' ||
+      newResidant.prenom === '' ||
+      newResidant.cin === '' ||
+      newResidant.email === '' ||
+      newResidant.profession === '' ||
+      newResidant.ameliore === '' ||
+      newResidant.telephone === ''
     ) {
       // Handle invalid form data
       return;
     }
-
+  
+    console.log(newResidant);
+  
     // Convert ameliore to a boolean if it's a string "yes" or "no"
-    const amelioreBoolean = newResidant.ameliore === "yes";
-
+    const amelioreBoolean = newResidant.ameliore === 'yes';
+  
     // Prepare the data to dispatch
     const residantData = {
       nom: newResidant.nom,
@@ -233,84 +236,108 @@ const ResidantTable = ({ columns, rows, title }) => {
       is_ameliore: amelioreBoolean,
       telephone: newResidant.telephone,
     };
-
+  
     console.log(residantData);
-
-    // Dispatch the action to add residant
+  
+    // Show loading toast while processing
+    const loadingToastId = toast.loading('Adding residant...', {
+      position: 'bottom-right',
+      autoClose: false,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: false,
+      draggable: true,
+      progress: 0,
+      theme: 'dark',
+    });
+  
     try {
+      // Dispatch the action to add residant
       const response = await dispatch(addResidantThunk(residantData));
-
+  
+      // Clear loading toast
+      toast.dismiss(loadingToastId);
+  
       // Display success message
-      if (response && response.payload.status === "success") {
-        toast.success("Residant added successfully", {
-          position: "bottom-right",
+      if (response && response.payload.status === 'success') {
+        toast.success(response.payload.message, {
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: false,
           draggable: true,
           progress: 0,
-          theme: "dark",
+          theme: 'dark',
+        });
+        // Clear the form or close modal after successful submission
+        setAddModalOpen(false);
+        setNewResidant({
+          profession: '',
+          ameliore: '',
+          nb_pieces: '',
+          superficie: '',
+          address: '',
+        });
+      } else if (response && response.payload.status === 'alert') {
+        toast.error(response.payload.message, {
+          position: 'bottom-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: 'dark',
         });
       } else {
         // Handle other statuses or errors
-        toast.error("Failed to add residant", {
-          position: "bottom-right",
+        toast.error(response.payload.message, {
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: false,
           draggable: true,
           progress: 0,
-          theme: "dark",
+          theme: 'dark',
         });
       }
-
-      // Clear the form or close modal after successful submission
-      setAddModalOpen(false);
-      setNewResidant({
-        profession: "",
-        ameliore: "",
-        nb_pieces: "",
-        superficie: "",
-        address: "",
-      });
     } catch (error) {
-      console.error("Error adding residant:", error);
-      toast.error("An error occurred while adding residant", {
-        position: "bottom-right",
+      console.error('Error adding residant:', error);
+      toast.error('An error occurred while adding residant', {
+        position: 'bottom-right',
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
         draggable: true,
         progress: 0,
-        theme: "dark",
+        theme: 'dark',
       });
     }
   };
+  
 
   const handleEditResidant = async () => {
     // Validate all fields before dispatching
     if (
-      currentResidant.res_id === "" ||
-      currentResidant.nom === "" ||
-      currentResidant.prenom === "" ||
-      currentResidant.cin == "" ||
-      currentResidant.email === "" ||
-      currentResidant.profession === "" ||
-      currentResidant.ameliored === "" ||
-      currentResidant.telephone === ""
+      currentResidant.res_id === '' ||
+      currentResidant.nom === '' ||
+      currentResidant.prenom === '' ||
+      currentResidant.cin === '' ||
+      currentResidant.email === '' ||
+      currentResidant.profession === '' ||
+      currentResidant.ameliore === '' ||
+      currentResidant.telephone === ''
     ) {
       // Handle invalid form data
       return;
     }
-
-    console.log(currentResidant);
-
+  
     // Convert is_ameliore to a boolean if it's a string "yes" or "no"
-    const isAmelioreBoolean = currentResidant.is_ameliore === "yes";
-
+    const isAmelioreBoolean = currentResidant.ameliore === 'yes';
+  
     // Prepare the data to dispatch
     const residantData = {
       res_id: currentResidant.res_id,
@@ -319,58 +346,85 @@ const ResidantTable = ({ columns, rows, title }) => {
       cin: currentResidant.cin,
       email: currentResidant.email,
       profession: currentResidant.profession,
-      statut: currentResidant.statut,
       is_ameliore: isAmelioreBoolean,
+      telephone: currentResidant.telephone,
     };
 
-    //consol log residantData
     console.log(residantData);
-
+  
+    // Show loading toast while processing
+    const loadingToastId = toast.loading('Updating residant...', {
+      position: 'bottom-right',
+      autoClose: false,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: false,
+      draggable: true,
+      progress: 0,
+      theme: 'dark',
+    });
+  
     try {
+      // Dispatch the action to update residant
       const response = await dispatch(updateResidantThunk(residantData));
-
-      // Handle response
-      if (response && response.payload.status === "success") {
-        toast.success("Residant edited successfully", {
-          position: "bottom-right",
+  
+      // Clear loading toast
+      toast.dismiss(loadingToastId);
+  
+      // Display success message
+      if (response && response.payload.status === 'success') {
+        toast.success('Residant edited successfully', {
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: false,
           draggable: true,
           progress: 0,
-          theme: "dark",
+          theme: 'dark',
+        });
+  
+        // Clear the form or close modal after successful submission
+        setEditModalOpen(false);
+      } else if (response && response.payload.status === 'alert') {
+        toast.error(response.payload.message, {
+          position: 'bottom-right',
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: 'dark',
         });
       } else {
         // Handle other statuses or errors
-        toast.error("Failed to edit residant", {
-          position: "bottom-right",
+        toast.error('Failed to edit residant', {
+          position: 'bottom-right',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: false,
           draggable: true,
           progress: 0,
-          theme: "dark",
+          theme: 'dark',
         });
       }
-
-      // Clear the form or close modal after successful submission
-      setEditModalOpen(false);
     } catch (error) {
-      console.error("Error editing residant:", error);
-      toast.error("An error occurred while editing residant", {
-        position: "bottom-right",
+      console.error('Error editing residant:', error);
+      toast.error('An error occurred while editing residant', {
+        position: 'bottom-right',
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
         draggable: true,
         progress: 0,
-        theme: "dark",
+        theme: 'dark',
       });
     }
   };
+  
 
   //delete a residant
   const handleDeleteResidant = async () => {
@@ -643,7 +697,6 @@ const ResidantTable = ({ columns, rows, title }) => {
     );
   }, [page, pages, hasSearchFilter]);
 
-  
   return (
     <>
       <Table
@@ -701,12 +754,12 @@ const ResidantTable = ({ columns, rows, title }) => {
               <ModalBody>
                 <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Input
-                    isDisabled
                     type="text"
-                    label="No residant"
+                    label="Nom"
+                    placeholder="Enter Nom du residant"
                     className="max-w-sm"
                     classNames={{
-                      label: "text-white/90",
+                      label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
                         "bg-zinc-800",
                         "group-data-[has-value=true]:text-white/90",
@@ -720,14 +773,18 @@ const ResidantTable = ({ columns, rows, title }) => {
                         "!cursor-text",
                       ],
                     }}
+                    value={newResidant.nom}
+                    onChange={(e) =>
+                      setNewResidant({ ...newResidant, nom: e.target.value })
+                    }
                   />
                   <Input
-                    isDisabled
                     type="text"
-                    label="Occupé Par"
+                    label="Prenom"
+                    placeholder="Enter Prenom du residant"
                     className="max-w-sm"
                     classNames={{
-                      label: "text-white/90",
+                      label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
                         "bg-zinc-800",
                         "group-data-[has-value=true]:text-white/90",
@@ -741,6 +798,10 @@ const ResidantTable = ({ columns, rows, title }) => {
                         "!cursor-text",
                       ],
                     }}
+                    value={newResidant.prenom}
+                    onChange={(e) =>
+                      setNewResidant({ ...newResidant, prenom: e.target.value })
+                    }
                   />
                 </div>
                 <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
@@ -834,6 +895,88 @@ const ResidantTable = ({ columns, rows, title }) => {
                     </SelectItem>
                   </Select>
                 </div>
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
+                  {/* cin */}
+                  <Input
+                    type="text"
+                    label="CIN"
+                    placeholder="Entrer le CIN"
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
+                    value={newResidant.cin}
+                    onChange={(e) =>
+                      setNewResidant({ ...newResidant, cin: e.target.value })
+                    }
+                  />
+                  {/* telephone */}
+                  <Input
+                    type="text"
+                    label="Telephone"
+                    placeholder="Entrer le téléphone"
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
+                    value={newResidant.telephone}
+                    onChange={(e) =>
+                      setNewResidant({
+                        ...newResidant,
+                        telephone: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
+                  {/* email */}
+                  <Input
+                    type="text"
+                    label="Email"
+                    placeholder="Entrer l'email"
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
+                    value={newResidant.email}
+                    onChange={(e) =>
+                      setNewResidant({ ...newResidant, email: e.target.value })
+                    }
+                  />
+                </div>
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="flat" onPress={onClose}>
@@ -866,9 +1009,9 @@ const ResidantTable = ({ columns, rows, title }) => {
               <ModalBody>
                 <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Input
-                    isDisabled
                     type="text"
-                    label="Résidant"
+                    label="Nom"
+                    placeholder="Entrer le nom du residant"
                     className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
@@ -894,10 +1037,9 @@ const ResidantTable = ({ columns, rows, title }) => {
                   />
 
                   <Input
-                    isDisabled
                     type="text"
-                    label="No du residant"
-                    placeholder="Entrer No du residant"
+                    label="Prenom"
+                    placeholder="Entrer le prenom du residant"
                     className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
@@ -1017,10 +1159,11 @@ const ResidantTable = ({ columns, rows, title }) => {
                 </div>
 
                 <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
+                  {/* telephone */}
                   <Input
                     type="text"
-                    label="Nombre de pièces"
-                    placeholder="Entrer le nombre de pièces"
+                    label="Téléphone"
+                    placeholder="Entrer le téléphone"
                     className="max-w-sm"
                     classNames={{
                       label: "group-data-[filled-within=true]:text-zinc-400",
@@ -1036,11 +1179,69 @@ const ResidantTable = ({ columns, rows, title }) => {
                         "!cursor-text",
                       ],
                     }}
-                    defaultValue={currentResidant?.profession}
+                    defaultValue={currentResidant?.telephone}
                     onChange={(e) =>
                       setCurrentResidant({
                         ...currentResidant,
-                        profession: e.target.value,
+                        telephone: e.target.value,
+                      })
+                    }
+                  />
+                  {/* cin */}
+                  <Input
+                    type="text"
+                    label="CIN"
+                    placeholder="Entrer le CIN"
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
+                    defaultValue={currentResidant?.cin}
+                    onChange={(e) =>
+                      setCurrentResidant({
+                        ...currentResidant,
+                        cin: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
+                  {/* email */}
+                  <Input
+                    type="text"
+                    label="Email"
+                    placeholder="Entrer l'email"
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-zinc-800",
+                        "group-data-[hover=true]:bg-zinc-700",
+                        "group-data-[focus=true]:bg-zinc-800 ",
+                        "!cursor-text",
+                      ],
+                    }}
+                    defaultValue={currentResidant?.email}
+                    onChange={(e) =>
+                      setCurrentResidant({
+                        ...currentResidant,
+                        email: e.target.value,
                       })
                     }
                   />

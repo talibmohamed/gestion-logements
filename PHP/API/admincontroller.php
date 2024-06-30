@@ -70,37 +70,7 @@ class AdminController
     }
 
 
-    public function addUserAPI($data)
-    {
-        if ($data && isset($data['email']) && isset($data['nom']) && isset($data['prenom']) && isset($data['cin']) && isset($data['profession']) && isset($data['is_ameliore'])) {
-            $email = $data['email'];
-            $userData = [
-                'email' => $email,
-                'nom' => $data['nom'],
-                'prenom' => $data['prenom'],
-                'cin' => $data['cin'],
-                'profession' => $data['profession'],
-                'is_ameliore' => $data['is_ameliore']
-            ];
 
-            // Check which optional fields are provided
-            $optionalFields = ['telephone'];
-            foreach ($optionalFields as $field) {
-                if (isset($data[$field])) {
-                    $userData[$field] = $data[$field];
-                }
-            }
-
-            // Add user and send email
-            $response = $this->admin->addUserAndSendEmail($userData);
-
-            http_response_code(200);
-            echo json_encode($response);
-        } else {
-            http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Missing required fields.']);
-        }
-    }
 
     //all getAllreclamationAPI
     public function getAllreclamationAPI($jwt)
@@ -311,7 +281,177 @@ class AdminController
     }
 
 
+ public function addResidentAPI($data)
+{
+    if ($data) {
+        // Define required fields and initialize missing fields array
+        $requiredFields = ['email', 'nom', 'prenom', 'cin', 'profession'];
+        $missingFields = [];
 
+        $data['is_ameliore'] = $data['is_ameliore'] ? 'TRUE' : 'FALSE';
+
+
+        // Trim and sanitize fields
+        $data = array_map('trim', $data);
+        $data['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
+
+        // Check for missing required fields
+        foreach ($requiredFields as $field) {
+            if (!isset($data[$field]) || empty($data[$field])) {
+                $missingFields[] = $field;
+            }
+        }
+
+        // If there are missing required fields, return an error response
+        if (!empty($missingFields)) {
+            echo json_encode(['status' => 'error', 'message' => 'Missing required fields: ' . implode(', ', $missingFields)]);
+            return;
+        }
+
+        // Validate email format
+        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid email format.']);
+            return;
+        }
+
+        // Validate CIN format (assuming alphanumeric with specific length)
+        if (!preg_match('/^[a-zA-Z0-9]{4,10}$/', $data['cin'])) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid CIN format.']);
+            return;
+        }
+
+        // Validate is_ameliore (ensure it's a boolean)
+        $isAmeliore = filter_var($data['is_ameliore'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        if ($isAmeliore === null) {
+            echo json_encode(['status' => 'error', 'message' => 'Invalid value for is_ameliore. Must be a boolean.']);
+            return;
+        }
+
+        // Prepare user data
+        $userData = [
+            'email' => $data['email'],
+            'nom' => $data['nom'],
+            'prenom' => $data['prenom'],
+            'cin' => $data['cin'],
+            'profession' => $data['profession'],
+            'is_ameliore' => $isAmeliore
+        ];
+
+        // Check if telephone field is provided and add to user data
+        if (isset($data['telephone'])) {
+            $userData['telephone'] = $data['telephone'];
+        }
+
+        // Add resident and send response
+        $response = $this->admin->addResident($userData);
+
+        http_response_code(200);
+        echo json_encode($response);
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'No data provided.']);
+    }
+}
+    
+    // Controller method to update resident information
+    public function updateResidentAPI($data)
+    {
+        if ($data) {
+            // Check for required fields including res_id
+            $requiredFields = ['res_id', 'email', 'nom', 'prenom', 'cin', 'profession', 'is_ameliore'];
+            $missingFields = [];
+
+            $data['is_ameliore'] = $data['is_ameliore'] ? 'TRUE' : 'FALSE';
+
+            // Check for missing required fields
+            foreach ($requiredFields as $field) {
+                if (!isset($data[$field]) || empty($data[$field])) {
+                    $missingFields[] = $field;
+                }
+            }
+    
+            if (!empty($missingFields)) {
+                echo json_encode(['status' => 'error', 'message' => 'Missing required fields: ' . implode(', ', $missingFields)]);
+                return;
+            }
+    
+            // Validate email
+            if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid email format.']);
+                return;
+            }
+    
+            // Validate CIN (assuming it's alphanumeric and of a certain length)
+            if (!preg_match('/^[a-zA-Z0-9]{6,10}$/', $data['cin'])) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid CIN format.']);
+                return;
+            }
+    
+            // Convert is_ameliore to boolean
+            $isAmeliore = filter_var($data['is_ameliore'], FILTER_VALIDATE_BOOLEAN);
+    
+            if ($isAmeliore === null) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid value for is_ameliore. Must be a boolean.']);
+                return;
+            }
+    
+            // Prepare user data
+            $res_id = $data['res_id'];
+            $email = $data['email'];
+            $userData = [
+                'res_id' => $res_id,
+                'email' => $email,
+                'nom' => $data['nom'],
+                'prenom' => $data['prenom'],
+                'cin' => $data['cin'],
+                'profession' => $data['profession'],
+                'is_ameliore' => $isAmeliore
+            ];
+    
+            // Check which optional fields are provided
+            $optionalFields = ['telephone'];
+            foreach ($optionalFields as $field) {
+                if (isset($data[$field])) {
+                    $userData[$field] = $data[$field];
+                }
+            }
+    
+            // Update resident in the model
+            $response = $this->admin->updateResident($userData);
+    
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'No data provided.']);
+        }
+    }
+    
+
+    // Delete resident API
+    public function deleteResidentAPI($data)
+    {
+        // Check if required fields are present in $data
+        if (isset($data['res_id'])) {
+            // Sanitize and validate inputs
+            $res_id = filter_var($data['res_id'], FILTER_VALIDATE_INT);
+
+            // Check if res_id is valid
+            if ($res_id !== false && $res_id > 0) {
+                // Pass sanitized data to the model for deletion
+                $response = $this->admin->deleteResident($res_id);
+                // Respond with success message and HTTP 200 status
+                http_response_code(200);
+                echo json_encode($response);
+            } else {
+                // Respond with 400 Bad Request if res_id is invalid
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid res_id']);
+            }
+        } else {
+            // Respond with 400 Bad Request if res_id is missing
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'res_id parameter is required']);
+        }
+    }
 
 
 

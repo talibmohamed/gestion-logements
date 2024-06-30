@@ -254,6 +254,8 @@ export const addResidantThunk = createAsyncThunk(
 
     try {
       const response = await addResidant(jwt, residant);
+      console.log(response);
+
       // fetch all residants again to update the state
       dispatch(fetchResidantsThunk());
       return response;
@@ -273,6 +275,7 @@ export const updateResidantThunk = createAsyncThunk(
 
     try {
       const response = await updateResidant(jwt, residant);
+      console.log(response);
       // Fetch all residants again to update the state
       dispatch(fetchResidantsThunk());
       return response;
