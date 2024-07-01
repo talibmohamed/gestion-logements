@@ -347,7 +347,6 @@ const ResidantTable = ({ columns, rows, title }) => {
       telephone: currentResidant.telephone,
       profession: currentResidant.profession,
       is_ameliore: isAmelioreBoolean,
-      telephone: currentResidant.telephone,
     };
 
     console.log(residantData);

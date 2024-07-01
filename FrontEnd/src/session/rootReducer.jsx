@@ -4,6 +4,7 @@ import notificationReducer from './notificationSlice';
 import userReducer from './userslice';
 import adminReducer from './adminslice';
 import factureReducer from './factureSlice';
+import consumReducer from './consumSlice';
 import statisticsReducer from "./statisticsSlice"; 
 import logementsReducer from "./logementSlice"
 import residantssReducer from "./residantSlice"
@@ -18,7 +19,8 @@ const rootReducer = combineReducers({
   facture: factureReducer,
   statistics: statisticsReducer, 
   logements: logementsReducer,
-  residants: residantssReducer
+  residants: residantssReducer,
+  consum: consumReducer
 });
 
 export const resetStateReducer = (state, action) => {
@@ -31,7 +33,8 @@ export const resetStateReducer = (state, action) => {
       facture: undefined,
       statistics: undefined, 
       logements: undefined,
-      residants: undefined
+      residants: undefined,
+      consum: undefined
     };
   }
   return rootReducer(state, action);

@@ -9,7 +9,7 @@ import "./Statics.scss";
 import { Card, CardBody } from "@nextui-org/react";
 import { columns } from "./components/logData.jsx";
 import { ToastContainer } from "react-toastify";
-import { columnsc, usersc } from "./components/consumData.jsx";
+import { consumColumns } from "./components/consumData.jsx";
 
 // const sampleData = [
 //   { label: "vacant", data: [12, 6, 20, 4, 20, 1], color: "#96A7FF" },
@@ -34,10 +34,16 @@ const Logement = () => {
 
   const dispatch = useDispatch();
   const logements = useSelector((state) => state.logements.logements);
+  const consums = useSelector((state) => state.consums.consums);
 
   useEffect(() => {
     dispatch(fetchLogementsThunk());
   }, [dispatch]);
+  
+  useEffect(() => {
+    dispatch(fetchConsumsThunk());
+  }, [dispatch]);
+
 
   const transformLogementsData = (logements) => {
     return logements.map((logement) => ({
@@ -56,6 +62,19 @@ const Logement = () => {
     }));
   };
 
+  const transformConsumsData = (consums) => {
+    return consums.map((consum) => ({
+      id: consum.id,
+      num_de_log: consum.log_id,
+      nom: consum.nom,
+      type_log: consum.typelog,
+      ameliored: consum.is_ameliore ? "Oui" : "Non",
+      consumE: consum.consumE,
+      consumW: consum.consumW,
+    }));
+  };
+
+  const transformedConsums = transformConsumsData(consums);
   const transformedLogements = transformLogementsData(logements);
 
   return (
@@ -81,7 +100,7 @@ const Logement = () => {
           shadow="sm"
         >
           <CardBody>
-            <ConsumTable columns={columnsc} rows={usersc} title="Consommation" />
+            <ConsumTable columns={consumColumns} rows={transformedConsums} title="Consommation" />
           </CardBody>
         </Card>
       </div>

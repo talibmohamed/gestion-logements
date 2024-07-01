@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Table,
   TableHeader,
@@ -31,6 +32,10 @@ import { EyeIcon } from "../Icons/EyeIcon";
 import { VerticalDotsIcon } from "../Icons/VerticalDotsIcon";
 import PropTypes from "prop-types";
 import "./customWrappers.scss";
+import {
+  addConsumThunk,
+  updateConsumThunk,
+} from "../../../../../session/thunks/adminthunk.jsx";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
@@ -64,7 +69,7 @@ const ConsumTable = ({ columns, rows, title }) => {
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 10;
 
-  const [currentConsum, setCurrentConsum] = useState(null);
+  const [currentConsum, setCurrentConsum] = useState({});
 
   const {
     isOpen: isAddModalOpen,
@@ -86,6 +91,29 @@ const ConsumTable = ({ columns, rows, title }) => {
   //     onOpen: openDeleteModal,
   //     onOpenChange: setDeleteModalOpen,
   //   } = useDisclosure();
+
+  const [newConsum, setNewConsum] = useState({
+    id: "",
+    num_de_log: "",
+    nom: "",
+    type_log: "",
+    ameliored: "",
+    consumE: "",
+    consumW: "",
+  });
+
+  const handleEditClick = (consum) => {
+    setCurrentConsum({
+      id: consum.id,
+      num_de_log: consum.num_de_log,
+      nom: consum.nom,
+      type_log: consum.type_log,
+      ameliored: consum.ameliored,
+      consumE: consum.consumE,
+      consumW: consum.consumW,
+    });
+    setEditModalOpen(true);
+  };
 
   const pages = Math.ceil(rows.length / rowsPerPage);
 
@@ -123,16 +151,16 @@ const ConsumTable = ({ columns, rows, title }) => {
     let filteredUsers = [...rows];
 
     if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((user) =>
-        user.nom.toLowerCase().includes(filterValue.toLowerCase())
+      filteredUsers = filteredUsers.filter((item) =>
+        item.nom.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
     if (
       statusFilter !== "all" &&
       Array.from(statusFilter).length !== statusOptions.length
     ) {
-      filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.status)
+      filteredUsers = filteredUsers.filter((item) =>
+        Array.from(statusFilter).includes(item.status)
       );
     }
 
@@ -173,9 +201,178 @@ const ConsumTable = ({ columns, rows, title }) => {
   //     openDeleteModal();
   //   };
 
+
+  
+  const dispatch = useDispatch();
+
+  const handleAddConsum = async () => {
+    // Validate all fields before dispatching
+    if (
+      newConsum.id === "" ||
+      newConsum.num_de_log === "" ||
+      newConsum.nom === "" ||
+      newConsum.type_log === "" ||
+      newConsum.ameliored === "" ||
+      newConsum.consumE === "" ||
+      newConsum.consumW === ""
+    ) {
+      // Handle invalid form data
+      return;
+    }
+
+    // Convert ameliore to a boolean if it's a string "yes" or "no"
+    const amelioreBoolean = newConsum.ameliore === "yes";
+
+    // Prepare the data to dispatch
+    const ConsumData = {
+      id: newConsum.id,
+      num_de_log: newConsum.num_de_log,
+      nom: newConsum.nom,
+      type_log: newConsum.type_log,
+      ameliored: amelioreBoolean,
+      consumE: newConsum.consumE,
+      consumW: newConsum.consumW
+    };
+
+    console.log(consumData);
+
+    // Dispatch the action to add logement
+    try {
+      const response = await dispatch(addConsumThunk(consumData));
+
+      // Display success message
+      if (response && response.payload.status === "success") {
+        toast.success("Consum added successfully", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      } else {
+        // Handle other statuses or errors
+        toast.error("Failed to add Consum", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      }
+
+      // Clear the form or close modal after successful submission
+      setAddModalOpen(false);
+      setNewConsum({
+        type_log: "",
+        ameliore: "",
+        nb_pieces: "",
+        superficie: "",
+        address: "",
+      });
+    } catch (error) {
+      console.error("Error adding consum:", error);
+      toast.error("An error occurred while adding consum", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+    }
+  };
+
+  const handleEditConsum = async () => {
+    // Validate all fields before dispatching
+    if (
+      currentConsum.id === "" ||
+      currentConsum.num_de_log === "" ||
+      currentConsum.nom === "" ||
+      currentConsum.type_log === "" ||
+      currentConsum.ameliored === "" ||
+      currentConsum.consumE === "" ||
+      currentConsum.consumW === ""
+    ) {
+      // Handle invalid form data
+      return;
+    }
+
+    console.log(currentConsum);
+
+    // Convert is_ameliore to a boolean if it's a string "yes" or "no"
+    const isAmelioreBoolean = currentConsum.is_ameliore === "yes";
+
+    // Prepare the data to dispatch
+    const consumData = {
+      id: currentConsum.id,
+      num_de_log: currentConsum.num_de_log,
+      nom: currentConsum.nom,
+      type_log: currentConsum.type_log,
+      ameliored: isAmelioreBoolean,
+      consumE: currentConsum.consumE,
+      consumW: currentConsum.consumW,
+    };
+
+    //consol log consumData
+    console.log(consumData);
+
+    try {
+      const response = await dispatch(updateConsumThunk(consumData));
+
+      // Handle response
+      if (response && response.payload.status === "success") {
+        toast.success("Consum edited successfully", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      } else {
+        // Handle other statuses or errors
+        toast.error("Failed to edit consum", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      }
+
+      // Clear the form or close modal after successful submission
+      setEditModalOpen(false);
+    } catch (error) {
+      console.error("Error editing consum:", error);
+      toast.error("An error occurred while editing consum", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+    }
+  };
+
   const renderCell = React.useCallback(
-    (user, columnKey) => {
-      const cellValue = user[columnKey];
+    (item, columnKey) => {
+      const cellValue = item[columnKey];
 
       switch (columnKey) {
         case "role":
@@ -204,9 +401,9 @@ const ConsumTable = ({ columns, rows, title }) => {
                   <DropdownMenu
                     aria-label="Action event example"
                     onAction={(key) => {
-                      if (key === "details") handleDetailsIconClick(user);
-                      if (key === "edit") handleEditIconClick(user);
-                      //   if (key === "delete") handleDeleteIconClick(user);
+                      if (key === "details") handleDetailsIconClick(item);
+                      if (key === "edit") handleEditIconClick(item);
+                      //   if (key === "delete") handleDeleteIconClick(item);
                     }}
                   >
                     <DropdownItem key="details" startContent={<EyeIcon />}>
@@ -252,7 +449,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                   >
                     <span
                       className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                      onClick={() => handleDetailsIconClick(user)}
+                      onClick={() => handleDetailsIconClick(item)}
                     >
                       <EyeIcon />
                     </span>
@@ -282,7 +479,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                   >
                     <span
                       className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                      onClick={() => handleEditIconClick(user)}
+                      onClick={() => handleEditIconClick(item)}
                     >
                       <EditIcon />
                     </span>
@@ -314,7 +511,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                   >
                     <span
                       className="text-lg text-danger cursor-pointer active:opacity-50"
-                      onClick={() => handleDeleteIconClick(user)}
+                      onClick={() => handleDeleteIconClick(item)}
                     >
                       <DeleteIcon />
                     </span>
@@ -388,13 +585,12 @@ const ConsumTable = ({ columns, rows, title }) => {
                               popoverContent: ["bg-zinc-800", "text-white/90"],
                             }}
                           >
-                            {(user) => (
-                              <AutocompleteItem key={user.id}>
-                                {user.nom}
+                            {(item) => (
+                              <AutocompleteItem key={item.id}>
+                                {item.nom}
                               </AutocompleteItem>
                             )}
                           </Autocomplete>
-
                         </div>
 
                         <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
@@ -529,10 +725,10 @@ const ConsumTable = ({ columns, rows, title }) => {
           )}
         </TableHeader>
         <TableBody emptyContent={"No users found"} items={sortedItems}>
-          {(user) => (
-            <TableRow key={user.id}>
+          {(item) => (
+            <TableRow key={item.id}>
               {(columnKey) => (
-                <TableCell>{renderCell(user, columnKey)}</TableCell>
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
               )}
             </TableRow>
           )}
@@ -542,7 +738,7 @@ const ConsumTable = ({ columns, rows, title }) => {
       <Modal
         size="lg"
         isOpen={isDetailsModalOpen}
-        onOpenChange={() => setDetailsModalOpen(false)}
+        onOpenChange={setDetailsModalOpen}
         classNames={{
           base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
           closeButton: "hover:bg-white/5 active:bg-white/10",
@@ -562,7 +758,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                       type="text"
                       label="Facture ID:"
                       variant="bordered"
-                      defaultValue={currentConsum.id_fac}
+                      defaultValue={currentConsum.fac_id}
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -614,7 +810,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                       type="text"
                       label="Type de Facture:"
                       variant="bordered"
-                      defaultValue={currentConsum.type}
+                      defaultValue={currentConsum.fac_type}
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -639,7 +835,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                       isReadOnly
                       label="Mois de Consommation"
                       variant="bordered"
-                      defaultValue={currentConsum.mois}
+                      defaultValue={currentConsum.fac_date}
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -663,7 +859,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                       isReadOnly
                       label="Echeance"
                       variant="bordered"
-                      defaultValue={currentConsum.echeance}
+                      defaultValue={currentConsum.fac_echeance}
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -687,7 +883,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                       isReadOnly
                       label="Status"
                       variant="bordered"
-                      defaultValue={currentConsum.status}
+                      defaultValue={currentConsum.fac_etat}
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -711,7 +907,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                       isReadOnly
                       label="Montant TTC"
                       variant="bordered"
-                      defaultValue={currentConsum.ttc}
+                      defaultValue={currentConsum.fac_total}
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -796,7 +992,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                         type="text"
                         label="ID Logement:"
                         variant="bordered"
-                        defaultValue={currentConsum.id_logement}
+                        defaultValue={currentConsum.log_id}
                         className="max-w-sm"
                         classNames={{
                           label:
@@ -928,24 +1124,20 @@ const ConsumTable = ({ columns, rows, title }) => {
                       })
                     }
                   />
-                  
                 </div>
 
                 <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center mb-6 md:mb-0 gap-4">
-                <Input
+                  <Input
                     label="Electricité"
                     placeholder="Entrer la consommation"
                     endContent={
                       <div className="pointer-events-none flex items-center">
-                        <span className="text-default-400 text-small">
-                          m³
-                        </span>
+                        <span className="text-default-400 text-small">m³</span>
                       </div>
                     }
                     className="max-w-sm"
                     classNames={{
-                      label:
-                        "group-data-[filled-within=true]:text-zinc-400",
+                      label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
                         "bg-transparent",
                         "group-data-[has-value=true]:text-white/90",
@@ -965,22 +1157,19 @@ const ConsumTable = ({ columns, rows, title }) => {
                         consumE: e.target.value,
                       })
                     }
-                    />
+                  />
 
                   <Input
                     label="Eau"
                     placeholder="Entrer la consommation"
                     endContent={
                       <div className="pointer-events-none flex items-center">
-                        <span className="text-default-400 text-small">
-                          m³
-                        </span>
+                        <span className="text-default-400 text-small">m³</span>
                       </div>
                     }
                     className="max-w-sm"
                     classNames={{
-                      label:
-                        "group-data-[filled-within=true]:text-zinc-400",
+                      label: "group-data-[filled-within=true]:text-zinc-400",
                       input: [
                         "bg-transparent",
                         "group-data-[has-value=true]:text-white/90",

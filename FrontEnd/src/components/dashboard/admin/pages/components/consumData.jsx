@@ -1,4 +1,4 @@
-const columnsc = [
+const consumColumns = [
   { name: "No", uid: "id" },
   { name: "No logement", uid: "num_de_log" },
   { name: "Occupé Par", uid: "nom", sortable: true },
@@ -8,57 +8,5 @@ const columnsc = [
   { name: "Eau (m³)", uid: "consumW" },
   { name: "Actions", uid: "actions" },
 ];
-const usersc = [
-    {
-        id: 1,
-        num_de_log: "A101",
-        nom: "John Doe",
-        type_log: "Famille",
-        ameliored: "Oui",
-       consumE: 150,
-       consumW: 30,
-        actions: "Edit / Delete",
-      },
-      {
-        id: 2,
-        num_de_log: "B202",
-        nom: "Jane Smith",
-        type_log: "Individuel",
-        ameliored: "Non",
-       consumE: 100,
-       consumW: 25,
-        actions: "Edit / Delete",
-      },
-      {
-        id: 3,
-        num_de_log: "C303",
-        nom: "Michael Johnson",
-        type_log: "Famille",
-        ameliored: "Oui",
-       consumE: 200,
-       consumW: 35,
-        actions: "Edit / Delete",
-      },
-      {
-        id: 4,
-        num_de_log: "D404",
-        nom: "Sarah Williams",
-        type_log: "Individuel",
-        ameliored: "Non",
-       consumE: 120,
-       consumW: 28,
-        actions: "Edit / Delete",
-      },
-      {
-        id: 5,
-        num_de_log: "E505",
-        nom: "Chris Brown",
-        type_log: "Famille",
-        ameliored: "Oui",
-       consumE: 180,
-       consumW: 32,
-        actions: "Edit / Delete",
-      },
-    ];
 
-export { columnsc, usersc };
+export { consumColumns };
