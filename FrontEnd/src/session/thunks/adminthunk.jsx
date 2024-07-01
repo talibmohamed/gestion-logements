@@ -25,6 +25,12 @@ import {
   deleteResidant,
 } from "../services/adminapi";
 import {
+  fetchFactures,
+  addFacture,
+  updateFacture,
+  deleteFacture,
+} from "../services/adminapi";
+import {
   setStatistics,
   setStatisticsLoading,
   setStatisticsError,
@@ -308,3 +314,86 @@ export const deleteResidantThunk = createAsyncThunk(
     }
   }
 );
+
+
+export const fetchFacturesThunk = createAsyncThunk(
+  "factures/fetchFactures",
+  async (_, { dispatch, getState }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token; // Assuming auth slice manages JWT token
+
+    try {
+      const response = await fetchFactures(jwt); // Call your API function to fetch factures
+      dispatch(setFactures(response.factures));
+      return response; // Return response if needed by the caller
+    } catch (error) {
+      console.error("Error fetching factures:", error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to add a new facture
+export const addFactureThunk = createAsyncThunk(
+  "factures/addFacture",
+  async (facture, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    try {
+      const response = await addFacture(jwt, facture);
+      console.log(response);
+
+      // fetch all factures again to update the state
+      dispatch(fetchFacturesThunk());
+      return response;
+    } catch (error) {
+      console.error("Error adding facture:", error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to update an existing facture
+export const updateFactureThunk = createAsyncThunk(
+  "factures/updateFacture",
+  async (facture, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    try {
+      const response = await updateFacture(jwt, facture);
+      console.log(response);
+      // Fetch all factures again to update the state
+      dispatch(fetchFacturesThunk());
+      return response;
+    } catch (error) {
+      console.error("Error updating facture:", error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to delete a facture
+export const deleteFactureThunk = createAsyncThunk(
+  'factures/deleteFacture',
+  async (data, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    console.log(jwt);
+
+    try {
+      const response = await deleteFacture(jwt, data);
+      // Fetch all factures again to update the state
+      dispatch(fetchFacturesThunk());
+      console.log(response);
+      return response; // Ensure to return the response from deletefacture
+
+    } catch (error) {
+      console.error('Error deleting facture:', error);
+      throw error;
+    }
+  }
+);
+
