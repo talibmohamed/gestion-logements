@@ -50,15 +50,42 @@ function route($uri, $method)
             }
             break;
 
-        case '/api/v1/user/allnotification':
-            if ($method === 'POST') {
+
+        case '/api/v1/user/notification':
+            $jwtHandler = new JwtHandler();
+            $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+            $jwt_token = str_replace('Bearer ', '', $jwt_token);
+            $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+
+            if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
+                $adminController = new AdminController();
                 $userController = new UserController();
-                $userController->getAllnotifications($data);
+                $data = json_decode(file_get_contents("php://input"), true);
+
+                switch ($method) {
+                    case 'GET':
+                        // $adminController->getAllNotifications($data);
+                        break;
+
+                    case 'POST':
+                        $adminController->addNotificationAPI($data);
+                        break;
+
+                    default:
+                        http_response_code(405);
+                        echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+                        break;
+                }
             } else {
-                http_response_code(405);
-                echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+                http_response_code(401);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Unauthorized',
+                ]);
             }
             break;
+
+
             // case '/api/v1/user/firstloginwithtoken':
             //     if ($method === 'POST') {
             //         $userController = new UserController();
@@ -329,6 +356,9 @@ function route($uri, $method)
             break;
 
 
+
+
+
             //do the same to residants
         case '/api/v1/admin/residant':
             $jwtHandler = new JwtHandler();
@@ -372,14 +402,47 @@ function route($uri, $method)
             }
             break;
 
+
+        case '/api/v1/admin/notification':
+            $jwtHandler = new JwtHandler();
+            $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+            $jwt_token = str_replace('Bearer ', '', $jwt_token);
+            $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+
+            if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
+                $adminController = new AdminController();
+                $data = json_decode(file_get_contents("php://input"), true);
+
+                switch ($method) {
+                    case 'GET':
+                        // $adminController->getAllNotifications($data);
+                        break;
+
+                    case 'POST':
+                        $adminController->addNotificationAPI($data);
+                        break;
+
+                    default:
+                        http_response_code(405);
+                        echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+                        break;
+                }
+            } else {
+                http_response_code(401);
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Unauthorized',
+                ]);
+            }
+            break;
+
+
+
         default:
             http_response_code(404);
             echo json_encode(['status' => 'error', 'message' => 'API not found']);
             break;
     }
-
-
-    
 }
 
 // Call the router function

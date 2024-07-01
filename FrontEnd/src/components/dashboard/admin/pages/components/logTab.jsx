@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
+
 import "react-toastify/dist/ReactToastify.css";
 
 import {
@@ -1033,11 +1034,11 @@ const LogTable = ({ columns, rows, title }) => {
                         "text-white/90",
                       ],
                     }}
-                    value={newLogement?.statut}
+                    name={newLogement?.statut}
                     onChange={(e) =>
                       setNewLogement({
                         ...newLogement,
-                        statut: e.target.value,
+                        statut: e.target.name,
                       })
                     }
                   >

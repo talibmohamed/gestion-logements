@@ -30,11 +30,13 @@ import {
   updateFacture,
   deleteFacture,
 } from "../services/adminapi";
+import { sendNotification } from "../services/adminapi";
 import {
   setStatistics,
   setStatisticsLoading,
   setStatisticsError,
 } from "../statisticsSlice";
+
 import { setLogements } from "../logementSlice";
 import { setResidants } from "../residantSlice.jsx";
 
@@ -214,7 +216,7 @@ export const updateLogementThunk = createAsyncThunk(
 
 // Thunk to delete a logement
 export const deleteLogementThunk = createAsyncThunk(
-  'logements/deleteLogement',
+  "logements/deleteLogement",
   async (data, { getState, dispatch }) => {
     const state = getState();
     const jwt = state.auth.jwt_token;
@@ -227,16 +229,15 @@ export const deleteLogementThunk = createAsyncThunk(
       dispatch(fetchLogementsThunk());
       console.log(response);
       return response; // Ensure to return the response from deleteLogement
-
     } catch (error) {
-      console.error('Error deleting logement:', error);
+      console.error("Error deleting logement:", error);
       throw error;
     }
   }
 );
 
 export const fetchResidantsThunk = createAsyncThunk(
-  'residants/fetchResidants',
+  "residants/fetchResidants",
   async (_, { dispatch, getState }) => {
     const state = getState();
     const jwt = state.auth.jwt_token; // Assuming auth slice manages JWT token
@@ -295,7 +296,7 @@ export const updateResidantThunk = createAsyncThunk(
 
 // Thunk to delete a residant
 export const deleteResidantThunk = createAsyncThunk(
-  'residants/deleteResidant',
+  "residants/deleteResidant",
   async (data, { getState, dispatch }) => {
     const state = getState();
     const jwt = state.auth.jwt_token;
@@ -308,14 +309,12 @@ export const deleteResidantThunk = createAsyncThunk(
       dispatch(fetchResidantsThunk());
       console.log(response);
       return response; // Ensure to return the response from deleteresidant
-
     } catch (error) {
-      console.error('Error deleting residant:', error);
+      console.error("Error deleting residant:", error);
       throw error;
     }
   }
 );
-
 
 export const fetchFacturesThunk = createAsyncThunk(
   "factures/fetchFactures",
@@ -325,7 +324,7 @@ export const fetchFacturesThunk = createAsyncThunk(
 
     try {
       const response = await fetchFactures(jwt); // Call your API function to fetch factures
-      dispatch(setFactures(response.factures));
+      dispatch(setFacture(response.factures));
       return response; // Return response if needed by the caller
     } catch (error) {
       console.error("Error fetching factures:", error);
@@ -377,7 +376,7 @@ export const updateFactureThunk = createAsyncThunk(
 
 // Thunk to delete a facture
 export const deleteFactureThunk = createAsyncThunk(
-  'factures/deleteFacture',
+  "factures/deleteFacture",
   async (data, { getState, dispatch }) => {
     const state = getState();
     const jwt = state.auth.jwt_token;
@@ -390,11 +389,26 @@ export const deleteFactureThunk = createAsyncThunk(
       dispatch(fetchFacturesThunk());
       console.log(response);
       return response; // Ensure to return the response from deletefacture
-
     } catch (error) {
-      console.error('Error deleting facture:', error);
+      console.error("Error deleting facture:", error);
       throw error;
     }
   }
 );
 
+// Thunk to send a notification
+export const sendNotificationThunk = createAsyncThunk(
+  "notifications/sendAvis",
+  async (notificationData, { getState }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    try {
+      const response = await sendNotification(jwt, notificationData);
+      return response;
+    } catch (error) {
+      console.error("Error sending avis:", error);
+      throw error;
+    }
+  }
+);

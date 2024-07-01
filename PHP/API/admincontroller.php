@@ -643,7 +643,46 @@ class AdminController
             echo json_encode(['status' => 'error', 'message' => 'fac_id parameter is required']);
         }
     }
+    
+        public function addNotificationAPI($data) {
+            // Check if all required fields are present
+            if (
+                isset($data['notif_titre']) &&
+                isset($data['notif_desc']) &&
+                isset($data['res_id'])
+            ) {
+                // Sanitize and validate inputs
+                $notif_titre = htmlspecialchars($data['notif_titre'], ENT_QUOTES, 'UTF-8');
+                $notif_desc = htmlspecialchars($data['notif_desc'], ENT_QUOTES, 'UTF-8');
+                $res_id = filter_var($data['res_id'], FILTER_VALIDATE_INT);
 
+    
+                // Validate res_id
+                if ($res_id === false || $res_id <= 0) {
+                    http_response_code(400); // Bad Request
+                    echo json_encode(['status' => 'error', 'message' => 'Invalid res_id value']);
+                    return;
+                }
+
+    
+                // Prepare data for insertion
+                $notificationData = [
+                    'notif_titre' => $notif_titre,
+                    'notif_desc' => $notif_desc,
+                    'res_id' => $res_id,
+                ];
+    
+                // Pass sanitized data to the model for insertion
+                $response = $this->admin->addNotification($notificationData);
+    
+                // Respond with success message and HTTP 200 status
+                http_response_code(200);
+                echo json_encode($response);
+            } else {
+                http_response_code(400); // Bad Request
+                echo json_encode(['status' => 'error', 'message' => 'Missing required fields']);
+            }
+        }
 
 
 

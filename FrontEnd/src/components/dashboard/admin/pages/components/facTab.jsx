@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 import {
   Table,
@@ -330,8 +331,8 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
   const handleEditFacture = async () => {
     // Validate all fields before dispatching
     if (
-      currentFacture.fac_date === "" ||
-      currentFacture.fac_echeance === "" ||
+      currentFacture.fac_type === "" ||
+      currentFacture.fac_id === "" ||
       currentFacture.fac_etat === "" ||
       currentFacture.fac_total === ""
     ) {
@@ -341,8 +342,8 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
 
     // Prepare the data to dispatch
     const factureData = {
-      fac_date: currentFacture.fac_date,
-      fac_echeance: currentFacture.fac_echeance,
+      fac_type: currentFacture.fac_type,
+      fac_id: currentFacture.fac_id,
       fac_etat: currentFacture.fac_etat,
       fac_total: currentFacture.fac_total,
     };
@@ -424,23 +425,6 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
 
   //delete a facture
   const handleDeleteFacture = async () => {
-    const statut = currentFacture.fac_etat;
-
-    if (statut === "en attente") {
-      setDeleteModalOpen(false);
-
-      toast.error("Facture en attente, impossible de la supprimer", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: 0,
-        theme: "dark",
-      });
-      return;
-    }
 
     // Get the Invoice ID
     const fac_id = currentFacture.fac_id;
@@ -739,6 +723,13 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                             classNames={{
                               popoverContent: ["bg-zinc-800", "text-white/90"],
                             }}
+                            value={newFacture.res_id}
+                            onChange={(e) =>
+                              setNewFacture({
+                                ...newFacture,
+                                res_id: e.target.value,
+                              })
+                            }
                           >
                             {(item) => (
                               <AutocompleteItem key={item.res_id}>
@@ -749,11 +740,13 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                                     alignItems: "center",
                                   }}
                                 >
-                                  <span>{item.nom} {item.prenom}</span>
-                                  <span>{'RES' + item.res_id}</span>
+                                  <span>
+                                    {item.nom} {item.prenom}
+                                  </span>
+                                  <span>{"RES" + item.res_id}</span>
                                 </div>
                               </AutocompleteItem>
-                            )}                      
+                            )}
                           </Autocomplete>
 
                           <Select
@@ -1529,14 +1522,14 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                       handleStatusChange(keys.currentKey)
                     }
                   >
-                    <SelectItem key="payé" textValue="payé">
-                      payé
+                    <SelectItem key="payée" textValue="payée">
+                      Payée
                     </SelectItem>
-                    <SelectItem key="retard" textValue="retard">
-                      retard
+                    <SelectItem key="en retard" textValue="en retard">
+                      En Retard
                     </SelectItem>
-                    <SelectItem key="attente" textValue="attente">
-                      attente
+                    <SelectItem key="en attente" textValue="en attente">
+                      En attente
                     </SelectItem>
                   </Select>
 

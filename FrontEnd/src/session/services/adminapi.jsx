@@ -357,3 +357,24 @@ export const deleteFacture = async (jwtToken, data) => {
     throw error;
   }
 };
+
+
+// Function to send avis
+export const sendNotification = async (jwtToken, notificationData) => {
+  try {
+    const response = await axios.post(
+      `${baseURL}/admin/notification`,
+      notificationData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error in sendAvis:", error);
+    throw error;
+  }
+};
