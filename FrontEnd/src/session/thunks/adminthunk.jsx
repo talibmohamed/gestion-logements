@@ -239,6 +239,7 @@ export const fetchResidantsThunk = createAsyncThunk(
   async (_, { dispatch, getState }) => {
     const state = getState();
     const jwt = state.auth.jwt_token; // Assuming auth slice manages JWT token
+    console.log(response);
 
     try {
       const response = await fetchResidants(jwt); // Call your API function to fetch residants

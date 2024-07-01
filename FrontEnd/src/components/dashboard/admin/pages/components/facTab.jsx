@@ -35,7 +35,6 @@ import { DeleteIcon } from "../Icons/DeleteIcon";
 import { EyeIcon } from "../Icons/EyeIcon";
 import { VerticalDotsIcon } from "../Icons/VerticalDotsIcon";
 import PropTypes from "prop-types";
-import { useDispatch } from "react-redux";
 import "./customWrappers.scss";
 import {
   addFactureThunk,
