@@ -30,16 +30,13 @@ import {
   updateFacture,
   deleteFacture,
 } from "../services/adminapi";
-import {
-  fetchConsums,
-  addConsum,
-  updateConsum,
-} from "../services/adminapi";
+import { sendNotification } from "../services/adminapi";
 import {
   setStatistics,
   setStatisticsLoading,
   setStatisticsError,
 } from "../statisticsSlice";
+
 import { setLogements } from "../logementSlice";
 import { setResidants } from "../residantSlice.jsx";
 import { setConsums } from "../consumSlice.jsx";
@@ -134,6 +131,7 @@ export const fetchFactureThunk = createAsyncThunk(
     try {
       const response = await fetchFacture(jwt);
       console.log(response);
+
       dispatch(setFacture(response.factures));
       return response;
     } catch (error) {
@@ -219,7 +217,7 @@ export const updateLogementThunk = createAsyncThunk(
 
 // Thunk to delete a logement
 export const deleteLogementThunk = createAsyncThunk(
-  'logements/deleteLogement',
+  "logements/deleteLogement",
   async (data, { getState, dispatch }) => {
     const state = getState();
     const jwt = state.auth.jwt_token;
@@ -232,9 +230,8 @@ export const deleteLogementThunk = createAsyncThunk(
       dispatch(fetchLogementsThunk());
       console.log(response);
       return response; // Ensure to return the response from deleteLogement
-
     } catch (error) {
-      console.error('Error deleting logement:', error);
+      console.error("Error deleting logement:", error);
       throw error;
     }
   }
@@ -247,7 +244,7 @@ export const fetchResidantsThunk = createAsyncThunk(
     const jwt = state.auth.jwt_token; // Assuming auth slice manages JWT token
 
     try {
-      const response = await fetchResidants(jwt); // Call your API function to fetch residants
+      const response = await fetchResidants(jwt);
       dispatch(setResidants(response.residants));
       return response; // Return response if needed by the caller
     } catch (error) {
@@ -300,7 +297,7 @@ export const updateResidantThunk = createAsyncThunk(
 
 // Thunk to delete a residant
 export const deleteResidantThunk = createAsyncThunk(
-  'residants/deleteResidant',
+  "residants/deleteResidant",
   async (data, { getState, dispatch }) => {
     const state = getState();
     const jwt = state.auth.jwt_token;
@@ -313,14 +310,12 @@ export const deleteResidantThunk = createAsyncThunk(
       dispatch(fetchResidantsThunk());
       console.log(response);
       return response; // Ensure to return the response from deleteresidant
-
     } catch (error) {
-      console.error('Error deleting residant:', error);
+      console.error("Error deleting residant:", error);
       throw error;
     }
   }
 );
-
 
 export const fetchFacturesThunk = createAsyncThunk(
   "factures/fetchFactures",
@@ -330,7 +325,7 @@ export const fetchFacturesThunk = createAsyncThunk(
 
     try {
       const response = await fetchFactures(jwt); // Call your API function to fetch factures
-      dispatch(setFactures(response.factures));
+      dispatch(setFacture(response.factures));
       return response; // Return response if needed by the caller
     } catch (error) {
       console.error("Error fetching factures:", error);
@@ -382,7 +377,7 @@ export const updateFactureThunk = createAsyncThunk(
 
 // Thunk to delete a facture
 export const deleteFactureThunk = createAsyncThunk(
-  'factures/deleteFacture',
+  "factures/deleteFacture",
   async (data, { getState, dispatch }) => {
     const state = getState();
     const jwt = state.auth.jwt_token;
@@ -395,65 +390,10 @@ export const deleteFactureThunk = createAsyncThunk(
       dispatch(fetchFacturesThunk());
       console.log(response);
       return response; // Ensure to return the response from deletefacture
-
     } catch (error) {
-      console.error('Error deleting facture:', error);
+      console.error("Error deleting facture:", error);
       throw error;
     }
   }
 );
 
-export const fetchConsumsThunk = createAsyncThunk(
-  "consums/fetchConsums",
-  async (_, { dispatch, getState }) => {
-    const state = getState();
-    const jwt = state.auth.jwt_token; // Assuming auth slice manages JWT token
-
-    try {
-      const response = await fetchConsums(jwt); // Call your API function to fetch consums
-      dispatch(setConsums(response.consums));
-      return response; // Return response if needed by the caller
-    } catch (error) {
-      console.error("Error fetching consums:", error);
-      throw error;
-    }
-  }
-);
-
-// Thunk to add a new consum
-export const addConsumThunk = createAsyncThunk(
-  "consums/addConsum",
-  async (consum, { getState, dispatch }) => {
-    const state = getState();
-    const jwt = state.auth.jwt_token;
-
-    try {
-      const response = await addConsum(jwt, consum);
-      // fetch all consums again to update the state
-      dispatch(fetchConsumsThunk());
-      return response;
-    } catch (error) {
-      console.error("Error adding consum:", error);
-      throw error;
-    }
-  }
-);
-
-// Thunk to update an existing consum
-export const updateConsumThunk = createAsyncThunk(
-  "consums/updateConsum",
-  async (consum, { getState, dispatch }) => {
-    const state = getState();
-    const jwt = state.auth.jwt_token;
-
-    try {
-      const response = await updateConsum(jwt, consum);
-      // Fetch all consums again to update the state
-      dispatch(fetchConsumsThunk());
-      return response;
-    } catch (error) {
-      console.error("Error updating consum:", error);
-      throw error;
-    }
-  }
-);

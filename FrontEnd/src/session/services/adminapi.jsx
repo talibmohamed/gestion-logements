@@ -359,31 +359,12 @@ export const deleteFacture = async (jwtToken, data) => {
 };
 
 
-
-// Function to fetch all logements
-export const fetchConsums = async (jwt) => {
-  try {
-    const response = await axios.get(`${baseURL}/admin/consum`, {
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error(
-      "Error in fetchConsums:",
-      error.response || error.message || error
-    );
-    throw error;
-  }
-};
-
-// Function to add a consum
-export const addConsum = async (jwtToken, consumData) => {
+// Function to send avis
+export const sendNotification = async (jwtToken, notificationData) => {
   try {
     const response = await axios.post(
-      `${baseURL}/admin/consum`,
-      consumData,
+      `${baseURL}/admin/notification`,
+      notificationData,
       {
         headers: {
           "Content-Type": "application/json",
@@ -393,44 +374,7 @@ export const addConsum = async (jwtToken, consumData) => {
     );
     return response.data;
   } catch (error) {
-    console.error("Error in addConsum:", error);
-    throw error;
-  }
-};
-
-// Function to update a consum
-export const updateConsum = async (jwtToken, consumData) => {
-  try {
-    const response = await axios.put(
-      `${baseURL}/admin/consum`,
-      consumData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwtToken}`,
-        },
-      }
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error in updateConsum:", error);
-    throw error;
-  }
-};
-
-// Function to delete a consum
-export const deleteConsum = async (jwtToken, data) => {
-  try {
-    const response = await axios.delete(`${baseURL}/admin/consum`, {
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-        "Content-Type": "application/json",
-      },
-      data: data, // Pass data object directly to Axios
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error in deleteConsum:", error);
+    console.error("Error in sendAvis:", error);
     throw error;
   }
 };

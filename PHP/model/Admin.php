@@ -1073,4 +1073,116 @@ class admin
             ];
         }
     }
+
+    //add notifications
+
+
+    public function addNotification($notificationData)
+    {
+        try {
+            $connection = $this->db->getConnection();
+            $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+            // Extract data from $notificationData array
+            $notif_titre = $notificationData['notif_titre'];
+            $notif_desc = $notificationData['notif_desc'];
+            $res_id = $notificationData['res_id'];
+
+            // Check if res_id exists in residant table
+            $stmt = $connection->prepare("SELECT * FROM residant WHERE res_id = ?");
+            $stmt->execute([$res_id]);
+            $resident = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$resident) {
+                return [
+                    'status' => 'error',
+                    'message' => 'Residant not found.'
+                ];
+            }
+
+            // Extract recipient details
+            $recipientEmail = $resident['email']; // Assuming email field in residant table
+            $recipientNom = $resident['nom']; // Replace with actual field name for nom
+            $recipientPrenom = $resident['prenom']; // Replace with actual field name for prenom
+
+            // Prepare SQL statement with named placeholders
+            $sql = $connection->prepare('INSERT INTO notification (notif_titre, notif_desc, res_id) VALUES (:notif_titre, :notif_desc, :res_id)');
+
+            // Execute SQL statement with data bindings
+            $sql->execute([
+                ':notif_titre' => $notif_titre,
+                ':notif_desc' => $notif_desc,
+                ':res_id' => $res_id
+            ]);
+
+            // Close the connection
+            $connection = null;
+
+            // Send email notification
+            $subject = 'Houselytics Notification'; // Subject of the email
+            $body = "
+            <html>
+            <head>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: 20px auto;
+                        padding: 20px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        background-color: #f9f9f9;
+                    }
+                    h2 {
+                        font-size: 24px;
+                        color: #333;
+                    }
+                    p {
+                        margin: 10px 0;
+                    }
+                    a {
+                        color: #007bff;
+                        text-decoration: none;
+                    }
+                    a:hover {
+                        text-decoration: underline;
+                    }
+                    .footer {
+                        margin-top: 20px;
+                        font-size: 14px;
+                        color: #555;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <h2>Cher/Chère " . htmlentities($recipientNom, ENT_QUOTES, 'UTF-8') . " " . htmlentities($recipientPrenom, ENT_QUOTES, 'UTF-8') . ",</h2>
+                    <p>Vous avez reçu une nouvelle notification. Veuillez consulter votre compte Houselytics.</p>
+                    <p><strong>" . htmlentities($notif_titre, ENT_QUOTES, 'UTF-8') . "</strong></p>
+                    <p><strong>Description :</strong> " . htmlentities($notif_desc, ENT_QUOTES, 'UTF-8') . "</p>
+                    <p>Cordialement,<br>houselytics</p>
+                    <p class='footer'>Ceci est un email automatique, merci de ne pas y répondre.</p>
+                </div>
+            </body>
+            </html>
+            ";
+            // Call sendEmail function
+            sendEmail($recipientEmail, $recipientNom, $recipientPrenom, $subject, $body);
+
+            return [
+                'status' => 'success',
+                'message' => 'Notification added successfully'
+            ];
+        } catch (PDOException $e) {
+            // Return error response if an exception occurs
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 }
