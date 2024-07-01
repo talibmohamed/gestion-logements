@@ -32,6 +32,11 @@ import {
 } from "../services/adminapi";
 import { sendNotification } from "../services/adminapi";
 import {
+  fetchConsums,
+  addConsum,
+  updateConsum,
+} from "../services/adminapi";
+import {
   setStatistics,
   setStatisticsLoading,
   setStatisticsError,
@@ -397,3 +402,19 @@ export const deleteFactureThunk = createAsyncThunk(
   }
 );
 
+// Thunk to send a notification
+export const sendNotificationThunk = createAsyncThunk(
+  "notifications/sendAvis",
+  async (notificationData, { getState }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    try {
+      const response = await sendNotification(jwt, notificationData);
+      return response;
+    } catch (error) {
+      console.error("Error sending avis:", error);
+      throw error;
+    }
+  }
+);
