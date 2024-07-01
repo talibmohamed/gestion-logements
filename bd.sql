@@ -54,13 +54,18 @@ CREATE TABLE password_reset_tokens (
     FOREIGN KEY (email) REFERENCES residant (email) ON DELETE CASCADE
 );
 
+CREATE TYPE fac_etat_enum AS ENUM ('payée', 'en retard', 'en attente');
+
+CREATE TYPE fac_type_enum AS ENUM ('electricite', 'eau');
+
+
+
 CREATE TABLE facture (
     fac_id       SERIAL PRIMARY KEY,
-    fac_no       VARCHAR(100),
     fac_date     DATE,
-    fac_type     VARCHAR(255),
+    fac_type     fac_type_enum,
     fac_total    DOUBLE PRECISION,
-    fac_etat     VARCHAR(40),
+    fac_etat     fac_etat_enum DEFAULT 'en attente',
     fac_echeance DATE,
     res_id       INT,
     FOREIGN KEY (res_id)

@@ -4,7 +4,10 @@ import { columns, statusOptions } from "./components/facData";
 import FactureTable from "./components/facTab.jsx";
 import { Card, CardBody, Textarea, Input, Button } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchFactureThunk } from "../../../../session/thunks/adminthunk";
+import {
+  fetchFactureThunk,
+  fetchResidantsThunk,
+} from "../../../../session/thunks/adminthunk";
 
 const Facture = () => {
   const dispatch = useDispatch();
@@ -19,6 +22,19 @@ const Facture = () => {
       }
     };
 
+    fetchData();
+  }, [dispatch]);
+
+  //fetch all residants
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await dispatch(fetchResidantsThunk()).unwrap();
+        console.log(response);
+      } catch (error) {
+        console.error("Error fetching residants:", error);
+      }
+    };
     fetchData();
   }, [dispatch]);
 
@@ -81,7 +97,7 @@ const Facture = () => {
               }
               className="custom-input max-w-xs mb-2 ml-2 "
               classNames={{
-                label: "text-sm font-normal"
+                label: "text-sm font-normal",
               }}
             />
           </div>

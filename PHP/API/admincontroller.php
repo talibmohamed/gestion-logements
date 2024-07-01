@@ -85,18 +85,6 @@ class AdminController
         }
     }
 
-    //get all facture 
-    public function getAllfactureAPI($jwt)
-    {
-        if ($jwt) {
-            $response = $this->admin->getAllfacture($jwt);
-            http_response_code(200);
-            echo json_encode($response);
-        } else {
-            http_response_code(400);
-            echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
-        }
-    }
 
     //get statistics
     public function getStatisticsAPI()
@@ -281,77 +269,77 @@ class AdminController
     }
 
 
- public function addResidentAPI($data)
-{
-    if ($data) {
-        // Define required fields and initialize missing fields array
-        $requiredFields = ['email', 'nom', 'prenom', 'cin', 'profession'];
-        $missingFields = [];
+    public function addResidentAPI($data)
+    {
+        if ($data) {
+            // Define required fields and initialize missing fields array
+            $requiredFields = ['email', 'nom', 'prenom', 'cin', 'profession'];
+            $missingFields = [];
 
-        $data['is_ameliore'] = $data['is_ameliore'] ? 'TRUE' : 'FALSE';
+            $data['is_ameliore'] = $data['is_ameliore'] ? 'TRUE' : 'FALSE';
 
 
-        // Trim and sanitize fields
-        $data = array_map('trim', $data);
-        $data['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
+            // Trim and sanitize fields
+            $data = array_map('trim', $data);
+            $data['email'] = filter_var($data['email'], FILTER_SANITIZE_EMAIL);
 
-        // Check for missing required fields
-        foreach ($requiredFields as $field) {
-            if (!isset($data[$field]) || empty($data[$field])) {
-                $missingFields[] = $field;
+            // Check for missing required fields
+            foreach ($requiredFields as $field) {
+                if (!isset($data[$field]) || empty($data[$field])) {
+                    $missingFields[] = $field;
+                }
             }
+
+            // If there are missing required fields, return an error response
+            if (!empty($missingFields)) {
+                echo json_encode(['status' => 'error', 'message' => 'Missing required fields: ' . implode(', ', $missingFields)]);
+                return;
+            }
+
+            // Validate email format
+            if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid email format.']);
+                return;
+            }
+
+            // Validate CIN format (assuming alphanumeric with specific length)
+            if (!preg_match('/^[a-zA-Z0-9]{4,10}$/', $data['cin'])) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid CIN format.']);
+                return;
+            }
+
+            // Validate is_ameliore (ensure it's a boolean)
+            $isAmeliore = filter_var($data['is_ameliore'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($isAmeliore === null) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid value for is_ameliore. Must be a boolean.']);
+                return;
+            }
+
+            // Prepare user data
+            $userData = [
+                'email' => $data['email'],
+                'nom' => $data['nom'],
+                'prenom' => $data['prenom'],
+                'cin' => $data['cin'],
+                'profession' => $data['profession'],
+                'is_ameliore' => $isAmeliore
+            ];
+
+            // Check if telephone field is provided and add to user data
+            if (isset($data['telephone'])) {
+                $userData['telephone'] = $data['telephone'];
+            }
+
+            // Add resident and send response
+            $response = $this->admin->addResident($userData);
+
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            echo json_encode(['status' => 'error', 'message' => 'No data provided.']);
         }
-
-        // If there are missing required fields, return an error response
-        if (!empty($missingFields)) {
-            echo json_encode(['status' => 'error', 'message' => 'Missing required fields: ' . implode(', ', $missingFields)]);
-            return;
-        }
-
-        // Validate email format
-        if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-            echo json_encode(['status' => 'error', 'message' => 'Invalid email format.']);
-            return;
-        }
-
-        // Validate CIN format (assuming alphanumeric with specific length)
-        if (!preg_match('/^[a-zA-Z0-9]{4,10}$/', $data['cin'])) {
-            echo json_encode(['status' => 'error', 'message' => 'Invalid CIN format.']);
-            return;
-        }
-
-        // Validate is_ameliore (ensure it's a boolean)
-        $isAmeliore = filter_var($data['is_ameliore'], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-        if ($isAmeliore === null) {
-            echo json_encode(['status' => 'error', 'message' => 'Invalid value for is_ameliore. Must be a boolean.']);
-            return;
-        }
-
-        // Prepare user data
-        $userData = [
-            'email' => $data['email'],
-            'nom' => $data['nom'],
-            'prenom' => $data['prenom'],
-            'cin' => $data['cin'],
-            'profession' => $data['profession'],
-            'is_ameliore' => $isAmeliore
-        ];
-
-        // Check if telephone field is provided and add to user data
-        if (isset($data['telephone'])) {
-            $userData['telephone'] = $data['telephone'];
-        }
-
-        // Add resident and send response
-        $response = $this->admin->addResident($userData);
-
-        http_response_code(200);
-        echo json_encode($response);
-    } else {
-        echo json_encode(['status' => 'error', 'message' => 'No data provided.']);
     }
-}
-    
+
     // Controller method to update resident information
     public function updateResidentAPI($data)
     {
@@ -368,32 +356,32 @@ class AdminController
                     $missingFields[] = $field;
                 }
             }
-    
+
             if (!empty($missingFields)) {
                 echo json_encode(['status' => 'error', 'message' => 'Missing required fields: ' . implode(', ', $missingFields)]);
                 return;
             }
-    
+
             // Validate email
             if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
                 echo json_encode(['status' => 'error', 'message' => 'Invalid email format.']);
                 return;
             }
-    
+
             // Validate CIN (assuming it's alphanumeric and of a certain length)
             if (!preg_match('/^[a-zA-Z0-9]{6,10}$/', $data['cin'])) {
                 echo json_encode(['status' => 'error', 'message' => 'Invalid CIN format.']);
                 return;
             }
-    
+
             // Convert is_ameliore to boolean
             $isAmeliore = filter_var($data['is_ameliore'], FILTER_VALIDATE_BOOLEAN);
-    
+
             if ($isAmeliore === null) {
                 echo json_encode(['status' => 'error', 'message' => 'Invalid value for is_ameliore. Must be a boolean.']);
                 return;
             }
-    
+
             // Prepare user data
             $res_id = $data['res_id'];
             $email = $data['email'];
@@ -406,7 +394,7 @@ class AdminController
                 'profession' => $data['profession'],
                 'is_ameliore' => $isAmeliore
             ];
-    
+
             // Check which optional fields are provided
             $optionalFields = ['telephone'];
             foreach ($optionalFields as $field) {
@@ -414,17 +402,17 @@ class AdminController
                     $userData[$field] = $data[$field];
                 }
             }
-    
+
             // Update resident in the model
             $response = $this->admin->updateResident($userData);
-    
+
             http_response_code(200);
             echo json_encode($response);
         } else {
             echo json_encode(['status' => 'error', 'message' => 'No data provided.']);
         }
     }
-    
+
 
     // Delete resident API
     public function deleteResidentAPI($data)
@@ -452,6 +440,210 @@ class AdminController
             echo json_encode(['status' => 'error', 'message' => 'res_id parameter is required']);
         }
     }
+
+
+    //get all facture 
+    public function getAllfactureAPI($jwt)
+    {
+        if ($jwt) {
+            $response = $this->admin->getAllfacture($jwt);
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
+        }
+    }
+
+    //         this is my table 
+
+    // CREATE TABLE facture (
+    //     fac_id       SERIAL PRIMARY KEY,
+    //     fac_date     DATE,
+    //     fac_type     fac_type_enum,
+    //     fac_total    DOUBLE PRECISION,
+    //     fac_etat     fac_etat_enum DEFAULT 'en attente',
+    //     fac_echeance DATE,
+    //     res_id       INT,
+    //     FOREIGN KEY (res_id)
+    //         REFERENCES residant (res_id) ON DELETE CASCADE
+    // );
+
+    // add facture
+
+    public function addFactureAPI($data)
+    {
+        // Check if all required fields are present
+        if (
+            isset($data['fac_date']) &&
+            isset($data['fac_type']) &&
+            isset($data['fac_total']) &&
+            isset($data['fac_etat']) &&
+            isset($data['fac_echeance']) &&
+            isset($data['res_id'])
+        ) {
+            // Sanitize and validate inputs
+            $fac_date = htmlspecialchars($data['fac_date'], ENT_QUOTES, 'UTF-8');
+            $fac_type = htmlspecialchars($data['fac_type'], ENT_QUOTES, 'UTF-8');
+            $fac_total = filter_var($data['fac_total'], FILTER_VALIDATE_FLOAT);
+            $fac_etat = htmlspecialchars($data['fac_etat'], ENT_QUOTES, 'UTF-8');
+            $fac_echeance = htmlspecialchars($data['fac_echeance'], ENT_QUOTES, 'UTF-8');
+            $res_id = filter_var($data['res_id'], FILTER_VALIDATE_INT);
+
+            // Validate fac_etat against enum values
+            $allowed_fac_etats = ['en attente', 'payée', 'en retard'];
+            if (!in_array($fac_etat, $allowed_fac_etats)) {
+                http_response_code(400); // Bad Request
+                echo json_encode(['status' => 'error', 'message' => 'Invalid fac_etat value']);
+                return;
+            }
+
+            // Validate fac_type against enum values
+            $allowed_fac_types = ['electricite', 'eau'];
+            if (!in_array($fac_type, $allowed_fac_types)) {
+                http_response_code(400); // Bad Request
+                echo json_encode(['status' => 'error', 'message' => 'Invalid fac_type value']);
+                return;
+            }
+
+            // Validate fac_total
+            if ($fac_total === false || $fac_total <= 0) {
+                http_response_code(400); // Bad Request
+                echo json_encode(['status' => 'error', 'message' => 'Invalid fac_total value']);
+                return;
+            }
+
+            // Validate res_id
+            if ($res_id === false || $res_id <= 0) {
+                http_response_code(400); // Bad Request
+                echo json_encode(['status' => 'error', 'message' => 'Invalid res_id value']);
+                return;
+            }
+
+            // Validate date format (YYYY-MM-DD)
+            $date_format = 'Y-m-d';
+            $fac_date_obj = DateTime::createFromFormat($date_format, $fac_date);
+            $fac_echeance_obj = DateTime::createFromFormat($date_format, $fac_echeance);
+
+            if (!$fac_date_obj || $fac_date_obj->format($date_format) !== $fac_date) {
+                http_response_code(400); // Bad Request
+                echo json_encode(['status' => 'error', 'message' => 'Invalid fac_date format. Expected format: YYYY-MM-DD.']);
+                return;
+            }
+
+            if (!$fac_echeance_obj || $fac_echeance_obj->format($date_format) !== $fac_echeance) {
+                http_response_code(400); // Bad Request
+                echo json_encode(['status' => 'error', 'message' => 'Invalid fac_echeance format. Expected format: YYYY-MM-DD.']);
+                return;
+            }
+
+            // Prepare data for insertion
+            $factureData = [
+                'fac_date' => $fac_date,
+                'fac_type' => $fac_type,
+                'fac_total' => $fac_total,
+                'fac_etat' => $fac_etat,
+                'fac_echeance' => $fac_echeance,
+                'res_id' => $res_id
+            ];
+
+            // Pass sanitized data to the model for insertion
+            $response = $this->admin->addFacture($factureData);
+
+            // Respond with success message and HTTP 200 status
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            // Respond with 400 Bad Request if any required field is missing
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'All required fields must be provided']);
+        }
+    }
+
+    // Update facture API
+    public function updateFactureAPI($data)
+    {
+        // Check if all required fields are present
+        if (
+            isset($data['fac_id']) &&
+            isset($data['fac_type']) &&
+            isset($data['fac_etat']) &&
+            isset($data['fac_total'])
+        ) {
+            // Sanitize and validate inputs
+            $fac_id = filter_var($data['fac_id'], FILTER_VALIDATE_INT);
+            $fac_type = htmlspecialchars($data['fac_type'], ENT_QUOTES, 'UTF-8');
+            $fac_etat = htmlspecialchars($data['fac_etat'], ENT_QUOTES, 'UTF-8');
+            $fac_total = filter_var($data['fac_total'], FILTER_VALIDATE_FLOAT);
+
+            // Validate fac_etat against enum values
+            $allowed_fac_etats = ['en attente', 'payée', 'en retard'];
+            if (!in_array($fac_etat, $allowed_fac_etats)) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid fac_etat value']);
+                return;
+            }
+
+            // Validate fac_type against enum values
+            $allowed_fac_types = ['electricite', 'eau'];
+            if (!in_array($fac_type, $allowed_fac_types)) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid fac_type value']);
+                return;
+            }
+
+            // Check if fac_total is valid
+            if ($fac_total === false || $fac_total <= 0) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid fac_total value']);
+                return;
+            }
+
+            // Prepare data for update
+            $factureData = [
+                'fac_id' => $fac_id,
+                'fac_type' => $fac_type,
+                'fac_etat' => $fac_etat,
+                'fac_total' => $fac_total
+            ];
+
+            // Pass sanitized data to the model for update
+            $response = $this->admin->updateFacture($factureData);
+
+            // Respond with success message and HTTP 200 status
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            // Respond with 400 Bad Request if any required field is missing
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'All required fields must be provided']);
+        }
+    }
+
+    // Delete facture API
+    public function deleteFactureAPI($data)
+    {
+        // Check if required fields are present in $data
+        if (isset($data['fac_id'])) {
+            // Sanitize and validate inputs
+            $fac_id = filter_var($data['fac_id'], FILTER_VALIDATE_INT);
+
+            // Check if fac_id is valid
+            if ($fac_id !== false && $fac_id > 0) {
+                // Pass sanitized data to the model for deletion
+                $response = $this->admin->deleteFacture($fac_id);
+                // Respond with success message and HTTP 200 status
+                http_response_code(200);
+                echo json_encode($response);
+            } else {
+                // Respond with 400 Bad Request if fac_id is invalid
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid fac_id']);
+            }
+        } else {
+            // Respond with 400 Bad Request if fac_id is missing
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'fac_id parameter is required']);
+        }
+    }
+
 
 
 
