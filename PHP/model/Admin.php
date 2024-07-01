@@ -1185,4 +1185,104 @@ class admin
             ];
         }
     }
+    //get all reclamation
+    public function getReclamation()
+    {
+        try {
+            $connection = $this->db->getConnection();
+            $sql = $connection->prepare("
+                    SELECT 
+                        r.rec_id, 
+                        r.res_id, 
+                        (res.nom || ' ' || res.prenom) AS nom,
+                        r.rec_type, 
+                        r.rec_date, 
+                        r.rec_desc, 
+                        r.rec_etat 
+                    FROM 
+                        reclamation r
+                    JOIN 
+                        residant res 
+                    ON 
+                        r.res_id = res.res_id
+                ");
+            $sql->execute();
+            $reclamations = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+            return [
+                'status' => 'success',
+                'reclamations' => $reclamations
+            ];
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    //update reclamation rec_etat
+    public function updateReclamation($data)
+    {
+        try {
+            $connection = $this->db->getConnection();
+
+            // Extract data from $data array
+            $rec_id = $data['rec_id'];
+            $rec_etat = $data['rec_etat'];
+
+            // Prepare SQL statement with named placeholders
+            $sql = $connection->prepare('UPDATE reclamation SET rec_etat = :rec_etat WHERE rec_id = :rec_id');
+
+            // Execute SQL statement with data bindings
+            $sql->execute([
+                ':rec_id' => $rec_id,
+                ':rec_etat' => $rec_etat
+            ]);
+
+            return [
+                'status' => 'success',
+                'message' => 'Reclamation updated successfully'
+            ];
+        } catch (PDOException $e) {
+            // Return error response if an exception occurs
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+    
+    //delete reclamation
+    public function deleteReclamation($rec_id)
+    {
+        try {
+            $connection = $this->db->getConnection();
+
+            $sql = $connection->prepare('DELETE FROM reclamation WHERE rec_id = ?');
+
+            $sql->execute([$rec_id]);
+
+            // Check if any rows were affected
+            $rowsAffected = $sql->rowCount();
+
+            if ($rowsAffected > 0) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Reclamation deleted successfully'
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Reclamation not found or could not be deleted'
+                ];
+            }
+        } catch (PDOException $e) {
+            // Return error response if an exception occurs
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 }

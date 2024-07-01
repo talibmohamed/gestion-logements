@@ -643,46 +643,133 @@ class AdminController
             echo json_encode(['status' => 'error', 'message' => 'fac_id parameter is required']);
         }
     }
-    
-        public function addNotificationAPI($data) {
-            // Check if all required fields are present
-            if (
-                isset($data['notif_titre']) &&
-                isset($data['notif_desc']) &&
-                isset($data['res_id'])
-            ) {
-                // Sanitize and validate inputs
-                $notif_titre = htmlspecialchars($data['notif_titre'], ENT_QUOTES, 'UTF-8');
-                $notif_desc = htmlspecialchars($data['notif_desc'], ENT_QUOTES, 'UTF-8');
-                $res_id = filter_var($data['res_id'], FILTER_VALIDATE_INT);
 
-    
-                // Validate res_id
-                if ($res_id === false || $res_id <= 0) {
-                    http_response_code(400); // Bad Request
-                    echo json_encode(['status' => 'error', 'message' => 'Invalid res_id value']);
-                    return;
-                }
+    public function addNotificationAPI($data)
+    {
+        // Check if all required fields are present
+        if (
+            isset($data['notif_titre']) &&
+            isset($data['notif_desc']) &&
+            isset($data['res_id'])
+        ) {
+            // Sanitize and validate inputs
+            $notif_titre = htmlspecialchars($data['notif_titre'], ENT_QUOTES, 'UTF-8');
+            $notif_desc = htmlspecialchars($data['notif_desc'], ENT_QUOTES, 'UTF-8');
+            $res_id = filter_var($data['res_id'], FILTER_VALIDATE_INT);
 
-    
-                // Prepare data for insertion
-                $notificationData = [
-                    'notif_titre' => $notif_titre,
-                    'notif_desc' => $notif_desc,
-                    'res_id' => $res_id,
-                ];
-    
-                // Pass sanitized data to the model for insertion
-                $response = $this->admin->addNotification($notificationData);
-    
+
+            // Validate res_id
+            if ($res_id === false || $res_id <= 0) {
+                http_response_code(400); // Bad Request
+                echo json_encode(['status' => 'error', 'message' => 'Invalid res_id value']);
+                return;
+            }
+
+
+            // Prepare data for insertion
+            $notificationData = [
+                'notif_titre' => $notif_titre,
+                'notif_desc' => $notif_desc,
+                'res_id' => $res_id,
+            ];
+
+            // Pass sanitized data to the model for insertion
+            $response = $this->admin->addNotification($notificationData);
+
+            // Respond with success message and HTTP 200 status
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400); // Bad Request
+            echo json_encode(['status' => 'error', 'message' => 'Missing required fields']);
+        }
+    }
+
+    //get reclamation
+    public function getReclamationAPI($jwt)
+    {
+        if ($jwt) {
+            $response = $this->admin->getReclamation();
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
+        }
+    }
+
+    //update desc only rec_etat so he will get only rec_id and rec_etat
+    public function updateReclamationAPI($data)
+    {
+        // Check if all required fields are present
+        if (
+            isset($data['rec_id']) &&
+            isset($data['rec_etat'])
+        ) {
+            // Sanitize and validate inputs
+            $rec_id = filter_var($data['rec_id'], FILTER_VALIDATE_INT);
+            $rec_etat = htmlspecialchars($data['rec_etat'], ENT_QUOTES, 'UTF-8');
+
+            // Validate rec_etat against enum values
+            $allowed_rec_etats = ['en attente', 'en cours', 'résolu'];
+            if (!in_array($rec_etat, $allowed_rec_etats)) {
+                http_response_code(400); // Bad Request
+                echo json_encode(['status' => 'error', 'message' => 'Invalid rec_etat value']);
+                return;
+            }
+
+            // Validate rec_id
+            if ($rec_id === false || $rec_id <= 0) {
+                http_response_code(400); // Bad Request
+                echo json_encode(['status' => 'error', 'message' => 'Invalid rec_id value']);
+                return;
+            }
+
+            // Prepare data for insertion
+            $reclamationData = [
+                'rec_id' => $rec_id,
+                'rec_etat' => $rec_etat
+            ];
+
+            // Pass sanitized data to the model for insertion
+            $response = $this->admin->updateReclamation($reclamationData);
+
+            // Respond with success message and HTTP 200 status
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400); // Bad Request
+            echo json_encode(['status' => 'error', 'message' => 'Missing required fields']);
+        }
+    }
+
+
+    //delete raclamation
+    public function deleteReclamationAPI($data)
+    {
+        // Check if required fields are present in $data
+        if (isset($data['rec_id'])) {
+            // Sanitize and validate inputs
+            $rec_id = filter_var($data['rec_id'], FILTER_VALIDATE_INT);
+
+            // Check if rec_id is valid
+            if ($rec_id !== false && $rec_id > 0) {
+                // Pass sanitized data to the model for deletion
+                $response = $this->admin->deleteReclamation($rec_id);
                 // Respond with success message and HTTP 200 status
                 http_response_code(200);
                 echo json_encode($response);
             } else {
-                http_response_code(400); // Bad Request
-                echo json_encode(['status' => 'error', 'message' => 'Missing required fields']);
+                // Respond with 400 Bad Request if rec_id is invalid
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid rec_id']);
             }
+        } else {
+            // Respond with 400 Bad Request if rec_id is missing
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'rec_id parameter is required']);
         }
+    }
 
 
 

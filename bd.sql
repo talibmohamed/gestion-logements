@@ -86,20 +86,20 @@ CREATE TABLE consommation (
         REFERENCES logement (log_id) ON DELETE CASCADE
 );
 
+CREATE TYPE rec_etat_enum AS ENUM ('en attente', 'résolu', 'non résolu', 'annulé');
+
+
 CREATE TABLE reclamation (
     rec_id         SERIAL PRIMARY KEY,
     rec_desc       VARCHAR(255),
-    rec_etat       VARCHAR(50),
+    rec_etat       rec_etat_enum,
     rec_date       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     rec_response   DATE,
     res_id         INT,
-    log_id         INT,
     message        VARCHAR(255),
-    FOREIGN KEY (res_id)
-        REFERENCES residant (res_id) ON DELETE CASCADE,
-    FOREIGN KEY (log_id)
-        REFERENCES logement (log_id) ON DELETE CASCADE
+    FOREIGN KEY (res_id) REFERENCES residant (res_id) ON DELETE CASCADE
 );
+
 
 CREATE TABLE notification (
     notif_id SERIAL PRIMARY KEY,

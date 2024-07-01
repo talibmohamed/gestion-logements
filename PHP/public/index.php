@@ -355,10 +355,6 @@ function route($uri, $method)
             }
             break;
 
-
-
-
-
             //do the same to residants
         case '/api/v1/admin/residant':
             $jwtHandler = new JwtHandler();
@@ -435,6 +431,44 @@ function route($uri, $method)
                 ]);
             }
             break;
+
+            case '/api/v1/admin/reclamation':
+                $jwtHandler = new JwtHandler();
+                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                $jwt_token = str_replace('Bearer ', '', $jwt_token);
+                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+    
+                if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
+                    $adminController = new AdminController();
+    
+                    switch ($method) {
+                        case 'GET':
+                            $adminController->getReclamationAPI($jwt_token);
+                            break;
+                        case 'PUT':
+                            $data = json_decode(file_get_contents('php://input'), true);
+                            $adminController->updateReclamationAPI($data);
+                            break;
+                        case 'DELETE':
+                            $data = json_decode(file_get_contents('php://input'), true);
+                            $adminController->deleteReclamationAPI($data);
+                            break;
+                        default:
+                            http_response_code(405); // Method Not Allowed
+                            echo json_encode([
+                                'status' => 'error',
+                                'message' => 'Method Not Allowed',
+                            ]);
+                            break;
+                    }
+                } else {
+                    http_response_code(401); // Unauthorized
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Unauthorized',
+                    ]);
+                }
+                break;
 
 
 
