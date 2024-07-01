@@ -489,7 +489,7 @@ class AdminController
             $fac_etat = htmlspecialchars($data['fac_etat'], ENT_QUOTES, 'UTF-8');
             $fac_echeance = htmlspecialchars($data['fac_echeance'], ENT_QUOTES, 'UTF-8');
             $res_id = filter_var($data['res_id'], FILTER_VALIDATE_INT);
-    
+
             // Validate fac_etat against enum values
             $allowed_fac_etats = ['en attente', 'payée', 'en retard'];
             if (!in_array($fac_etat, $allowed_fac_etats)) {
@@ -497,7 +497,7 @@ class AdminController
                 echo json_encode(['status' => 'error', 'message' => 'Invalid fac_etat value']);
                 return;
             }
-    
+
             // Validate fac_type against enum values
             $allowed_fac_types = ['electricite', 'eau'];
             if (!in_array($fac_type, $allowed_fac_types)) {
@@ -505,38 +505,38 @@ class AdminController
                 echo json_encode(['status' => 'error', 'message' => 'Invalid fac_type value']);
                 return;
             }
-    
+
             // Validate fac_total
             if ($fac_total === false || $fac_total <= 0) {
                 http_response_code(400); // Bad Request
                 echo json_encode(['status' => 'error', 'message' => 'Invalid fac_total value']);
                 return;
             }
-    
+
             // Validate res_id
             if ($res_id === false || $res_id <= 0) {
                 http_response_code(400); // Bad Request
                 echo json_encode(['status' => 'error', 'message' => 'Invalid res_id value']);
                 return;
             }
-    
+
             // Validate date format (YYYY-MM-DD)
             $date_format = 'Y-m-d';
             $fac_date_obj = DateTime::createFromFormat($date_format, $fac_date);
             $fac_echeance_obj = DateTime::createFromFormat($date_format, $fac_echeance);
-    
+
             if (!$fac_date_obj || $fac_date_obj->format($date_format) !== $fac_date) {
                 http_response_code(400); // Bad Request
                 echo json_encode(['status' => 'error', 'message' => 'Invalid fac_date format. Expected format: YYYY-MM-DD.']);
                 return;
             }
-    
+
             if (!$fac_echeance_obj || $fac_echeance_obj->format($date_format) !== $fac_echeance) {
                 http_response_code(400); // Bad Request
                 echo json_encode(['status' => 'error', 'message' => 'Invalid fac_echeance format. Expected format: YYYY-MM-DD.']);
                 return;
             }
-    
+
             // Prepare data for insertion
             $factureData = [
                 'fac_date' => $fac_date,
@@ -546,10 +546,10 @@ class AdminController
                 'fac_echeance' => $fac_echeance,
                 'res_id' => $res_id
             ];
-    
+
             // Pass sanitized data to the model for insertion
             $response = $this->admin->addFacture($factureData);
-    
+
             // Respond with success message and HTTP 200 status
             http_response_code(200);
             echo json_encode($response);
@@ -559,7 +559,92 @@ class AdminController
             echo json_encode(['status' => 'error', 'message' => 'All required fields must be provided']);
         }
     }
-    
+
+    // Update facture API
+    public function updateFactureAPI($data)
+    {
+        // Check if all required fields are present
+        if (
+            isset($data['fac_id']) &&
+            isset($data['fac_type']) &&
+            isset($data['fac_etat']) &&
+            isset($data['fac_total'])
+        ) {
+            // Sanitize and validate inputs
+            $fac_id = filter_var($data['fac_id'], FILTER_VALIDATE_INT);
+            $fac_type = htmlspecialchars($data['fac_type'], ENT_QUOTES, 'UTF-8');
+            $fac_etat = htmlspecialchars($data['fac_etat'], ENT_QUOTES, 'UTF-8');
+            $fac_total = filter_var($data['fac_total'], FILTER_VALIDATE_FLOAT);
+
+            // Validate fac_etat against enum values
+            $allowed_fac_etats = ['en attente', 'payée', 'en retard'];
+            if (!in_array($fac_etat, $allowed_fac_etats)) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid fac_etat value']);
+                return;
+            }
+
+            // Validate fac_type against enum values
+            $allowed_fac_types = ['electricite', 'eau'];
+            if (!in_array($fac_type, $allowed_fac_types)) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid fac_type value']);
+                return;
+            }
+
+            // Check if fac_total is valid
+            if ($fac_total === false || $fac_total <= 0) {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid fac_total value']);
+                return;
+            }
+
+            // Prepare data for update
+            $factureData = [
+                'fac_id' => $fac_id,
+                'fac_type' => $fac_type,
+                'fac_etat' => $fac_etat,
+                'fac_total' => $fac_total
+            ];
+
+            // Pass sanitized data to the model for update
+            $response = $this->admin->updateFacture($factureData);
+
+            // Respond with success message and HTTP 200 status
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            // Respond with 400 Bad Request if any required field is missing
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'All required fields must be provided']);
+        }
+    }
+
+    // Delete facture API
+    public function deleteFactureAPI($data)
+    {
+        // Check if required fields are present in $data
+        if (isset($data['fac_id'])) {
+            // Sanitize and validate inputs
+            $fac_id = filter_var($data['fac_id'], FILTER_VALIDATE_INT);
+
+            // Check if fac_id is valid
+            if ($fac_id !== false && $fac_id > 0) {
+                // Pass sanitized data to the model for deletion
+                $response = $this->admin->deleteFacture($fac_id);
+                // Respond with success message and HTTP 200 status
+                http_response_code(200);
+                echo json_encode($response);
+            } else {
+                // Respond with 400 Bad Request if fac_id is invalid
+                http_response_code(400);
+                echo json_encode(['status' => 'error', 'message' => 'Invalid fac_id']);
+            }
+        } else {
+            // Respond with 400 Bad Request if fac_id is missing
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'fac_id parameter is required']);
+        }
+    }
+
+
 
 
 

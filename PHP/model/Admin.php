@@ -1004,5 +1004,73 @@ class admin
             ];
         }
     }
-    
+
+    // Update facture in the database
+    public function updateFacture($data)
+    {
+        try {
+            $connection = $this->db->getConnection();
+
+            // Extract data from $data array
+            $fac_id = $data['fac_id'];
+            $fac_type = $data['fac_type'];
+            $fac_etat = $data['fac_etat'];
+            $fac_total = $data['fac_total'];
+
+            // Prepare SQL statement with named placeholders
+            $sql = $connection->prepare('UPDATE facture SET fac_type = :fac_type, fac_etat = :fac_etat, fac_total = :fac_total WHERE fac_id = :fac_id');
+
+            // Execute SQL statement with data bindings
+            $sql->execute([
+                ':fac_id' => $fac_id,
+                ':fac_type' => $fac_type,
+                ':fac_etat' => $fac_etat,
+                ':fac_total' => $fac_total
+            ]);
+
+            return [
+                'status' => 'success',
+                'message' => 'Facture updated successfully'
+            ];
+        } catch (PDOException $e) {
+            // Return error response if an exception occurs
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    // Delete facture
+    public function deleteFacture($fac_id)
+    {
+        try {
+            $connection = $this->db->getConnection();
+
+            $sql = $connection->prepare('DELETE FROM facture WHERE fac_id = ?');
+
+            $sql->execute([$fac_id]);
+
+            // Check if any rows were affected
+            $rowsAffected = $sql->rowCount();
+
+            if ($rowsAffected > 0) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Facture deleted successfully'
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Facture not found or could not be deleted'
+                ];
+            }
+        } catch (PDOException $e) {
+            // Return error response if an exception occurs
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 }
