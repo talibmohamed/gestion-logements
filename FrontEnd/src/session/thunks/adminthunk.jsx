@@ -418,3 +418,59 @@ export const sendNotificationThunk = createAsyncThunk(
     }
   }
 );
+
+
+export const fetchConsumsThunk = createAsyncThunk(
+  "consums/fetchConsums",
+  async (_, { dispatch, getState }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token; // Assuming auth slice manages JWT token
+
+    try {
+      const response = await fetchConsums(jwt); // Call your API function to fetch Consums
+      dispatch(setConsums(response.consums));
+      return response; // Return response if needed by the caller
+    } catch (error) {
+      console.error("Error fetching consums:", error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to add a new consum
+export const addConsumThunk = createAsyncThunk(
+  "consums/addConsum",
+  async (consum, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    try {
+      const response = await addConsum(jwt, consum);
+      // fetch all consums again to update the state
+      dispatch(fetchConsumsThunk());
+      return response;
+    } catch (error) {
+      console.error("Error adding consum:", error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to update an existing consum
+export const updateConsumThunk = createAsyncThunk(
+  "consums/updateConsum",
+  async (consum, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    try {
+      const response = await updateConsum(jwt, consum);
+      // Fetch all consums again to update the state
+      dispatch(fetchConsumsThunk());
+      return response;
+    } catch (error) {
+      console.error("Error updating consum:", error);
+      throw error;
+    }
+  }
+);

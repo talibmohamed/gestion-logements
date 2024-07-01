@@ -378,3 +378,65 @@ export const sendNotification = async (jwtToken, notificationData) => {
     throw error;
   }
 };
+
+
+// Function to fetch all consums
+export const fetchConsums = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/admin/consum`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error in fetchConsums:",
+      error.response || error.message || error
+    );
+    throw error;
+  }
+};
+
+// Function to add a Consum
+export const addConsum = async (jwtToken, consumData) => {
+  try {
+    const response = await axios.post(
+      `${baseURL}/admin/consum`,
+      consumData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      }
+    );
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error("Error in addConsum:", error);
+    throw error;
+  }
+};
+
+
+// Function to update a consum
+export const updateConsum = async (jwtToken, consumData) => {
+  try {
+    const response = await axios.put(
+      `${baseURL}/admin/consum`,
+      consumData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      }
+    );
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error("Error in updateConsum:", error);
+    throw error;
+  }
+};
