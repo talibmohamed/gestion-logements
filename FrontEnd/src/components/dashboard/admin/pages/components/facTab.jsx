@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
 import {
   Table,
   TableHeader,
@@ -60,9 +62,9 @@ const SMALL_DEVICE_COLUMNS = [
 ];
 
 const statusColorMap = {
-  Payée: "secondary",
-  "En Retard": "primary",
-  "En Attente": "warning",
+  payée: "secondary",
+  "en retard": "primary",
+  "en attente": "warning",
 };
 
 const FactureTable = ({ columns, rows, statusOptions, title }) => {
@@ -504,6 +506,16 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
       });
     }
   };
+
+  const residants = useSelector((state) => {
+    return state.residants.residants.map((resident) => ({
+      res_id: resident.res_id,
+      nom: resident.nom,
+      prenom: resident.prenom,
+    }));
+  });
+
+  console.log(residants);
 
   const renderCell = React.useCallback(
     (item, columnKey) => {
