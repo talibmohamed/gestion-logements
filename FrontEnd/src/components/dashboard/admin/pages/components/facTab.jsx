@@ -35,19 +35,31 @@ import { DeleteIcon } from "../Icons/DeleteIcon";
 import { EyeIcon } from "../Icons/EyeIcon";
 import { VerticalDotsIcon } from "../Icons/VerticalDotsIcon";
 import PropTypes from "prop-types";
+import { useDispatch } from "react-redux";
 import "./customWrappers.scss";
+import {
+  addFactureThunk,
+  updateFactureThunk,
+  deleteFactureThunk,
+} from "../../../../../session/thunks/adminthunk.jsx";
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id",
+  "fac_id",
   "nom",
-  "type",
-  "mois",
-  "echeance",
-  "status",
-  "ttc",
+  "fac_type",
+  "fac_date",
+  "fac_echeance",
+  "fac_etat",
+  "fac_total",
   "actions",
 ];
-const SMALL_DEVICE_COLUMNS = ["nom", "type", "echeance", "status", "actions"];
+const SMALL_DEVICE_COLUMNS = [
+  "nom",
+  "fac_type",
+  "fac_echeance",
+  "fac_etat",
+  "actions",
+];
 
 const statusColorMap = {
   payée: "secondary",
@@ -55,7 +67,7 @@ const statusColorMap = {
   "en attente": "warning",
 };
 
-const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
+const FactureTable = ({ columns, rows, statusOptions, title }) => {
   const [filterValue, setFilterValue] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [visibleColumns, setVisibleColumns] = React.useState(
@@ -67,8 +79,6 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
   });
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 10;
-
-  const [currentInvoice, setCurrentInvoice] = useState(null);
 
   const {
     isOpen: isAddModalOpen,
@@ -90,6 +100,31 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
     onOpen: openDeleteModal,
     onOpenChange: setDeleteModalOpen,
   } = useDisclosure();
+
+  const [newFacture, setNewFacture] = useState({
+    fac_id: "",
+    nom: "",
+    fac_type: "",
+    fac_date: "",
+    fac_echeance: "",
+    fac_etat: "",
+    fac_total: "",
+  });
+
+  const [currentFacture, setCurrentFacture] = useState({});
+
+  const handleEditClick = (facture) => {
+    setCurrentFacture({
+      fac_id: facture.fac_id,
+      nom: facture.nom,
+      fac_type: facture.fac_type,
+      fac_date: facture.fac_date,
+      fac_echeance: facture.fac_echeance,
+      fac_etat: facture.fac_etat,
+      fac_total: facture.fac_total,
+    });
+    setEditModalOpen(true);
+  };
 
   const pages = Math.ceil(rows.length / rowsPerPage);
 
@@ -136,7 +171,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
       Array.from(statusFilter).length !== statusOptions.length
     ) {
       filteredUsers = filteredUsers.filter((item) =>
-        Array.from(statusFilter).includes(item.status)
+        Array.from(statusFilter).includes(item.fac_etat)
       );
     }
 
@@ -160,25 +195,316 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
     });
   }, [sortDescriptor, items]);
 
-  const handleDotsIconClick = (invoice) => {
-    setCurrentInvoice(invoice);
+  const handleDotsIconClick = (facture) => {
+    setCurrentFacture(facture);
   };
 
-  const handleDetailsIconClick = (invoice) => {
-    setCurrentInvoice(invoice);
+  const handleDetailsIconClick = (facture) => {
+    setCurrentFacture(facture);
     openDetailsModal(true);
   };
-  const handleEditIconClick = (invoice) => {
-    setCurrentInvoice(invoice);
+  const handleEditIconClick = (facture) => {
+    setCurrentFacture(facture);
     openEditModal();
   };
-  const handleDeleteIconClick = (invoice) => {
-    setCurrentInvoice(invoice);
+  const handleDeleteIconClick = (facture) => {
+    setCurrentFacture(facture);
     openDeleteModal();
   };
 
-  const handleStatusChange = (status) => {
-    setCurrentInvoice({ ...currentInvoice, status });
+  const handleStatusChange = (fac_etat) => {
+    setCurrentFacture({ ...currentFacture, fac_etat });
+  };
+
+  const dispatch = useDispatch();
+
+  const handleAddFacture = async () => {
+    // Validate all fields before dispatching
+    if (
+      newFacture.fac_id === "" ||
+      newFacture.nom === "" ||
+      newFacture.fac_type === "" ||
+      newFacture.fac_date === "" ||
+      newFacture.fac_echeance === "" ||
+      newFacture.fac_etat === "" ||
+      newFacture.fac_total === ""
+    ) {
+      // Handle invalid form data
+      return;
+    }
+
+    console.log(newFacture);
+
+    // Prepare the data to dispatch
+    const factureData = {
+      nom: newFacture.nom,
+      fac_type: newFacture.fac_type,
+      fac_date: newFacture.fac_date,
+      fac_echeance: newFacture.fac_echeance,
+      fac_etat: newFacture.fac_etat,
+      fac_total: newFacture.fac_total,
+    };
+
+    console.log(factureData);
+
+    // Show loading toast while processing
+    const loadingToastId = toast.loading("Adding facture...", {
+      position: "bottom-right",
+      autoClose: false,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: false,
+      draggable: true,
+      progress: 0,
+      theme: "dark",
+    });
+
+    try {
+      // Dispatch the action to add facture
+      const response = await dispatch(addFactureThunk(factureData));
+
+      // Clear loading toast
+      toast.dismiss(loadingToastId);
+
+      // Display success message
+      if (response && response.payload.status === "success") {
+        toast.success(response.payload.message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+        // Clear the form or close modal after successful submission
+        setAddModalOpen(false);
+        setNewFacture({
+          nom: "",
+          fac_type: "",
+          fac_date: "",
+          fac_echeance: "",
+          fac_etat: "",
+          fac_total: "",
+        });
+      } else if (response && response.payload.status === "alert") {
+        toast.error(response.payload.message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      } else {
+        // Handle other statuses or errors
+        toast.error(response.payload.message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      }
+    } catch (error) {
+      console.error("Error adding Facture:", error);
+      toast.error("An error occurred while adding Facture", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+    }
+  };
+
+  const handleEditFacture = async () => {
+    // Validate all fields before dispatching
+    if (
+      currentFacture.fac_date === "" ||
+      currentFacture.fac_echeance === "" ||
+      currentFacture.fac_etat === "" ||
+      currentFacture.fac_total === ""
+    ) {
+      // Handle invalid form data
+      return;
+    }
+
+    // Prepare the data to dispatch
+    const factureData = {
+      fac_date: currentFacture.fac_date,
+      fac_echeance: currentFacture.fac_echeance,
+      fac_etat: currentFacture.fac_etat,
+      fac_total: currentFacture.fac_total,
+    };
+
+    console.log(factureData);
+
+    // Show loading toast while processing
+    const loadingToastId = toast.loading("Updating facture...", {
+      position: "bottom-right",
+      autoClose: false,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: false,
+      draggable: true,
+      progress: 0,
+      theme: "dark",
+    });
+
+    try {
+      // Dispatch the action to update facture
+      const response = await dispatch(updateFactureThunk(factureData));
+
+      // Clear loading toast
+      toast.dismiss(loadingToastId);
+
+      // Display success message
+      if (response && response.payload.status === "success") {
+        toast.success("facture edited successfully", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+
+        // Clear the form or close modal after successful submission
+        setEditModalOpen(false);
+      } else if (response && response.payload.status === "alert") {
+        toast.error(response.payload.message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      } else {
+        // Handle other statuses or errors
+        toast.error("Failed to edit facture", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      }
+    } catch (error) {
+      console.error("Error editing facture:", error);
+      toast.error("An error occurred while editing facture", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+    }
+  };
+
+  //delete a facture
+  const handleDeleteFacture = async () => {
+    const statut = currentFacture.fac_etat;
+
+    if (statut === "en attente") {
+      setDeleteModalOpen(false);
+
+      toast.error("Facture en attente, impossible de la supprimer", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+      return;
+    }
+
+    // Get the Invoice ID
+    const fac_id = currentFacture.fac_id;
+
+    // Validate all fields before dispatching
+    if (!fac_id) {
+      console.error("Invalid invoice ID for deletion:", fac_id);
+      return;
+    }
+
+    // Prepare data for deletion
+    const data = {
+      fac_id: fac_id,
+    };
+
+    console.log(data);
+
+    try {
+      // Dispatch action to delete invoice
+      const response = await dispatch(deleteFactureThunk(data));
+
+      console.log(response);
+
+      // Handle response
+      if (response && response.payload.status === "success") {
+        toast.success("Facture deleted successfully", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      } else {
+        // Handle other statuses or errors
+        toast.error("Failed to delete invoice", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      }
+
+      // Clear the form or close modal after successful deletion
+      setDeleteModalOpen(false);
+    } catch (error) {
+      console.error("Error deleting invoice:", error);
+      toast.error("An error occurred while deleting invoice", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+    }
   };
 
   const residants = useSelector((state) => {
@@ -206,7 +532,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
           return (
             <Chip
               className="capitalize"
-              color={statusColorMap[item.status]}
+              color={statusColorMap[item.fac_etat]}
               size="sm"
               variant="flat"
             >
@@ -418,7 +744,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                             }}
                           >
                             {(item) => (
-                              <AutocompleteItem key={item.id}>
+                              <AutocompleteItem key={item.res_id}>
                                 {item.nom}
                               </AutocompleteItem>
                             )}
@@ -452,6 +778,13 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                                 "text-white/90",
                               ],
                             }}
+                            value={newFacture.fac_type}
+                            onChange={(e) =>
+                              setnewFacture({
+                                ...newFacture,
+                                fac_type: e.target.value,
+                              })
+                            }
                           >
                             <SelectItem key="eau" value="eau">
                               Eau
@@ -490,6 +823,13 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                                 "!cursor-text",
                               ],
                             }}
+                            value={newFacture.fac_total}
+                            onChange={(e) =>
+                              setnewFacture({
+                                ...newFacture,
+                                fac_total: e.target.value,
+                              })
+                            }
                           />
 
                           <Select
@@ -521,6 +861,13 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                                 "text-white/90",
                               ],
                             }}
+                            value={newFacture.fac_etat}
+                            onChange={(e) =>
+                              setnewFacture({
+                                ...newFacture,
+                                fac_etat: e.target.value,
+                              })
+                            }
                           >
                             <SelectItem key="Attente" value="attente">
                               Attente
@@ -532,15 +879,32 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                           <DatePicker
                             label="Mois de consommation"
                             className="max-w-sm"
+                            value={new Date(newFacture.fac_date)}
+                            onChange={(e) =>
+                              setnewFacture({
+                                ...newFacture,
+                                fac_date:new Date(e.target.value),
+                              })
+                            }
                           />
-                          <DatePicker label="Echeance" className="max-w-sm" />
+                          <DatePicker
+                            label="Echeance"
+                            className="max-w-sm"
+                            value={new Date(newFacture.fac_echeance)}
+                            onChange={(e) =>
+                              setnewFacture({
+                                ...newFacture,
+                                fac_echeance: new Date(e.target.value),
+                              })
+                            }
+                          />
                         </div>
                       </ModalBody>
                       <ModalFooter>
                         <Button color="danger" onPress={onClose}>
                           Close
                         </Button>
-                        <Button color="primary" onPress={onClose}>
+                        <Button color="primary" onPress={handleAddFacture}>
                           Enregistrer
                         </Button>
                       </ModalFooter>
@@ -636,14 +1000,13 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                 Détails de la Facture
               </ModalHeader>
               <ModalBody>
-                {isMobile ? (
+                {/* {isMobile ? ( */}
                   <>
                     <Input
                       isReadOnly
                       type="text"
                       label="Facture ID:"
                       variant="bordered"
-                      defaultValue={currentInvoice.id_fac}
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -662,6 +1025,13 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                           "border-zinc-600",
                         ],
                       }}
+                      defaultValue={currentFacture?.fac_id}
+                      onChange={(e) =>
+                        setCurrentFacture({
+                          ...currentFacture,
+                          fac_id: e.target.value,
+                        })
+                      }
                     />
 
                     <Input
@@ -669,7 +1039,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                       type="text"
                       label="Résidant:"
                       variant="bordered"
-                      defaultValue={currentInvoice.nom}
+                      defaultValue={currentFacture.nom}
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -688,6 +1058,12 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                           "border-zinc-600",
                         ],
                       }}
+                      onChange={(e) =>
+                        setCurrentFacture({
+                          ...currentFacture,
+                          nom: e.target.value,
+                        })
+                      }
                     />
 
                     <Input
@@ -695,7 +1071,13 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                       type="text"
                       label="Type de Facture:"
                       variant="bordered"
-                      defaultValue={currentInvoice.type}
+                      defaultValue={currentFacture.fac_type}
+                      onChange={(e) =>
+                        setCurrentFacture({
+                          ...currentFacture,
+                          fac_type: e.target.value,
+                        })
+                      }
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -720,7 +1102,13 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                       isReadOnly
                       label="Mois de Consommation"
                       variant="bordered"
-                      defaultValue={currentInvoice.mois}
+                      defaultValue={currentFacture.fac_date}
+                      onChange={(e) =>
+                        setCurrentFacture({
+                          ...currentFacture,
+                          fac_date: e.target.value,
+                        })
+                      }
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -744,7 +1132,13 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                       isReadOnly
                       label="Echeance"
                       variant="bordered"
-                      defaultValue={currentInvoice.echeance}
+                      defaultValue={currentFacture.fac_echeance}
+                      onChange={(e) =>
+                        setCurrentFacture({
+                          ...currentFacture,
+                          fac_echeance: e.target.value,
+                        })
+                      }
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -768,7 +1162,13 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                       isReadOnly
                       label="Status"
                       variant="bordered"
-                      defaultValue={currentInvoice.status}
+                      defaultValue={currentFacture.fac_etat}
+                      onChange={(e) =>
+                        setCurrentFacture({
+                          ...currentFacture,
+                          fac_etat: e.target.value,
+                        })
+                      }
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -792,7 +1192,13 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                       isReadOnly
                       label="Montant TTC"
                       variant="bordered"
-                      defaultValue={currentInvoice.ttc}
+                      defaultValue={currentFacture.fac_total}
+                      onChange={(e) =>
+                        setCurrentFacture({
+                          ...currentFacture,
+                          fac_total: e.target.value,
+                        })
+                      }
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -813,7 +1219,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                       }}
                     />
                   </>
-                ) : (
+                {/* ) : (
                   <>
                     <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                       <Input
@@ -822,6 +1228,12 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                         label="Résidant:"
                         variant="bordered"
                         defaultValue={currentInvoice.nom}
+                        onChange={(e) =>
+                          setCurrentResidant({
+                            ...currentResidant,
+                            nom: e.target.value,
+                          })
+                        }
                         className="max-w-sm"
                         classNames={{
                           label:
@@ -849,6 +1261,12 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                         label="Profession:"
                         variant="bordered"
                         defaultValue={currentInvoice.profession}
+                        onChange={(e) =>
+                          setCurrentResidant({
+                            ...currentResidant,
+                            profession: e.target.value,
+                          })
+                        }
                         className="max-w-sm"
                         classNames={{
                           label:
@@ -877,7 +1295,13 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                         type="text"
                         label="ID Logement:"
                         variant="bordered"
-                        defaultValue={currentInvoice.id_logement}
+                        defaultValue={currentInvoice.log_id}
+                        onChange={(e) =>
+                          setCurrentResidant({
+                            ...currentResidant,
+                            log_id: e.target.value,
+                          })
+                        }
                         className="max-w-sm"
                         classNames={{
                           label:
@@ -905,6 +1329,12 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                         label="Type du logement:"
                         variant="bordered"
                         defaultValue={currentInvoice.type_log}
+                        onChange={(e) =>
+                          setCurrentResidant({
+                            ...currentResidant,
+                            type_log: e.target.value,
+                          })
+                        }
                         className="max-w-sm"
                         classNames={{
                           label:
@@ -931,6 +1361,12 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                         label="Amélioré:"
                         variant="bordered"
                         defaultValue={currentInvoice.ameliored ? "Oui" : "Non"}
+                        onChange={(e) =>
+                          setCurrentResidant({
+                            ...currentResidant,
+                            ameliored: e.target.value,
+                          })
+                        }
                         className="max-w-sm"
                         classNames={{
                           label:
@@ -953,7 +1389,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                       />
                     </div>
                   </>
-                )}
+                )} */}
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" onClick={onClose}>
@@ -1001,10 +1437,10 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                         "!cursor-text",
                       ],
                     }}
-                    defaultValue={currentInvoice?.nom}
+                    defaultValue={currentFacture?.nom}
                     onChange={(e) =>
-                      setCurrentInvoice({
-                        ...currentInvoice,
+                      setCurrentFacture({
+                        ...currentFacture,
                         nom: e.target.value,
                       })
                     }
@@ -1036,11 +1472,11 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                         "text-white/90",
                       ],
                     }}
-                    defaultValue={currentInvoice?.typeFacture}
+                    defaultValue={currentFacture?.fac_type}
                     onChange={(value) =>
-                      setCurrentInvoice({
-                        ...currentInvoice,
-                        typeFacture: value,
+                      setCurrentFacture({
+                        ...currentFacture,
+                        fac_type: value,
                       })
                     }
                   >
@@ -1082,7 +1518,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                       ],
                     }}
                     color="warning"
-                    defaultValue={currentInvoice?.status}
+                    defaultValue={currentFacture?.fac_etat}
                     onSelectionChange={(keys) =>
                       handleStatusChange(keys.currentKey)
                     }
@@ -1123,11 +1559,11 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                         <span className="text-default-400 text-small">$</span>
                       </div>
                     }
-                    defaultValue={currentInvoice?.ttc}
+                    defaultValue={currentFacture?.fac_total}
                     onChange={(e) =>
-                      setCurrentInvoice({
-                        ...currentInvoice,
-                        ttc: e.target.value,
+                      setCurrentFacture({
+                        ...currentFacture,
+                        fac_total: e.target.value,
                       })
                     }
                   />
@@ -1137,7 +1573,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                 <Button color="danger" variant="light" onClick={onClose}>
                   Fermer
                 </Button>
-                <Button color="primary" onClick={handleEditIconClick}>
+                <Button color="primary" onClick={handleEditFacture}>
                   Sauvegarder
                 </Button>
               </ModalFooter>
@@ -1172,7 +1608,24 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                 >
                   Fermer
                 </Button>
-                <Button color="primary">Continuer</Button>
+                {currentFacture && currentFacture.nom && (
+                  <Button
+                    color="primary"
+                    onClick={() => {
+                      console.log("Current Facture:", currentFacture);
+                      if (currentFacture && currentFacture.nom) {
+                        handleDeleteFacture(currentFacture.nom);
+                      } else {
+                        console.error(
+                          "Invalid Facture ID for deletion:",
+                          currentFacture?.nom
+                        );
+                      }
+                    }}
+                  >
+                    Continuer
+                  </Button>
+                )}
               </ModalFooter>
             </>
           )}
@@ -1182,7 +1635,7 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
   );
 };
 
-InvoiceTable.propTypes = {
+FactureTable.propTypes = {
   columns: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string.isRequired,
@@ -1191,17 +1644,18 @@ InvoiceTable.propTypes = {
   ).isRequired,
   rows: PropTypes.arrayOf(
     PropTypes.shape({
-      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      id_fac: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
       nom: PropTypes.string.isRequired,
-      type: PropTypes.string.isRequired,
-      mois: PropTypes.string.isRequired,
-      echeance: PropTypes.string.isRequired,
-      status: PropTypes.string.isRequired,
-      ttc: PropTypes.string.isRequired,
+      fac_type: PropTypes.string.isRequired,
+      fac_date: PropTypes.string.isRequired,
+      fac_echeance: PropTypes.string.isRequired,
+      fac_etat: PropTypes.string.isRequired,
+      fac_total: PropTypes.string.isRequired,
     })
   ).isRequired,
   statusOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
   title: PropTypes.string,
 };
 
-export default InvoiceTable;
+export default FactureTable;

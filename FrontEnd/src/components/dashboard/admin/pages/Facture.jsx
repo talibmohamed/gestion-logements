@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import "./Overview.scss";
 import { columns, statusOptions } from "./components/facData";
-import InvoiceTable from "./components/facTab.jsx";
+import FactureTable from "./components/facTab.jsx";
 import { Card, CardBody, Textarea, Input, Button } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -60,7 +60,7 @@ const Facture = () => {
         shadow="sm"
       >
         <CardBody>
-          <InvoiceTable
+          <FactureTable
             columns={columns}
             rows={transformedFactures}
             statusOptions={statusOptions.map((option) => option.uid)}

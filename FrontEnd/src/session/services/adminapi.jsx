@@ -277,3 +277,83 @@ export const deleteResidant = async (jwtToken, data) => {
     throw error;
   }
 };
+
+
+
+// Function to fetch all Factures
+export const fetchFactures = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/admin/facture`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error in fetchFactures:",
+      error.response || error.message || error
+    );
+    throw error;
+  }
+};
+
+// Function to add a Facture
+export const addFacture = async (jwtToken, factureData) => {
+  try {
+    const response = await axios.post(
+      `${baseURL}/admin/facture`,
+      factureData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      }
+    );
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error("Error in addFacture:", error);
+    throw error;
+  }
+};
+
+
+// Function to update a Facture
+export const updateFacture = async (jwtToken, factureData) => {
+  try {
+    const response = await axios.put(
+      `${baseURL}/admin/facture`,
+      factureData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      }
+    );
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error("Error in updateFacture:", error);
+    throw error;
+  }
+};
+
+// Function to delete a Facture
+export const deleteFacture = async (jwtToken, data) => {
+  try {
+    const response = await axios.delete(`${baseURL}/admin/facture`, {
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        "Content-Type": "application/json",
+      },
+      data: data, // Pass data object directly to Axios
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error in deleteFacture:", error);
+    throw error;
+  }
+};
