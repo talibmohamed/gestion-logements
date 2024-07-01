@@ -102,6 +102,7 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
 
   const [newFacture, setNewFacture] = useState({
     fac_id: "",
+    res_id: "",
     nom: "",
     fac_type: "",
     fac_date: "",
@@ -514,12 +515,9 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
     }));
   });
 
-  console.log(residants);
-
   const renderCell = React.useCallback(
     (item, columnKey) => {
       const cellValue = item[columnKey];
-
       switch (columnKey) {
         case "role":
           return (
@@ -527,7 +525,7 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
               <p className="text-bold text-small capitalize">{cellValue}</p>
             </div>
           );
-        case "status":
+        case "fac_etat":
           return (
             <Chip
               className="capitalize"
@@ -734,7 +732,7 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                       <ModalBody>
                         <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4 autocomplete">
                           <Autocomplete
-                            defaultItems={rows}
+                            defaultItems={residants}
                             label="Résidant"
                             placeholder="Chercher un résidant"
                             className="max-w-sm"
@@ -744,9 +742,18 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                           >
                             {(item) => (
                               <AutocompleteItem key={item.res_id}>
-                                {item.nom}
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <span>{item.nom} {item.prenom}</span>
+                                  <span>{'RES' + item.res_id}</span>
+                                </div>
                               </AutocompleteItem>
-                            )}
+                            )}                      
                           </Autocomplete>
 
                           <Select
@@ -874,7 +881,7 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                           </Select>
                         </div>
 
-                        <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4 datePicker">
+                        {/* <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4 datePicker">
                           <DatePicker
                             label="Mois de consommation"
                             className="max-w-sm"
@@ -897,7 +904,7 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                               })
                             }
                           />
-                        </div>
+                        </div> */}
                       </ModalBody>
                       <ModalFooter>
                         <Button color="danger" onPress={onClose}>
@@ -1000,224 +1007,224 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
               </ModalHeader>
               <ModalBody>
                 {/* {isMobile ? ( */}
-                  <>
-                    <Input
-                      isReadOnly
-                      type="text"
-                      label="Facture ID:"
-                      variant="bordered"
-                      className="max-w-sm"
-                      classNames={{
-                        label: "group-data-[filled-within=true]:text-zinc-400",
-                        input: [
-                          "bg-transparent",
-                          "group-data-[has-value=true]:text-white/90",
-                        ],
-                        innerWrapper: "bg-transparent",
-                        inputWrapper: [
-                          "bg-transparent",
-                          "group-data-[hover=true]:bg-zinc-800",
-                          "group-data-[hover=true]:border-zinc-500",
-                          "group-data-[focus=true]:bg-transparent ",
-                          "group-data-[focus=true]:border-zinc-400 ",
-                          "!cursor-text",
-                          "border-zinc-600",
-                        ],
-                      }}
-                      defaultValue={currentFacture?.fac_id}
-                      onChange={(e) =>
-                        setCurrentFacture({
-                          ...currentFacture,
-                          fac_id: e.target.value,
-                        })
-                      }
-                    />
+                <>
+                  <Input
+                    isReadOnly
+                    type="text"
+                    label="Facture ID:"
+                    variant="bordered"
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                    defaultValue={currentFacture?.fac_id}
+                    onChange={(e) =>
+                      setCurrentFacture({
+                        ...currentFacture,
+                        fac_id: e.target.value,
+                      })
+                    }
+                  />
 
-                    <Input
-                      isReadOnly
-                      type="text"
-                      label="Résidant:"
-                      variant="bordered"
-                      defaultValue={currentFacture.nom}
-                      className="max-w-sm"
-                      classNames={{
-                        label: "group-data-[filled-within=true]:text-zinc-400",
-                        input: [
-                          "bg-transparent",
-                          "group-data-[has-value=true]:text-white/90",
-                        ],
-                        innerWrapper: "bg-transparent",
-                        inputWrapper: [
-                          "bg-transparent",
-                          "group-data-[hover=true]:bg-zinc-800",
-                          "group-data-[hover=true]:border-zinc-500",
-                          "group-data-[focus=true]:bg-transparent ",
-                          "group-data-[focus=true]:border-zinc-400 ",
-                          "!cursor-text",
-                          "border-zinc-600",
-                        ],
-                      }}
-                      onChange={(e) =>
-                        setCurrentFacture({
-                          ...currentFacture,
-                          nom: e.target.value,
-                        })
-                      }
-                    />
+                  <Input
+                    isReadOnly
+                    type="text"
+                    label="Résidant:"
+                    variant="bordered"
+                    defaultValue={currentFacture.nom}
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                    onChange={(e) =>
+                      setCurrentFacture({
+                        ...currentFacture,
+                        nom: e.target.value,
+                      })
+                    }
+                  />
 
-                    <Input
-                      isReadOnly
-                      type="text"
-                      label="Type de Facture:"
-                      variant="bordered"
-                      defaultValue={currentFacture.fac_type}
-                      onChange={(e) =>
-                        setCurrentFacture({
-                          ...currentFacture,
-                          fac_type: e.target.value,
-                        })
-                      }
-                      className="max-w-sm"
-                      classNames={{
-                        label: "group-data-[filled-within=true]:text-zinc-400",
-                        input: [
-                          "bg-transparent",
-                          "group-data-[has-value=true]:text-white/90",
-                        ],
-                        innerWrapper: "bg-transparent",
-                        inputWrapper: [
-                          "bg-transparent",
-                          "group-data-[hover=true]:bg-zinc-800",
-                          "group-data-[hover=true]:border-zinc-500",
-                          "group-data-[focus=true]:bg-transparent ",
-                          "group-data-[focus=true]:border-zinc-400 ",
-                          "!cursor-text",
-                          "border-zinc-600",
-                        ],
-                      }}
-                    />
+                  <Input
+                    isReadOnly
+                    type="text"
+                    label="Type de Facture:"
+                    variant="bordered"
+                    defaultValue={currentFacture.fac_type}
+                    onChange={(e) =>
+                      setCurrentFacture({
+                        ...currentFacture,
+                        fac_type: e.target.value,
+                      })
+                    }
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                  />
 
-                    <Input
-                      isReadOnly
-                      label="Mois de Consommation"
-                      variant="bordered"
-                      defaultValue={currentFacture.fac_date}
-                      onChange={(e) =>
-                        setCurrentFacture({
-                          ...currentFacture,
-                          fac_date: e.target.value,
-                        })
-                      }
-                      className="max-w-sm"
-                      classNames={{
-                        label: "group-data-[filled-within=true]:text-zinc-400",
-                        input: [
-                          "bg-transparent",
-                          "group-data-[has-value=true]:text-white/90",
-                        ],
-                        innerWrapper: "bg-transparent",
-                        inputWrapper: [
-                          "bg-transparent",
-                          "group-data-[hover=true]:bg-zinc-800",
-                          "group-data-[hover=true]:border-zinc-500",
-                          "group-data-[focus=true]:bg-transparent ",
-                          "group-data-[focus=true]:border-zinc-400 ",
-                          "!cursor-text",
-                          "border-zinc-600",
-                        ],
-                      }}
-                    />
-                    <Input
-                      isReadOnly
-                      label="Echeance"
-                      variant="bordered"
-                      defaultValue={currentFacture.fac_echeance}
-                      onChange={(e) =>
-                        setCurrentFacture({
-                          ...currentFacture,
-                          fac_echeance: e.target.value,
-                        })
-                      }
-                      className="max-w-sm"
-                      classNames={{
-                        label: "group-data-[filled-within=true]:text-zinc-400",
-                        input: [
-                          "bg-transparent",
-                          "group-data-[has-value=true]:text-white/90",
-                        ],
-                        innerWrapper: "bg-transparent",
-                        inputWrapper: [
-                          "bg-transparent",
-                          "group-data-[hover=true]:bg-zinc-800",
-                          "group-data-[hover=true]:border-zinc-500",
-                          "group-data-[focus=true]:bg-transparent ",
-                          "group-data-[focus=true]:border-zinc-400 ",
-                          "!cursor-text",
-                          "border-zinc-600",
-                        ],
-                      }}
-                    />
-                    <Input
-                      isReadOnly
-                      label="Status"
-                      variant="bordered"
-                      defaultValue={currentFacture.fac_etat}
-                      onChange={(e) =>
-                        setCurrentFacture({
-                          ...currentFacture,
-                          fac_etat: e.target.value,
-                        })
-                      }
-                      className="max-w-sm"
-                      classNames={{
-                        label: "group-data-[filled-within=true]:text-zinc-400",
-                        input: [
-                          "bg-transparent",
-                          "group-data-[has-value=true]:text-white/90",
-                        ],
-                        innerWrapper: "bg-transparent",
-                        inputWrapper: [
-                          "bg-transparent",
-                          "group-data-[hover=true]:bg-zinc-800",
-                          "group-data-[hover=true]:border-zinc-500",
-                          "group-data-[focus=true]:bg-transparent ",
-                          "group-data-[focus=true]:border-zinc-400 ",
-                          "!cursor-text",
-                          "border-zinc-600",
-                        ],
-                      }}
-                    />
-                    <Input
-                      isReadOnly
-                      label="Montant TTC"
-                      variant="bordered"
-                      defaultValue={currentFacture.fac_total}
-                      onChange={(e) =>
-                        setCurrentFacture({
-                          ...currentFacture,
-                          fac_total: e.target.value,
-                        })
-                      }
-                      className="max-w-sm"
-                      classNames={{
-                        label: "group-data-[filled-within=true]:text-zinc-400",
-                        input: [
-                          "bg-transparent",
-                          "group-data-[has-value=true]:text-white/90",
-                        ],
-                        innerWrapper: "bg-transparent",
-                        inputWrapper: [
-                          "bg-transparent",
-                          "group-data-[hover=true]:bg-zinc-800",
-                          "group-data-[hover=true]:border-zinc-500",
-                          "group-data-[focus=true]:bg-transparent ",
-                          "group-data-[focus=true]:border-zinc-400 ",
-                          "!cursor-text",
-                          "border-zinc-600",
-                        ],
-                      }}
-                    />
-                  </>
+                  <Input
+                    isReadOnly
+                    label="Mois de Consommation"
+                    variant="bordered"
+                    defaultValue={currentFacture.fac_date}
+                    onChange={(e) =>
+                      setCurrentFacture({
+                        ...currentFacture,
+                        fac_date: e.target.value,
+                      })
+                    }
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                  />
+                  <Input
+                    isReadOnly
+                    label="Echeance"
+                    variant="bordered"
+                    defaultValue={currentFacture.fac_echeance}
+                    onChange={(e) =>
+                      setCurrentFacture({
+                        ...currentFacture,
+                        fac_echeance: e.target.value,
+                      })
+                    }
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                  />
+                  <Input
+                    isReadOnly
+                    label="Status"
+                    variant="bordered"
+                    defaultValue={currentFacture.fac_etat}
+                    onChange={(e) =>
+                      setCurrentFacture({
+                        ...currentFacture,
+                        fac_etat: e.target.value,
+                      })
+                    }
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                  />
+                  <Input
+                    isReadOnly
+                    label="Montant TTC"
+                    variant="bordered"
+                    defaultValue={currentFacture.fac_total}
+                    onChange={(e) =>
+                      setCurrentFacture({
+                        ...currentFacture,
+                        fac_total: e.target.value,
+                      })
+                    }
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                  />
+                </>
                 {/* ) : (
                   <>
                     <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
@@ -1643,7 +1650,7 @@ FactureTable.propTypes = {
   ).isRequired,
   rows: PropTypes.arrayOf(
     PropTypes.shape({
-      id_fac: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      fac_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
         .isRequired,
       nom: PropTypes.string.isRequired,
       fac_type: PropTypes.string.isRequired,

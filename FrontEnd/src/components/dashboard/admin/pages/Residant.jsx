@@ -28,6 +28,11 @@ const Residant = () => {
     const dispatch = useDispatch();
     const residantsState = useSelector(state => state.residants);
     const residants = residantsState?.residants || [];
+
+    console.log("1");
+    console.log(residantsState);
+    console.log("1");
+
   
     useEffect(() => {
       dispatch(fetchResidantsThunk()); 

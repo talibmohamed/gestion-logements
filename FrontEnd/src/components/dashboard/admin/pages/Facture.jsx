@@ -30,7 +30,6 @@ const Facture = () => {
     const fetchData = async () => {
       try {
         const response = await dispatch(fetchResidantsThunk()).unwrap();
-        console.log(response);
       } catch (error) {
         console.error("Error fetching residants:", error);
       }
@@ -38,18 +37,17 @@ const Facture = () => {
     fetchData();
   }, [dispatch]);
 
-  console.log(factures);
-
   // Transform factures data to match the table's expected structure
   const transformedFactures = factures.map((facture) => ({
     id: facture.fac_id,
+    fac_id: facture.fac_id,
     id_res: facture.res_id,
     nom: facture.nom,
-    type: facture.fac_type,
-    mois: facture.fac_date,
-    echeance: facture.fac_echeance,
-    status: facture.fac_etat,
-    ttc: facture.fac_total,
+    fac_type: facture.fac_type,
+    fac_date: facture.fac_date,
+    fac_echeance: facture.fac_echeance,
+    fac_etat: facture.fac_etat,
+    fac_total: facture.fac_total,
   }));
 
   return (

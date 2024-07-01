@@ -128,6 +128,7 @@ export const fetchFactureThunk = createAsyncThunk(
     try {
       const response = await fetchFacture(jwt);
       console.log(response);
+
       dispatch(setFacture(response.factures));
       return response;
     } catch (error) {
@@ -235,14 +236,13 @@ export const deleteLogementThunk = createAsyncThunk(
 );
 
 export const fetchResidantsThunk = createAsyncThunk(
-  "residants/fetchResidants",
+  'residants/fetchResidants',
   async (_, { dispatch, getState }) => {
     const state = getState();
     const jwt = state.auth.jwt_token; // Assuming auth slice manages JWT token
-    console.log(response);
 
     try {
-      const response = await fetchResidants(jwt); // Call your API function to fetch residants
+      const response = await fetchResidants(jwt);
       dispatch(setResidants(response.residants));
       return response; // Return response if needed by the caller
     } catch (error) {
