@@ -277,4 +277,118 @@ class residant
             ];
         }
     }
+
+
+    //get reclamations
+    public function getReclamations($jwt)
+    {
+        try {
+            $jwtHandler = new JwtHandler();
+            $token_info = $jwtHandler->verifyJwtToken($jwt);
+            $res_id = $token_info['data']['id'];
+
+            $connection = $this->db->getConnection();
+
+            // Query to get all reclamations of the resident
+            $sql = $connection->prepare('
+                SELECT
+                    r.rec_id,
+                    TO_CHAR(r.rec_date, \'YYYY-MM-DD\') as rec_date,
+                    r.rec_type,
+                    r.rec_desc as rec_description,
+                    r.rec_etat,
+                    r.rec_response
+                FROM
+                    reclamation r
+                WHERE
+                    r.res_id = ?
+            ');
+
+            $sql->execute([$res_id]);
+            $reclamations = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+            if ($reclamations !== false) {
+                return [
+                    'status' => 'success',
+                    'reclamations' => $reclamations
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'No reclamations found for this resident'
+                ];
+            }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    // Update reclamation status to 'annuler'
+    // Update reclamation status to 'annulée'
+    // Update reclamation status to 'annulé'
+    public function updateReclamationStatus($jwt, $reclamation_id)
+    {
+        try {
+            $jwtHandler = new JwtHandler();
+            $token_info = $jwtHandler->verifyJwtToken($jwt);
+            $res_id = $token_info['data']['id'];
+
+            $connection = $this->db->getConnection();
+
+            // Requête pour vérifier l'état actuel de la réclamation
+            $checkStatusQuery = $connection->prepare('
+                SELECT rec_etat
+                FROM reclamation
+                WHERE rec_id = ? AND res_id = ?
+            ');
+            $checkStatusQuery->execute([$reclamation_id, $res_id]);
+            $currentStatus = $checkStatusQuery->fetchColumn();
+
+            if ($currentStatus === 'annulé') {
+                return [
+                    'status' => 'error',
+                    'message' => 'La réclamation est déjà annulée'
+                ];
+            }
+
+            if ($currentStatus !== 'en attente') {
+                return [
+                    'status' => 'error',
+                    'message' => 'Seules les réclamations en attente peuvent être annulées'
+                ];
+            }
+
+            // Définir la valeur de l'état
+            $status = 'annulé';
+
+            // Requête pour mettre à jour l'état de la réclamation
+            $updateStatusQuery = $connection->prepare('
+                UPDATE reclamation
+                SET rec_etat = ?
+                WHERE rec_id = ? AND res_id = ?
+            ');
+            $updateStatusQuery->execute([$status, $reclamation_id, $res_id]);
+
+            // Vérifier si des lignes ont été affectées
+            if ($updateStatusQuery->rowCount() > 0) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Réclamation annulée avec succès'
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Réclamation non trouvée ou vous n\'êtes pas autorisé à la mettre à jour'
+                ];
+            }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 }

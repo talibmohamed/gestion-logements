@@ -4,17 +4,17 @@ import { columns, statusOptions } from "./components/facData";
 import InvoiceTable from "./components/facTab.jsx";
 import { Card, CardBody } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchFactureThunk } from "../../../../session/thunks/userthunks.jsx";
+import { fetchFactureThunk } from "../../../../session/thunks/userthunks";
 
 const Facture = () => {
   const dispatch = useDispatch();
-  const factures = useSelector((state) => state.facture.factures); // Ensure the state key is correct
+  const factures = useSelector((state) => state.facture.factures) ? useSelector((state) => state.facture.factures) : [];
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await dispatch(fetchFactureThunk()).unwrap();
-        console.log("API Response:", response);
+        console.log(response);
       } catch (error) {
         console.error("Error fetching factures:", error);
       }
@@ -23,7 +23,10 @@ const Facture = () => {
     fetchData();
   }, [dispatch]);
 
+  console.log('factures');
   console.log(factures);
+  console.log('factures');
+
 
   // Ensure factures is always an array
   const transformedFactures = factures.map((facture) => ({
@@ -37,7 +40,7 @@ const Facture = () => {
     ttc: facture.fac_total,
   }));
 
-  console.log("Transformed Factures:", transformedFactures);
+  console.log("Transformed Factures:", factures);
 
   return (
     <div className="w-full">

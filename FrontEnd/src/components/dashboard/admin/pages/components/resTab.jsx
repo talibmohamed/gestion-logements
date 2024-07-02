@@ -422,23 +422,23 @@ const ResidantTable = ({ columns, rows, title }) => {
 
   //delete a residant
   const handleDeleteResidant = async () => {
-    const statut = currentResidant.statut;
+    // const statut = currentResidant.statut;
 
-    if (statut === "occupé") {
-      setDeleteModalOpen(false);
+    // if (statut === "occupé") {
+    //   setDeleteModalOpen(false);
 
-      toast.error("Residant occupé, impossible de le supprimer", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: 0,
-        theme: "dark",
-      });
-      return;
-    }
+    //   toast.error("Residant occupé, impossible de le supprimer", {
+    //     position: "bottom-right",
+    //     autoClose: 5000,
+    //     hideProgressBar: false,
+    //     closeOnClick: true,
+    //     pauseOnHover: false,
+    //     draggable: true,
+    //     progress: 0,
+    //     theme: "dark",
+    //   });
+    //   return;
+    // }
 
     // Get the Residant ID
     const res_id = currentResidant.res_id;
@@ -989,7 +989,7 @@ const ResidantTable = ({ columns, rows, title }) => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Détails sur le residant 
+                Détails sur le residant
               </ModalHeader>
               <ModalBody>
                 <>

@@ -1,43 +1,66 @@
-import React from "react";
-import "./Statics.scss";
-import { columns, users, statusReclOptions } from "./components/reclaData.jsx";
-import ReclamationTable from "./components/reclaTab.jsx";
-import ReclaGraph from "./components/reclaGraph";
-import ReclaCard from "./components/reclaCard";
+import React, { useEffect } from "react";
 import { Card, CardBody } from "@nextui-org/react";
-import { Carousel } from "react-responsive-carousel";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchReclamationThunk } from "../../../../session/thunks/userthunks.jsx";
+import ReclaCard from "./components/reclaCard";
+import ReclamationTable from "./components/reclaTab.jsx";
+import { columns, statusReclOptions } from "./components/reclaData.jsx";
+import { ToastContainer } from "react-toastify";
 
 const Reclamation = () => {
-  const sampleData = [
-    {
-      label: "total des réclamations par mois",
-      data: [20, 10, 10, 3, 6, 11],
-      color: "#96A7FF",
-    },
-  ];
+  const dispatch = useDispatch();
+  const reclamations = useSelector((state) => state.reclamation.reclamations)
+    ? useSelector((state) => state.reclamation.reclamations)
+    : [];
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await dispatch(fetchReclamationThunk()).unwrap();
+        console.log(response);
+      } catch (error) {
+        console.error("Error fetching factures:", error);
+      }
+    };
+
+    fetchData();
+  }, [dispatch]);
+
+  // console.log(reclamations);
+  // Ensure reclamations is always an array and handle empty case
+  const transformedReclamations = reclamations
+    ? reclamations.map((reclamation) => ({
+        id: reclamation.rec_id,
+        id_recl: reclamation.rec_id,
+        type_recl: reclamation.rec_type,
+        desc: reclamation.rec_description,
+        date: reclamation.rec_date,
+        status: reclamation.rec_etat,
+        sol: reclamation.rec_response,
+      }))
+    : [];
 
   return (
-  <div>
-      <div>
-        <Card
-          isBlurred
-          className="border-none bg-background/15 white:bg-default-100/50 card-wrapper custom-card-wrapper w-full over"
-          shadow="sm"
-        >
-          <CardBody>
-            <ReclaCard title="Réclamations" />
-          </CardBody>
-          <CardBody>
-            <ReclamationTable
-              columns={columns}
-              rows={users}
-              statusReclOptions={statusReclOptions.map((option) => option.uid)}
-              title="Historique des Réclamations"
-            />
-          </CardBody>
-        </Card>
-      </div></div>
+    <div>
+      <Card
+        isBlurred
+        className="border-none bg-background/15 white:bg-default-100/50 card-wrapper custom-card-wrapper w-full over"
+        shadow="sm"
+      >
+        <CardBody>
+          <ReclaCard title="Réclamations" />
+        </CardBody>
+        <CardBody>
+          <ReclamationTable
+            columns={columns}
+            rows={transformedReclamations}
+            statusReclOptions={statusReclOptions.map((option) => option.uid)}
+            title="Historique des Réclamations"
+          />
+        </CardBody>
+      </Card>
+      <ToastContainer />
+    </div>
   );
 };
 

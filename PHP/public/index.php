@@ -181,19 +181,46 @@ function route($uri, $method)
 
 
             //get user facure 
-            case '/api/v1/user/facture':
-                if ($method === 'GET') {
+        case '/api/v1/user/facture':
+            if ($method === 'GET') {
+                $jwtHandler = new JwtHandler();
+                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                $jwt_token = str_replace('Bearer ', '', $jwt_token);
+
+                // Validate the JWT token
+                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+
+                if ($token_info['valid']) {
+                    $data['jwt'] = $jwt_token;
+                    $userController = new UserController();
+                    $userController->getFactureAPI($data);
+                } else {
+                    http_response_code(401); // Unauthorized
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Unauthorized',
+                    ]);
+                    exit;
+                }
+            } else {
+                http_response_code(405); // Method Not Allowed
+                echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+                exit;
+            }
+            break;
+
+        case '/api/v1/user/reclamation':
+            switch ($method) {
+                case 'GET':
                     $jwtHandler = new JwtHandler();
                     $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
                     $jwt_token = str_replace('Bearer ', '', $jwt_token);
-            
-                    // Validate the JWT token
+                    // Check the JWT validation
                     $token_info = $jwtHandler->verifyJwtToken($jwt_token);
-            
                     if ($token_info['valid']) {
                         $data['jwt'] = $jwt_token;
                         $userController = new UserController();
-                        $userController->getFactureAPI($data);
+                        $userController->getReclamationAPI($data);
                     } else {
                         http_response_code(401); // Unauthorized
                         echo json_encode([
@@ -202,14 +229,51 @@ function route($uri, $method)
                         ]);
                         exit;
                     }
-                } else {
-                    http_response_code(405); // Method Not Allowed
-                    echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
-                    exit;
-                }
-                break;
-            
+                    break;
 
+                case 'POST':
+                    $jwtHandler = new JwtHandler();
+                    $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                    $jwt_token = str_replace('Bearer ', '', $jwt_token);
+
+                    // Validate the JWT token
+                    $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+
+                    if ($token_info['valid']) {
+                        // Get the input data from the PUT request
+                        $input = json_decode(file_get_contents('php://input'), true);
+
+                        if (isset($input['rec_id'])) {
+                            $data['jwt'] = $jwt_token;
+                            $data['rec_id'] = $input['rec_id'];
+                            $userController = new UserController();
+                            $response = $userController->updateReclamationStatusAPI($data);
+
+                            // Check if the update was successful
+                            if ($response['status'] === 'success') {
+                                http_response_code(200); // OK
+                                echo json_encode($response);
+                            } else {
+                                http_response_code(400); // Bad Request or other appropriate code
+                                echo json_encode($response);
+                            }
+                        } else {
+                            http_response_code(400); // Bad Request
+                            echo json_encode([
+                                'status' => 'error',
+                                'message' => 'Missing required parameters',
+                            ]);
+                        }
+                    } else {
+                        http_response_code(401); // Unauthorized
+                        echo json_encode([
+                            'status' => 'error',
+                            'message' => 'Unauthorized',
+                        ]);
+                    }
+                    exit;
+            }
+            break;
 
 
             // Admin routes

@@ -71,14 +71,12 @@ export const checkToken = async (token) => {
     console.log(response.data);
     console.log("3");
 
-
     return response.data;
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
-
 
 // Function to fetch statistics
 export const fetchStatistics = async (jwt) => {
@@ -112,6 +110,44 @@ export const fetchFacture = async (jwt) => {
       "Error in fetchFacture:",
       error.response || error.message || error
     );
+    throw error;
+  }
+};
+
+//fetch reclamation
+export const fetchReclamation = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/user/reclamation`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error in fetchReclamation:",
+      error.response || error.message || error
+    );
+    throw error;
+  }
+};
+
+export const annulerReclamation = async (data, jwtToken) => {
+  try {
+    console.log('data');
+    const response = await axios.post(
+      `${baseURL}/user/reclamation`,
+      data, // Pass data as the second argument
+      {
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error in annulerReclamation:", error.message);
     throw error;
   }
 };

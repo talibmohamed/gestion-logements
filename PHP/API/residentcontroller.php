@@ -139,4 +139,57 @@ class UserController
             exit;
         }
     }
+
+    //getReclamationAPI
+    public function getReclamationAPI($data)
+    {
+        if ($data && isset($data['jwt'])) {
+            $jwtHandler = new JwtHandler();
+            $token_info = $jwtHandler->verifyJwtToken($data['jwt']);
+
+            if ($token_info['valid']) {
+                // Extract user ID from the decoded token data
+
+                // Call the method to get facture data
+                $response = $this->residant->getReclamations($data['jwt']);
+
+                // Output the response as JSON and stop further execution
+                http_response_code(200);
+                echo json_encode($response);
+                exit;
+            } else {
+                http_response_code(401); // Unauthorized
+                echo json_encode(array('status' => 'error', 'message' => 'Unauthorized'));
+                exit;
+            }
+        } else {
+            http_response_code(400);
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
+            exit;
+        }
+    }
+
+    //updateReclamationStatusAPI
+    public function updateReclamationStatusAPI($data)
+    {
+        if ($data && isset($data['jwt']) && isset($data['rec_id'])) {
+
+                // Extract user ID from the decoded token 
+
+                $rec_id = filter_var($data['rec_id'], FILTER_VALIDATE_INT);
+
+                // Call the method to get facture data
+                $response = $this->residant->updateReclamationStatus($data['jwt'], $rec_id);
+
+                // Output the response as JSON and stop further execution
+                http_response_code(200);
+                echo json_encode($response);
+                exit;
+            
+        } else {
+            http_response_code(400);
+            echo json_encode(array('status' => 'error11', 'message' => 'Invalid JSON data'));
+            exit;
+        }
+    }
 }

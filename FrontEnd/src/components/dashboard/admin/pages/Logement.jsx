@@ -34,15 +34,15 @@ const Logement = () => {
 
   const dispatch = useDispatch();
   const logements = useSelector((state) => state.logements.logements);
-  const consums = useSelector((state) => state.consums.consums);
+  // const consums = useSelector((state) => state.consums.consums);
 
   useEffect(() => {
     dispatch(fetchLogementsThunk());
   }, [dispatch]);
   
-  useEffect(() => {
-    dispatch(fetchConsumsThunk());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchConsumsThunk());
+  // }, [dispatch]);
 
 
   const transformLogementsData = (logements) => {
@@ -62,19 +62,19 @@ const Logement = () => {
     }));
   };
 
-  const transformConsumsData = (consums) => {
-    return consums.map((consum) => ({
-      id: consum.id,
-      num_de_log: consum.log_id,
-      nom: consum.nom,
-      type_log: consum.typelog,
-      ameliored: consum.is_ameliore ? "Oui" : "Non",
-      consumE: consum.consumE,
-      consumW: consum.consumW,
-    }));
-  };
+  // const transformConsumsData = (consums) => {
+  //   return consums.map((consum) => ({
+  //     id: consum.id,
+  //     num_de_log: consum.log_id,
+  //     nom: consum.nom,
+  //     type_log: consum.typelog,
+  //     ameliored: consum.is_ameliore ? "Oui" : "Non",
+  //     consumE: consum.consumE,
+  //     consumW: consum.consumW,
+  //   }));
+  // };
 
-  const transformedConsums = transformConsumsData(consums);
+  // const transformedConsums = transformConsumsData(consums);
   const transformedLogements = transformLogementsData(logements);
 
   return (
@@ -100,7 +100,7 @@ const Logement = () => {
           shadow="sm"
         >
           <CardBody>
-            <ConsumTable columns={consumColumns} rows={transformedConsums} title="Consommation" />
+            {/* <ConsumTable columns={consumColumns} rows={transformedConsums} title="Consommation" /> */}
           </CardBody>
         </Card>
       </div>

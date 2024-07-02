@@ -28,6 +28,9 @@ import { EyeIcon } from "../Icons/EyeIcon";
 import { VerticalDotsIcon } from "../Icons/VerticalDotsIcon";
 import PropTypes from "prop-types";
 import "./customWrappers.scss";
+import { useDispatch } from "react-redux";
+import { annulerReclamationThunk } from "../../../../../session/thunks/userthunks";
+import { toast } from "react-toastify";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id_recl",
@@ -41,13 +44,14 @@ const INITIAL_VISIBLE_COLUMNS = [
 const SMALL_DEVICE_COLUMNS = ["id_recl", "type_recl", "status", "actions"];
 
 const statusColorMap = {
-  annulée: "default",
-  résolue: "secondary",
-  "non résolue": "primary",
+  annulé: "default",
+  résolu: "secondary",
+  "non résolu": "primary",
   "en attente": "warning",
 };
 
 const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
+  const dispatch = useDispatch();
   const [statusFilter, setStatusFilter] = React.useState("all");
   const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS)
@@ -146,6 +150,101 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
   const handleCancelIconClick = (reclamation) => {
     setCurrentReclamation(reclamation);
     openCancelModal();
+  };
+
+  const handleCancelRecalamtion = async (rec_id) => {
+    console.log("Cancelling reclamation with id:", rec_id);
+
+    // Show loading toast while processing
+    const loadingToastId = toast.loading("Cancelling reclamation...", {
+      position: "bottom-right",
+      autoClose: false,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: false,
+      draggable: true,
+      progress: 0,
+      theme: "dark",
+    });
+
+    //etat !== from en attente return
+    if (
+      currentReclamation.status === "resolu" ||
+      currentReclamation.status === "non résolu" ||
+      currentReclamation.status === "annulé"
+    ) {
+      toast.dismiss(loadingToastId);
+      toast.error(
+        `Vous ne pouvez pas annuler une réclamation ${currentReclamation.status} !`,
+        {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        }
+      );
+
+      return;
+    }
+
+    const data = {
+      rec_id: rec_id,
+    };
+
+    try {
+      // Dispatch action to cancel reclamation
+      const action = annulerReclamationThunk(data);
+      const actionResult = await dispatch(action);
+
+      // Hide loading toast
+      toast.dismiss(loadingToastId);
+
+      // Handle action result (response handled in action.payload)
+      if (actionResult.payload && actionResult.payload.status === "success") {
+        toast.success(actionResult.payload.message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      } else {
+        toast.error(actionResult.payload.message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      }
+
+      // Close modal or handle UI state
+      setCancelModalOpen(false);
+    } catch (error) {
+      console.error("Error cancelling reclamation:", error);
+      toast.error("An error occurred while cancelling reclamation", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+
+      // Optionally handle state or UI updates on error
+    }
   };
 
   const renderCell = React.useCallback(
@@ -371,7 +470,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                       variant="bordered"
                       labelPlacement="outside"
                       defaultValue={currentReclamation.type_recl}
-                      className="mb-3"  
+                      className="mb-3"
                     />
                   </>
                 )}
@@ -381,7 +480,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                   variant="bordered"
                   labelPlacement="outside"
                   defaultValue={currentReclamation.desc}
-                  className="mb-3" 
+                  className="mb-3"
                 />
                 {isMobile && (
                   <>
@@ -391,7 +490,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                       variant="bordered"
                       labelPlacement="outside"
                       defaultValue={currentReclamation.date}
-                      className="mb-3" 
+                      className="mb-3"
                     />
                     <Input
                       isReadOnly
@@ -399,7 +498,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                       variant="bordered"
                       labelPlacement="outside"
                       defaultValue={currentReclamation.status}
-                      className="mb-3" 
+                      className="mb-3"
                     />
                     <Input
                       isReadOnly
@@ -407,7 +506,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                       variant="bordered"
                       labelPlacement="outside"
                       defaultValue={currentReclamation.sol}
-                      className="mb-3" 
+                      className="mb-3"
                     />
                   </>
                 )}
@@ -450,7 +549,14 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                 >
                   Fermer
                 </Button>
-                <Button color="primary">Continuer</Button>
+                <Button
+                  color="primary"
+                  onClick={() =>
+                    handleCancelRecalamtion(currentReclamation.id_recl)
+                  }
+                >
+                  Continuer
+                </Button>
               </ModalFooter>
             </>
           )}

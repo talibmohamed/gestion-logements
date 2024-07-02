@@ -15,6 +15,8 @@ import {
 } from "../statisticsSlice";
 import { fetchStatistics, fetchFacture } from "../services/userapi";
 import { setFacture } from "../factureSlice";
+import { fetchReclamation, annulerReclamation } from "../services/userapi";
+import { setReclamations } from "../reclamationSlice";
 
 // Thunk to handle user login
 export const loginUserThunk = createAsyncThunk(
@@ -143,6 +145,43 @@ export const fetchFactureThunk = createAsyncThunk(
       return response;
     } catch (error) {
       console.error("Error checking token:", error);
+      throw error;
+    }
+  }
+);
+
+//fetch reclamation
+export const fetchReclamationThunk = createAsyncThunk(
+  "user/fetchReclamation",
+  async (_, { dispatch, getState }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+    console.log(jwt);
+
+    try {
+      const response = await fetchReclamation(jwt); 
+      dispatch(setReclamations(response.reclamations)); 
+      return response;
+    } catch (error) {
+      console.error("Error fetching reclamation:", error);
+      throw error;
+    }
+  }
+);
+
+export const annulerReclamationThunk = createAsyncThunk(
+  "user/annulerReclamation",
+  async (data, { getState, dispatch }) => {
+    try {
+      const state = getState();
+      const jwt = state.auth.jwt_token;
+
+      const response = await annulerReclamation(data, jwt); 
+      // fetch fetchReclamationThunk to update 
+      dispatch(fetchReclamationThunk());
+      return response; 
+    } catch (error) {
+      console.error("Error annuler reclamation:", error);
       throw error;
     }
   }

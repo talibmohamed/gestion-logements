@@ -54,7 +54,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
       <Sidebar
         className={`sidebar ${toggled ? "toggled" : ""}`}
         backgroundColor="#171821"
-        width={toggled ? "90%" : "20vw"}
+        width={toggled ? "90%" : "15vw"}
         border="0px solid #171821"
         toggled={toggled}
         customBreakPoint="1000px"
