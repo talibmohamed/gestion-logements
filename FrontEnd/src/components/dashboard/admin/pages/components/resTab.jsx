@@ -55,8 +55,6 @@ const SMALL_DEVICE_COLUMNS = [
   "nom",
   "prenom",
   "cin",
-  "email",
-  "telephone",
   "profession",
   "ameliored",
   "actions",
@@ -92,9 +90,9 @@ const ResidantTable = ({ columns, rows, title }) => {
     onOpenChange: setDeleteModalOpen,
   } = useDisclosure();
   const {
-    isOpen: isDetails2ModalOpen,
-    onOpen: openDetails2Modal,
-    onOpenChange: setDetails2ModalOpen,
+    isOpen: isDetailsModalOpen,
+    onOpen: openDetailsModal,
+    onOpenChange: setDetailsModalOpen,
   } = useDisclosure();
 
   const [newResidant, setNewResidant] = useState({
@@ -187,9 +185,9 @@ const ResidantTable = ({ columns, rows, title }) => {
     setCurrentResidant(residant);
   };
 
-  const handleDetails2IconClick = (residant) => {
+  const handleDetailsIconClick = (residant) => {
     setCurrentResidant(residant);
-    openDetails2Modal(true);
+    openDetailsModal(true);
   };
 
   const handleEditIconClick = (residant) => {
@@ -204,27 +202,26 @@ const ResidantTable = ({ columns, rows, title }) => {
 
   const dispatch = useDispatch();
 
-
   const handleAddResidant = async () => {
     // Validate all fields before dispatching
     if (
-      newResidant.nom === '' ||
-      newResidant.prenom === '' ||
-      newResidant.cin === '' ||
-      newResidant.email === '' ||
-      newResidant.profession === '' ||
-      newResidant.ameliore === '' ||
-      newResidant.telephone === ''
+      newResidant.nom === "" ||
+      newResidant.prenom === "" ||
+      newResidant.cin === "" ||
+      newResidant.email === "" ||
+      newResidant.profession === "" ||
+      newResidant.ameliore === "" ||
+      newResidant.telephone === ""
     ) {
       // Handle invalid form data
       return;
     }
-  
+
     console.log(newResidant);
-  
+
     // Convert ameliore to a boolean if it's a string "yes" or "no"
-    const amelioreBoolean = newResidant.ameliore === 'yes';
-  
+    const amelioreBoolean = newResidant.ameliore === "yes";
+
     // Prepare the data to dispatch
     const residantData = {
       nom: newResidant.nom,
@@ -235,108 +232,107 @@ const ResidantTable = ({ columns, rows, title }) => {
       profession: newResidant.profession,
       is_ameliore: amelioreBoolean,
     };
-  
+
     console.log(residantData);
-  
+
     // Show loading toast while processing
-    const loadingToastId = toast.loading('Adding residant...', {
-      position: 'bottom-right',
+    const loadingToastId = toast.loading("Adding residant...", {
+      position: "bottom-right",
       autoClose: false,
       hideProgressBar: false,
       closeOnClick: false,
       pauseOnHover: false,
       draggable: true,
       progress: 0,
-      theme: 'dark',
+      theme: "dark",
     });
-  
+
     try {
       // Dispatch the action to add residant
       const response = await dispatch(addResidantThunk(residantData));
-  
+
       // Clear loading toast
       toast.dismiss(loadingToastId);
-  
+
       // Display success message
-      if (response && response.payload.status === 'success') {
+      if (response && response.payload.status === "success") {
         toast.success(response.payload.message, {
-          position: 'bottom-right',
+          position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: false,
           draggable: true,
           progress: 0,
-          theme: 'dark',
+          theme: "dark",
         });
         // Clear the form or close modal after successful submission
         setAddModalOpen(false);
         setNewResidant({
-          profession: '',
-          ameliore: '',
-          nb_pieces: '',
-          superficie: '',
-          address: '',
+          profession: "",
+          ameliore: "",
+          nb_pieces: "",
+          superficie: "",
+          address: "",
         });
-      } else if (response && response.payload.status === 'alert') {
+      } else if (response && response.payload.status === "alert") {
         toast.error(response.payload.message, {
-          position: 'bottom-right',
+          position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: false,
           draggable: true,
           progress: 0,
-          theme: 'dark',
+          theme: "dark",
         });
       } else {
         // Handle other statuses or errors
         toast.error(response.payload.message, {
-          position: 'bottom-right',
+          position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: false,
           draggable: true,
           progress: 0,
-          theme: 'dark',
+          theme: "dark",
         });
       }
     } catch (error) {
-      console.error('Error adding residant:', error);
-      toast.error('An error occurred while adding residant', {
-        position: 'bottom-right',
+      console.error("Error adding residant:", error);
+      toast.error("An error occurred while adding residant", {
+        position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
         draggable: true,
         progress: 0,
-        theme: 'dark',
+        theme: "dark",
       });
     }
   };
-  
 
   const handleEditResidant = async () => {
     // Validate all fields before dispatching
     if (
-      currentResidant.res_id === '' ||
-      currentResidant.nom === '' ||
-      currentResidant.prenom === '' ||
-      currentResidant.cin === '' ||
-      currentResidant.email === '' ||
-      currentResidant.profession === '' ||
-      currentResidant.ameliore === '' ||
-      currentResidant.telephone === ''
+      currentResidant.res_id === "" ||
+      currentResidant.nom === "" ||
+      currentResidant.prenom === "" ||
+      currentResidant.cin === "" ||
+      currentResidant.email === "" ||
+      currentResidant.profession === "" ||
+      currentResidant.ameliore === "" ||
+      currentResidant.telephone === ""
     ) {
       // Handle invalid form data
       return;
     }
-  
+
     // Convert is_ameliore to a boolean if it's a string "yes" or "no"
-    const isAmelioreBoolean = currentResidant.ameliore === 'yes';
-  
+    const isAmelioreBoolean = currentResidant.ameliore === "yes";
+
     // Prepare the data to dispatch
     const residantData = {
       res_id: currentResidant.res_id,
@@ -350,80 +346,79 @@ const ResidantTable = ({ columns, rows, title }) => {
     };
 
     console.log(residantData);
-  
+
     // Show loading toast while processing
-    const loadingToastId = toast.loading('Updating residant...', {
-      position: 'bottom-right',
+    const loadingToastId = toast.loading("Updating residant...", {
+      position: "bottom-right",
       autoClose: false,
       hideProgressBar: false,
       closeOnClick: false,
       pauseOnHover: false,
       draggable: true,
       progress: 0,
-      theme: 'dark',
+      theme: "dark",
     });
-  
+
     try {
       // Dispatch the action to update residant
       const response = await dispatch(updateResidantThunk(residantData));
-  
+
       // Clear loading toast
       toast.dismiss(loadingToastId);
-  
+
       // Display success message
-      if (response && response.payload.status === 'success') {
-        toast.success('Residant edited successfully', {
-          position: 'bottom-right',
+      if (response && response.payload.status === "success") {
+        toast.success("Residant edited successfully", {
+          position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: false,
           draggable: true,
           progress: 0,
-          theme: 'dark',
+          theme: "dark",
         });
-  
+
         // Clear the form or close modal after successful submission
         setEditModalOpen(false);
-      } else if (response && response.payload.status === 'alert') {
+      } else if (response && response.payload.status === "alert") {
         toast.error(response.payload.message, {
-          position: 'bottom-right',
+          position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: false,
           draggable: true,
           progress: 0,
-          theme: 'dark',
+          theme: "dark",
         });
       } else {
         // Handle other statuses or errors
-        toast.error('Failed to edit residant', {
-          position: 'bottom-right',
+        toast.error("Failed to edit residant", {
+          position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: false,
           draggable: true,
           progress: 0,
-          theme: 'dark',
+          theme: "dark",
         });
       }
     } catch (error) {
-      console.error('Error editing residant:', error);
-      toast.error('An error occurred while editing residant', {
-        position: 'bottom-right',
+      console.error("Error editing residant:", error);
+      toast.error("An error occurred while editing residant", {
+        position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: false,
         draggable: true,
         progress: 0,
-        theme: 'dark',
+        theme: "dark",
       });
     }
   };
-  
 
   //delete a residant
   const handleDeleteResidant = async () => {
@@ -534,22 +529,13 @@ const ResidantTable = ({ columns, rows, title }) => {
                   <DropdownMenu
                     aria-label="Action event example"
                     onAction={(key) => {
-                      if (key === "details") handleDetails2IconClick(item);
+                      if (key === "details") handleDetailsIconClick(item);
                       if (key === "edit") handleEditIconClick(item);
                       if (key === "delete") handleDeleteIconClick(item);
                     }}
                   >
                     <DropdownItem key="details" startContent={<Eye2Icon />}>
                       Détails
-                    </DropdownItem>
-
-                    <DropdownItem
-                      key="equip"
-                      startContent={
-                        <TipsAndUpdatesOutlinedIcon sx={{ fontSize: 16 }} />
-                      }
-                    >
-                      Les équipements disponibles
                     </DropdownItem>
 
                     <DropdownItem key="edit" startContent={<EditIcon />}>
@@ -992,6 +978,251 @@ const ResidantTable = ({ columns, rows, title }) => {
 
       <Modal
         size="lg"
+        isOpen={isDetailsModalOpen}
+        onOpenChange={() => setDetailsModalOpen(false)}
+        classNames={{
+          base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+          closeButton: "hover:bg-white/5 active:bg-white/10",
+        }}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Détails sur le residant 
+              </ModalHeader>
+              <ModalBody>
+                <>
+                  <Input
+                    isReadOnly
+                    type="text"
+                    label="Nom"
+                    variant="bordered"
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                    defaultValue={currentResidant?.nom}
+                    onChange={(e) =>
+                      setCurrentResidant({
+                        ...currentResidant,
+                        nom: e.target.value,
+                      })
+                    }
+                  />
+
+                  <Input
+                    isReadOnly
+                    type="text"
+                    label="Prénom"
+                    variant="bordered"
+                    defaultValue={currentResidant.prenom}
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                    onChange={(e) =>
+                      setCurrentResidant({
+                        ...currentResidant,
+                        prenom: e.target.value,
+                      })
+                    }
+                  />
+
+                  <Input
+                    isReadOnly
+                    type="text"
+                    label="Cin"
+                    variant="bordered"
+                    defaultValue={currentResidant.cin}
+                    onChange={(e) =>
+                      setCurrentResidant({
+                        ...currentResidant,
+                        cin: e.target.value,
+                      })
+                    }
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                  />
+
+                  <Input
+                    isReadOnly
+                    label="Email"
+                    variant="bordered"
+                    defaultValue={currentResidant.email}
+                    onChange={(e) =>
+                      setCurrentResidant({
+                        ...currentResidant,
+                        email: e.target.value,
+                      })
+                    }
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                  />
+                  <Input
+                    isReadOnly
+                    label="Profession"
+                    variant="bordered"
+                    defaultValue={currentResidant.profession}
+                    onChange={(e) =>
+                      setCurrentResidant({
+                        ...currentResidant,
+                        profession: e.target.value,
+                      })
+                    }
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                  />
+                  <Input
+                    isReadOnly
+                    label="Téléphone"
+                    variant="bordered"
+                    defaultValue={currentResidant.telephone}
+                    onChange={(e) =>
+                      setCurrentResidant({
+                        ...currentResidant,
+                        telephone: e.target.value,
+                      })
+                    }
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                  />
+                  <Input
+                    isReadOnly
+                    label="Amelioré"
+                    variant="bordered"
+                    defaultValue={currentResidant.ameliored ? "Oui" : "Non"}
+                    onChange={(e) =>
+                      setCurrentResidant({
+                        ...currentResidant,
+                        ameliored: e.target.value,
+                      })
+                    }
+                    className="max-w-sm"
+                    classNames={{
+                      label: "group-data-[filled-within=true]:text-zinc-400",
+                      input: [
+                        "bg-transparent",
+                        "group-data-[has-value=true]:text-white/90",
+                      ],
+                      innerWrapper: "bg-transparent",
+                      inputWrapper: [
+                        "bg-transparent",
+                        "group-data-[hover=true]:bg-zinc-800",
+                        "group-data-[hover=true]:border-zinc-500",
+                        "group-data-[focus=true]:bg-transparent ",
+                        "group-data-[focus=true]:border-zinc-400 ",
+                        "!cursor-text",
+                        "border-zinc-600",
+                      ],
+                    }}
+                  />
+                </>{" "}
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" onClick={onClose}>
+                  Fermer
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        size="lg"
         isOpen={isEditModalOpen}
         onOpenChange={setEditModalOpen}
         classNames={{
@@ -1323,7 +1554,8 @@ ResidantTable.propTypes = {
   ).isRequired,
   rows: PropTypes.arrayOf(
     PropTypes.shape({
-      res_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      res_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
       nom: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
       prenom: PropTypes.string.isRequired,
       cin: PropTypes.string.isRequired,

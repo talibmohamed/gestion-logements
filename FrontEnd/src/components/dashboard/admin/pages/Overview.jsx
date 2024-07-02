@@ -3,7 +3,6 @@ import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import PieChartCard from "./components/pie";
 import Graph from "./components/graph.jsx";
-import DataTable from "./components/oveTab";
 import "./Overview.scss";
 import { columns } from "./components/data";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,12 +11,10 @@ import {
   fetchStatisticsThunk,
 } from "../../../../session/thunks/adminthunk";
 
-
 const sampleData = [
   { label: "vacant", data: [12, 6, 20, 4, 20, 1], color: "#96A7FF" },
   { label: "non-vacant", data: [10, 2, 8, 16, 0, 4], color: "#f9769d" },
 ];
-
 
 const Overview = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -97,13 +94,19 @@ const Overview = () => {
   ];
 
   // Calculate logement statistics dynamically
-  const logementStatuses = ["disponible", "en_maintenance", "occupé", "non_disponible", "autre"];
+  const logementStatuses = [
+    "disponible",
+    "en_maintenance",
+    "occupé",
+    "non_disponible",
+    "autre",
+  ];
   const colors = {
-    "disponible": "#28a745", // Green
-    "en_maintenance": "#ffc107", // Yellow
-    "occupé": "#F9769D", // Pink
-    "non_disponible": "#dc3545", // Red
-    "autre": "#6c757d" // Grey
+    disponible: "#28a745", // Green
+    en_maintenance: "#ffc107", // Yellow
+    occupé: "#F9769D", // Pink
+    non_disponible: "#dc3545", // Red
+    autre: "#6c757d", // Grey
   };
 
   const totalLogements = statistics?.logement?.total_logements_count || 0;
@@ -116,7 +119,8 @@ const Overview = () => {
 
   // Calculate occupied percentage for label
   const totalOccupied = statistics?.logement?.occupé || 0;
-  const occupiedPercentage = totalLogements > 0 ? (totalOccupied / totalLogements) * 100 : 0;
+  const occupiedPercentage =
+    totalLogements > 0 ? (totalOccupied / totalLogements) * 100 : 0;
   const logementStatisticsLabel = `${totalLogements} Logements`;
 
   // Label for factureStatistics to display the total of factures
@@ -124,12 +128,12 @@ const Overview = () => {
     (statistics?.facture?.total_paid_count || 0) +
     (statistics?.facture?.total_overdue_count || 0) +
     (statistics?.facture?.total_unpaid_count || 0) +
-    ' Factures';
+    " Factures";
 
   return (
     <div className="container mx-auto">
       {isMobile ? (
-        <Carousel showArrows={false} showStatus={false} showThumbs={false}>
+        <>
           <div className="carousel-item-wrapper">
             <PieChartCard
               title="Statistique Des Factures"
@@ -144,7 +148,7 @@ const Overview = () => {
               label={logementStatisticsLabel}
             />
           </div>
-        </Carousel>
+        </>
       ) : (
         <div className="flex flex-wrap justify-around">
           <div className="w-full md:w-1/2 p-2">
@@ -169,7 +173,7 @@ const Overview = () => {
           rows={transformedFactures}
           title="Factures récentes"
         /> */}
-         <Graph title="Graphe linéaire des logements" data={sampleData} />
+        <Graph title="Graphe linéaire des logements" data={sampleData} />
       </div>
     </div>
   );
