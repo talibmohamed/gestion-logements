@@ -30,6 +30,8 @@ import { DeleteIcon } from "../Icons/DeleteIcon";
 import { EyeIcon } from "../Icons/EyeIcon";
 import { VerticalDotsIcon } from "../Icons/VerticalDotsIcon";
 import PropTypes from "prop-types";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchReclamationsThunk } from "../../../../../session/thunks/adminthunk";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id_recl",
@@ -165,6 +167,19 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     setCurrentReclamation(reclamation);
     openDeleteModal();
   };
+
+  // const dispatch = useDispatch();
+  // const reclamationsState = useSelector(state => state.reclamations);
+  // const reclamation = reclamationsState?.reclamation || [];
+
+  // console.log("1");
+  // console.log(reclamation);
+  // console.log("1");
+
+
+  // useEffect(() => {
+  //   dispatch(fetchReclamationsThunk()); 
+  // }, [dispatch]); 
 
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];

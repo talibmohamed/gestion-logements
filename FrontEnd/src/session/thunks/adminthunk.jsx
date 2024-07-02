@@ -30,12 +30,10 @@ import {
   updateFacture,
   deleteFacture,
 } from "../services/adminapi";
+import { fetchReclamations } from "../services/adminapi";
+
 import { sendNotification } from "../services/adminapi";
-import {
-  fetchConsums,
-  addConsum,
-  updateConsum,
-} from "../services/adminapi";
+import { fetchConsums, addConsum, updateConsum } from "../services/adminapi";
 import {
   setStatistics,
   setStatisticsLoading,
@@ -45,6 +43,7 @@ import {
 import { setLogements } from "../logementSlice";
 import { setResidants } from "../residantSlice.jsx";
 import { setConsums } from "../consumSlice.jsx";
+import { setReclamations } from "../reclamationSlice.jsx";
 
 // Thunk for admin login
 export const loginAdminThunk = createAsyncThunk(
@@ -419,7 +418,6 @@ export const sendNotificationThunk = createAsyncThunk(
   }
 );
 
-
 export const fetchConsumsThunk = createAsyncThunk(
   "consums/fetchConsums",
   async (_, { dispatch, getState }) => {
@@ -470,6 +468,27 @@ export const updateConsumThunk = createAsyncThunk(
       return response;
     } catch (error) {
       console.error("Error updating consum:", error);
+      throw error;
+    }
+  }
+);
+
+//reclamation
+
+export const fetchReclamationsThunk = createAsyncThunk(
+  "reclamations/fetchReclamations",
+  async (_, { dispatch, getState }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token; // Assuming auth slice manages JWT token
+
+    try {
+      const response = await fetchReclamations(jwt); // Call your API function to fetch Consums
+      console.log(response.reclamations);
+
+      dispatch(setReclamations(response.reclamations));
+      return response; // Return response if needed by the caller
+    } catch (error) {
+      console.error("Error fetching reclamations:", error);
       throw error;
     }
   }

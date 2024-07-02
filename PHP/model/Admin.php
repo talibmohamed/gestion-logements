@@ -580,6 +580,18 @@ class admin
 
             $res_id = $connection->lastInsertId();
 
+            // Insert consumption records for the current month
+            $stmt = $connection->prepare("
+                INSERT INTO consommation (cons_type, cons_date, cons_quota, cons_actuel, res_id, log_id)
+                VALUES 
+                    ('eau', CURRENT_DATE, 0, 0, :res_id, :log_id),
+                    ('electricite', CURRENT_DATE, 0, 0, :res_id, :log_id)
+            ");
+            $stmt->execute([
+                ':res_id' => $res_id,
+                ':log_id' => $logement['log_id']
+            ]);
+
             // Generate JWT token and update login token
             $jwtHandler = new JwtHandler();
             $login_token = $jwtHandler->generateJwtToken($res_id, 'residant');
@@ -648,7 +660,7 @@ class admin
                 </div>
             </body>
             </html>
-        ";
+            ";
 
             if (!sendEmail($userData['email'], $userData['nom'], $userData['prenom'], $subject, $body)) {
                 error_log('Failed to send email after adding resident.');
@@ -1252,7 +1264,7 @@ class admin
             ];
         }
     }
-    
+
     //delete reclamation
     public function deleteReclamation($rec_id)
     {

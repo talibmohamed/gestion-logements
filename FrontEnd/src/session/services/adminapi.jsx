@@ -440,3 +440,25 @@ export const updateConsum = async (jwtToken, consumData) => {
     throw error;
   }
 };
+
+//reclamation
+// Function to fetch all reclamation
+export const fetchReclamations = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/admin/reclamation`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    console.log(response);
+
+    return response.data;
+  }
+  catch (error) {
+    console.error(
+      "Error in fetchReclamations:",
+      error.response || error.message || error
+    );
+    throw error;
+  }
+}

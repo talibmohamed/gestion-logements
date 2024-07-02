@@ -72,6 +72,7 @@ CREATE TABLE facture (
         REFERENCES residant (res_id) ON DELETE CASCADE
 );
 
+-------- consomation
 CREATE TABLE consommation (
     cons_id    SERIAL PRIMARY KEY,
     cons_type  VARCHAR(255),
@@ -80,11 +81,48 @@ CREATE TABLE consommation (
     cons_actuel DOUBLE PRECISION,
     res_id     INT,
     log_id     INT,
-    FOREIGN KEY (res_id)
-        REFERENCES residant (res_id) ON DELETE CASCADE,
-    FOREIGN KEY (log_id)
-        REFERENCES logement (log_id) ON DELETE CASCADE
+    month_year VARCHAR(7) DEFAULT TO_CHAR(CURRENT_DATE, 'YYYY-MM'),
+    status     VARCHAR(20) DEFAULT 'active',
+    FOREIGN KEY (res_id) REFERENCES residant (res_id) ON DELETE CASCADE,
+    FOREIGN KEY (log_id) REFERENCES logement (log_id) ON DELETE CASCADE
 );
+
+-- Step 2: Create a procedure to close current month's records and create new ones for the next month
+-- Step 2: Create a procedure to close current month's records and create new ones for the next month
+CREATE OR REPLACE FUNCTION close_and_create_consumption() RETURNS void AS $$
+DECLARE
+    current_month_year VARCHAR(7);
+    next_month_year VARCHAR(7);
+    res RECORD;
+BEGIN
+    current_month_year := TO_CHAR(CURRENT_DATE, 'YYYY-MM');
+    next_month_year := TO_CHAR((CURRENT_DATE + INTERVAL '1 month'), 'YYYY-MM');
+
+    UPDATE consommation
+    SET status = 'closed'
+    WHERE month_year = current_month_year;
+
+    FOR res IN SELECT res_id, log_id FROM residant
+    LOOP
+        INSERT INTO consommation (cons_type, cons_date, cons_quota, cons_actuel, res_id, log_id, month_year, status)
+        VALUES ('electricite', CURRENT_DATE, 0, 0, res.res_id, res.log_id, next_month_year, 'active');
+        
+        INSERT INTO consommation (cons_type, cons_date, cons_quota, cons_actuel, res_id, log_id, month_year, status)
+        VALUES ('eau', CURRENT_DATE, 0, 0, res.res_id, res.log_id, next_month_year, 'active');
+    END LOOP;
+END;
+$$ LANGUAGE plpgsql;
+
+
+create extension pg_cron with schema extensions;
+
+grant usage on schema cron to postgres;
+grant all privileges on all tables in schema cron to postgres;
+
+SELECT cron.schedule('0 0 1 * *', $$SELECT close_and_create_consumption()$$);
+
+
+------ end consomation
 
 CREATE TYPE rec_etat_enum AS ENUM ('en attente', 'résolu', 'non résolu', 'annulé');
 
