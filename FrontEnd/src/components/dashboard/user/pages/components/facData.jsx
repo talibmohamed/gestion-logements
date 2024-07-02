@@ -10,19 +10,19 @@ const columns = [
   {name: "Actions", uid: "actions"}
 ];
 
-const users = [
-  { id: 2, id_fac: "#1313313", type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "en retard", ttc: "$10" },
-  { id: 3, id_fac: "#1313313",  type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "en attente", ttc: "$10" },
-  { id: 4, id_fac: "#1313313",  type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "payée", ttc: "$10" },
-  { id: 5, id_fac: "#1313313",  type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "payée", ttc: "$10" },
-  { id: 6, id_fac: "#1313313", type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "payée", ttc: "$10" },
-  { id: 7, id_fac: "#1313313", type: "Eau", mois: "01/01/2025", echeance: "02/22/2024", status: "en retard", ttc: "$10" },
-  { id: 8, id_fac: "#1313313",  type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "en attente", ttc: "$10" },
-  { id: 9, id_fac: "#1313313",  type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "payée", ttc: "$10" },
-  { id: 10, id_fac: "#1313313",type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "payée", ttc: "$10" },
-  { id: 1, id_fac: "#1313313", type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "payée", ttc: "$10" },
-  ];
+// const users = [
+//   { id: 2, id_fac: "#1313313", type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "en retard", ttc: "$10" },
+//   { id: 3, id_fac: "#1313313",  type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "en attente", ttc: "$10" },
+//   { id: 4, id_fac: "#1313313",  type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "payée", ttc: "$10" },
+//   { id: 5, id_fac: "#1313313",  type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "payée", ttc: "$10" },
+//   { id: 6, id_fac: "#1313313", type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "payée", ttc: "$10" },
+//   { id: 7, id_fac: "#1313313", type: "Eau", mois: "01/01/2025", echeance: "02/22/2024", status: "en retard", ttc: "$10" },
+//   { id: 8, id_fac: "#1313313",  type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "en attente", ttc: "$10" },
+//   { id: 9, id_fac: "#1313313",  type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "payée", ttc: "$10" },
+//   { id: 10, id_fac: "#1313313",type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "payée", ttc: "$10" },
+//   { id: 1, id_fac: "#1313313", type: "Eau", mois: "02/22/2024", echeance: "02/22/2024", status: "payée", ttc: "$10" },
+//   ];
 
 const statusOptions = ["payée", "en retard", "en attente"];
 
-export {columns, users, statusOptions};
+export {columns, statusOptions};

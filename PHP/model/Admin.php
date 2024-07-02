@@ -523,6 +523,7 @@ class admin
         try {
             $connection = $this->db->getConnection();
 
+            // Prepare data for insertion
             $userData['is_ameliore'] = $userData['is_ameliore'] ? 'TRUE' : 'FALSE';
 
             // Check if email already exists
@@ -580,12 +581,10 @@ class admin
 
             $res_id = $connection->lastInsertId();
 
-            // Insert consumption records for the current month
+            // Insert initial consumption records for electricity and water
             $stmt = $connection->prepare("
-                INSERT INTO consommation (cons_type, cons_date, cons_quota, cons_actuel, res_id, log_id)
-                VALUES 
-                    ('eau', CURRENT_DATE, 0, 0, :res_id, :log_id),
-                    ('electricite', CURRENT_DATE, 0, 0, :res_id, :log_id)
+                INSERT INTO consommation (cons_date, elec_actuel, eau_actuel, res_id, log_id, month_year, status)
+                VALUES (CURRENT_DATE, 0, 0, :res_id, :log_id, TO_CHAR(CURRENT_DATE, 'YYYY-MM'), 'active');
             ");
             $stmt->execute([
                 ':res_id' => $res_id,
@@ -660,7 +659,7 @@ class admin
                 </div>
             </body>
             </html>
-            ";
+        ";
 
             if (!sendEmail($userData['email'], $userData['nom'], $userData['prenom'], $subject, $body)) {
                 error_log('Failed to send email after adding resident.');
@@ -686,6 +685,7 @@ class admin
             ];
         }
     }
+
 
     // Model method to update resident in the database
     public function updateResident($userData)
@@ -1294,6 +1294,81 @@ class admin
             return [
                 'status' => 'error',
                 'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    public function getAllConsommation()
+    {
+        try {
+            $connection = $this->db->getConnection();
+            $sql = $connection->prepare("
+                SELECT 
+                    c.cons_id AS cons_id,
+                    c.log_id AS log_id,
+                    CONCAT(res.nom, ' ', res.prenom) AS res_nom,
+                    ti.quotas_electricite,
+                    ti.quotas_eau,
+                    c.elec_actuel,
+                    c.eau_actuel
+                FROM 
+                    consommation c
+                JOIN 
+                    residant res ON c.res_id = res.res_id
+                JOIN 
+                    logement log ON c.log_id = log.log_id
+                JOIN 
+                    typelog_info ti ON log.typelog = ti.typelog AND log.is_ameliore = ti.is_ameliore
+                WHERE 
+                    c.status = 'active'
+            ");
+            $sql->execute();
+            $consommations = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+            return [
+                'status' => 'success',
+                'consommations' => $consommations
+            ];
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    public function updateConsommation($data)
+    {
+        try {
+            $connection = $this->db->getConnection();
+            $sql = $connection->prepare("
+            UPDATE consommation
+            SET elec_actuel = :elec_actuel,
+                eau_actuel = :eau_actuel
+            WHERE cons_id = :cons_id
+        ");
+            $sql->execute([
+                ':elec_actuel' => $data['elec_actuel'],
+                ':eau_actuel' => $data['eau_actuel'],
+                ':cons_id' => $data['cons_id']
+            ]);
+
+            // Check if update was successful
+            if ($sql->rowCount() > 0) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Actual consumption updated successfully.'
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'No rows updated. Consommation ID not found or values unchanged.'
+                ];
+            }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => 'Database error: ' . $e->getMessage()
             ];
         }
     }

@@ -176,4 +176,105 @@ class residant
             return array('status' => 'error3', 'message' => $e->getMessage());
         }
     }
+
+    //statistics
+    public function getStatistics($jwt)
+    {
+        try {
+            $jwtHandler = new JwtHandler();
+            $token_info = $jwtHandler->verifyJwtToken($jwt);
+            $res_id = $token_info['data']['id'];
+
+            $connection = $this->db->getConnection();
+
+            // Query to get total electricity and water usage and remaining quotas
+            $sql = $connection->prepare('
+                SELECT
+                    SUM(c.elec_actuel) AS total_electricity_used,
+                    COALESCE(SUM(t.quotas_electricite - c.elec_actuel), 0) AS electricity_quota_left,
+                    SUM(c.eau_actuel) AS total_water_used,
+                    COALESCE(SUM(t.quotas_eau - c.eau_actuel), 0) AS water_quota_left
+                FROM
+                    consommation c
+                JOIN
+                    logement l ON c.log_id = l.log_id
+                JOIN
+                    typelog_info t ON l.typelog = t.typelog AND l.is_ameliore = t.is_ameliore
+                WHERE
+                    c.res_id = ?
+            ');
+
+            $sql->execute([$res_id]);
+            $statistics = $sql->fetch(PDO::FETCH_ASSOC);
+
+            if ($statistics !== false) {
+                return [
+                    'status' => 'success',
+                    'statistics' => [
+                        'total_electricity_used' => $statistics['total_electricity_used'] ?? 0,
+                        'electricity_quota_left' => $statistics['electricity_quota_left'] ?? 0,
+                        'total_water_used' => $statistics['total_water_used'] ?? 0,
+                        'water_quota_left' => $statistics['water_quota_left'] ?? 0,
+                    ]
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'No statistics found'
+                ];
+            }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    //get facture 
+    public function getFactures($jwt)
+    {
+        try {
+            $jwtHandler = new JwtHandler();
+            $token_info = $jwtHandler->verifyJwtToken($jwt);
+            $res_id = $token_info['data']['id'];
+
+            $connection = $this->db->getConnection();
+
+            // Query to get all factures of the resident
+            $sql = $connection->prepare('
+                SELECT
+                    f.fac_id,
+                    f.fac_date,
+                    f.fac_type,
+                    f.fac_total,
+                    f.fac_etat,
+                    f.fac_echeance
+                FROM
+                    facture f
+                WHERE
+                    f.res_id = ?
+            ');
+
+            $sql->execute([$res_id]);
+            $factures = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+            if ($factures !== false) {
+                return [
+                    'status' => 'success',
+                    'factures' => $factures
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'No factures found for this resident'
+                ];
+            }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 }

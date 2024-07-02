@@ -101,6 +101,7 @@ const Overview = () => {
     "non_disponible",
     "autre",
   ];
+  
   const colors = {
     disponible: "#28a745", // Green
     en_maintenance: "#ffc107", // Yellow

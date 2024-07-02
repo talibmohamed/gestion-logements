@@ -772,6 +772,73 @@ class AdminController
     }
 
 
+    //get all Consommation
+    public function getConsommationAPI($jwt)
+    {
+        if ($jwt) {
+            $response = $this->admin->getAllConsommation();
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
+        }
+    }
+
+    //update consommation i will get cons_id eau_actuel elec_actuel
+    public function updateConsommationAPI($data)
+    {
+        // Check if all required fields are present
+        if (
+            isset($data['cons_id']) &&
+            isset($data['elec_actuel']) &&
+            isset($data['eau_actuel'])
+        ) {
+            // Sanitize and validate inputs
+            $cons_id = filter_var($data['cons_id'], FILTER_VALIDATE_INT);
+            $elec_actuel = filter_var($data['elec_actuel'], FILTER_VALIDATE_FLOAT);
+            $eau_actuel = filter_var($data['eau_actuel'], FILTER_VALIDATE_FLOAT);
+
+            // Validate cons_id
+            if ($cons_id === false || $cons_id <= 0) {
+                http_response_code(400); // Bad Request
+                echo json_encode(['status' => 'error', 'message' => 'Invalid cons_id value']);
+                return;
+            }
+
+            // Validate elec_actuel
+            if ($elec_actuel === false || $elec_actuel < 0) {
+                http_response_code(400); // Bad Request
+                echo json_encode(['status' => 'error', 'message' => 'Invalid elec_actuel value']);
+                return;
+            }
+
+            // Validate eau_actuel
+            if ($eau_actuel === false || $eau_actuel < 0) {
+                http_response_code(400); // Bad Request
+                echo json_encode(['status' => 'error', 'message' => 'Invalid eau_actuel value']);
+                return;
+            }
+
+            // Prepare data for insertion
+            $consommationData = [
+                'cons_id' => $cons_id,
+                'elec_actuel' => $elec_actuel,
+                'eau_actuel' => $eau_actuel
+            ];
+
+            // Pass sanitized data to the model for insertion
+            $response = $this->admin->updateConsommation($consommationData);
+
+            // Respond with success message and HTTP 200 status
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400); // Bad Request
+            echo json_encode(['status' => 'error', 'message' => 'Missing required fields']);
+        }
+    }
+    
 
 
     //the web socket controller 

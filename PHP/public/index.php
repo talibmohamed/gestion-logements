@@ -149,6 +149,68 @@ function route($uri, $method)
             }
             break;
 
+        case '/api/v1/user/statistics':
+            if ($method === 'GET') {
+                $jwtHandler = new JwtHandler();
+                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                $jwt_token = str_replace('Bearer ', '', $jwt_token);
+
+                // Validate the JWT token
+                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+
+                if ($token_info['valid']) {
+                    $data['jwt'] = $jwt_token;
+                    $userController = new UserController();
+                    $response = $userController->getStatisticsAPI($data);
+
+                    // Output the response as JSON
+                    http_response_code(200);
+                    echo json_encode($response);
+                } else {
+                    http_response_code(401); // Unauthorized
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Unauthorized',
+                    ]);
+                }
+            } else {
+                http_response_code(405); // Method Not Allowed
+                echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+            }
+            break;
+
+
+            //get user facure 
+            case '/api/v1/user/facture':
+                if ($method === 'GET') {
+                    $jwtHandler = new JwtHandler();
+                    $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                    $jwt_token = str_replace('Bearer ', '', $jwt_token);
+            
+                    // Validate the JWT token
+                    $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+            
+                    if ($token_info['valid']) {
+                        $data['jwt'] = $jwt_token;
+                        $userController = new UserController();
+                        $userController->getFactureAPI($data);
+                    } else {
+                        http_response_code(401); // Unauthorized
+                        echo json_encode([
+                            'status' => 'error',
+                            'message' => 'Unauthorized',
+                        ]);
+                        exit;
+                    }
+                } else {
+                    http_response_code(405); // Method Not Allowed
+                    echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+                    exit;
+                }
+                break;
+            
+
+
 
             // Admin routes
         case '/api/v1/admin/login':
@@ -432,45 +494,78 @@ function route($uri, $method)
             }
             break;
 
-            case '/api/v1/admin/reclamation':
-                $jwtHandler = new JwtHandler();
-                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-                $jwt_token = str_replace('Bearer ', '', $jwt_token);
-                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
-    
-                if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
-                    $adminController = new AdminController();
-    
-                    switch ($method) {
-                        case 'GET':
-                            $adminController->getReclamationAPI($jwt_token);
-                            break;
-                        case 'PUT':
-                            $data = json_decode(file_get_contents('php://input'), true);
-                            $adminController->updateReclamationAPI($data);
-                            break;
-                        case 'DELETE':
-                            $data = json_decode(file_get_contents('php://input'), true);
-                            $adminController->deleteReclamationAPI($data);
-                            break;
-                        default:
-                            http_response_code(405); // Method Not Allowed
-                            echo json_encode([
-                                'status' => 'error',
-                                'message' => 'Method Not Allowed',
-                            ]);
-                            break;
-                    }
-                } else {
-                    http_response_code(401); // Unauthorized
-                    echo json_encode([
-                        'status' => 'error',
-                        'message' => 'Unauthorized',
-                    ]);
+        case '/api/v1/admin/reclamation':
+            $jwtHandler = new JwtHandler();
+            $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+            $jwt_token = str_replace('Bearer ', '', $jwt_token);
+            $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+
+            if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
+                $adminController = new AdminController();
+
+                switch ($method) {
+                    case 'GET':
+                        $adminController->getReclamationAPI($jwt_token);
+                        break;
+                    case 'PUT':
+                        $data = json_decode(file_get_contents('php://input'), true);
+                        $adminController->updateReclamationAPI($data);
+                        break;
+                    case 'DELETE':
+                        $data = json_decode(file_get_contents('php://input'), true);
+                        $adminController->deleteReclamationAPI($data);
+                        break;
+                    default:
+                        http_response_code(405); // Method Not Allowed
+                        echo json_encode([
+                            'status' => 'error',
+                            'message' => 'Method Not Allowed',
+                        ]);
+                        break;
                 }
-                break;
+            } else {
+                http_response_code(401); // Unauthorized
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Unauthorized',
+                ]);
+            }
+            break;
 
+        case '/api/v1/admin/consommation':
+            $jwtHandler = new JwtHandler();
+            $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+            $jwt_token = str_replace('Bearer ', '', $jwt_token);
+            $token_info = $jwtHandler->verifyJwtToken($jwt_token);
 
+            if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
+                $adminController = new AdminController();
+
+                switch ($method) {
+                    case 'GET':
+                        $adminController->getConsommationAPI($jwt_token);
+                        break;
+                    case 'PUT':
+                        $data = json_decode(file_get_contents('php://input'), true);
+                        $adminController->updateConsommationAPI($data);
+                        break;
+
+                    default:
+                        http_response_code(405); // Method Not Allowed
+                        echo json_encode([
+                            'status' => 'error',
+                            'message' => 'Method Not Allowed',
+                        ]);
+                        break;
+                }
+            } else {
+                http_response_code(401); // Unauthorized
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Unauthorized',
+                ]);
+            }
+            break;
 
         default:
             http_response_code(404);

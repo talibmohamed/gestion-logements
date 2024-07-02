@@ -8,6 +8,13 @@ import {
 } from "../services/userapi";
 import { setUser } from "../userslice";
 import { loginSuccess, updateJwtToken } from "../authentication";
+import {
+  setStatistics,
+  setStatisticsError,
+  setStatisticsLoading,
+} from "../statisticsSlice";
+import { fetchStatistics, fetchFacture } from "../services/userapi";
+import { setFacture } from "../factureSlice";
 
 // Thunk to handle user login
 export const loginUserThunk = createAsyncThunk(
@@ -73,6 +80,8 @@ export const changePasswordThunk = createAsyncThunk(
   }
 );
 
+//console log statistics form statistics slice
+
 // Thunk to check token
 
 export const checkTokenThunk = createAsyncThunk(
@@ -91,6 +100,46 @@ export const checkTokenThunk = createAsyncThunk(
       // Dispatch updateJwtToken action to update the JWT token in the store
       dispatch(updateJwtToken({ jwt_token: newToken }));
 
+      return response;
+    } catch (error) {
+      console.error("Error checking token:", error);
+      throw error;
+    }
+  }
+);
+
+//statistics
+
+export const fetchStatisticsThunk = createAsyncThunk(
+  "user/fetchStatistics",
+  async (_, { dispatch, getState }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+    console.log(jwt);
+
+    try {
+      const response = await fetchStatistics(jwt); // Assuming fetchStatistics is a function that makes an API call
+      dispatch(setStatistics(response.statistics)); // Dispatch successful action with parsed data
+      return response; // Return response if needed by the caller
+    } catch (error) {
+      dispatch(setStatisticsError(error.message)); // Dispatch error action with error message
+      console.error("Error fetching statistics:", error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to fetch facture
+export const fetchFactureThunk = createAsyncThunk(
+  "user/fetchFacture",
+  async (_, { dispatch, getState }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+    console.log(jwt);
+
+    try {
+      const response = await fetchFacture(jwt); // Assuming fetchFacture is a function that makes an API call
+      dispatch(setFacture(response.factures)); // Dispatch successful action with parsed data
       return response;
     } catch (error) {
       console.error("Error checking token:", error);

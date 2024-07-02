@@ -2,18 +2,19 @@ import React, { useEffect } from "react";
 import "./Overview.scss";
 import { columns, statusOptions } from "./components/facData";
 import InvoiceTable from "./components/facTab.jsx";
-import { Card, CardBody, Textarea, Input, Button } from "@nextui-org/react";
+import { Card, CardBody } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
-// import { fetchFactureThunk } from "../../../../session/thunks/userthunk";
+import { fetchFactureThunk } from "../../../../session/thunks/userthunks.jsx";
 
 const Facture = () => {
   const dispatch = useDispatch();
-  const factures = useSelector((state) => state.facture.factures);
+  const factures = useSelector((state) => state.facture.factures); // Ensure the state key is correct
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await dispatch(fetchFactureThunk()).unwrap();
-        console.log(response);
+        console.log("API Response:", response);
       } catch (error) {
         console.error("Error fetching factures:", error);
       }
@@ -24,10 +25,10 @@ const Facture = () => {
 
   console.log(factures);
 
-  // Transform factures data to match the table's expected structure
+  // Ensure factures is always an array
   const transformedFactures = factures.map((facture) => ({
     id: facture.fac_id,
-    id_res: facture.res_id,
+    id_fac: facture.fac_id,
     nom: facture.nom,
     type: facture.fac_type,
     mois: facture.fac_date,
@@ -35,6 +36,8 @@ const Facture = () => {
     status: facture.fac_etat,
     ttc: facture.fac_total,
   }));
+
+  console.log("Transformed Factures:", transformedFactures);
 
   return (
     <div className="w-full">

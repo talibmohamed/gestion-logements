@@ -383,7 +383,7 @@ export const sendNotification = async (jwtToken, notificationData) => {
 // Function to fetch all consums
 export const fetchConsums = async (jwt) => {
   try {
-    const response = await axios.get(`${baseURL}/admin/consum`, {
+    const response = await axios.get(`${baseURL}/admin/consommation`, {
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
