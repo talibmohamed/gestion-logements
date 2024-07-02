@@ -426,7 +426,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
               </ModalHeader>
               <ModalBody>
                 {isMobile ? (
-                  <>
+                  <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
                   <Input
                       isReadOnly
                       label="Résidant"
@@ -583,7 +583,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                           ],
                         }}
                     />
-                  </>
+                  </div>
                 ) : (
                   <>
                     <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">

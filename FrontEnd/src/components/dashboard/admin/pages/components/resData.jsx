@@ -4,7 +4,7 @@ const columns = [
   { name: "Id Residant", uid: "res_id" },
   { name: "Nom", uid: "nom" },
   { name: "Prenom", uid: "prenom", sortable: true },
-  { name: "cin", uid: "cin"},
+  { name: "Cin", uid: "cin"},
   { name: "Email", uid: "email" },
   { name: "Telephone", uid: "telephone" },
   { name: "Profession", uid: "profession" },
