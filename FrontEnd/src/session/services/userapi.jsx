@@ -166,3 +166,21 @@ export const addReclamation = async (data, jwt) => {
     throw error;
   }
 };
+
+// Function to fetch logement details
+export const fetchLogement = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/user/logement`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error in fetchLogement:",
+      error.response || error.message || error
+    );
+    throw error;
+  }
+};

@@ -98,32 +98,120 @@ function route($uri, $method)
             //     }
 
         case '/api/v1/user/profile':
+
             if ($method === 'GET') {
                 $jwtHandler = new JwtHandler();
                 $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
                 $jwt_token = str_replace('Bearer ', '', $jwt_token);
-                $userController = new UserController();
-                $userController->profile($jwt_token);
+                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+
+                if ($token_info['valid'] && $token_info['data']['role'] === 'residant') {
+                    $res_id = $token_info['data']['id'];
+                    $userController = new UserController();
+                    $userController->profile($res_id);
+                } else {
+                    http_response_code(401); // Unauthorized
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Unauthorized',
+                    ]);
+                }
             } else {
                 http_response_code(405);
                 echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
             }
             break;
 
+            //logement
+        case '/api/v1/user/logement':
+            if ($method === 'GET') {
+                $jwtHandler = new JwtHandler();
+                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                $jwt_token = str_replace('Bearer ', '', $jwt_token);
+                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+
+                if ($token_info['valid'] && $token_info['data']['role'] === 'residant') {
+                    $res_id = $token_info['data']['id'];
+                    $userController = new UserController();
+                    $userController->getLogementAPI($res_id);
+                } else {
+                    http_response_code(401); // Unauthorized
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Unauthorized',
+                    ]);
+                }
+            } else {
+                http_response_code(405);
+                echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+            }
+
+
             //change password
+
         case '/api/v1/user/change-password':
             if ($method === 'POST') {
                 $jwtHandler = new JwtHandler();
                 $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
                 $jwt_token = str_replace('Bearer ', '', $jwt_token);
-                $data['jwt'] = $jwt_token;
-                $userController = new UserController();
-                $userController->changepassword($data);
+                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+                if ($token_info['valid']) {
+                    $data['jwt'] = $jwt_token;
+                    $userController = new UserController();
+                    $userController->changepassword($data);
+                } else {
+                    http_response_code(401); // Unauthorized
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Unauthorized',
+                    ]);
+                }
             } else {
                 http_response_code(405);
                 echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
             }
             break;
+
+// Handle the /api/v1/user/statisticsquota endpoint
+case '/api/v1/user/statisticsquota':
+    if ($method === 'GET') {
+        $jwtHandler = new JwtHandler();
+        $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        $jwt_token = str_replace('Bearer ', '', $jwt_token);
+
+        // Validate the JWT token
+        $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+
+        if ($token_info['valid'] && $token_info['data']['role'] === 'residant') {
+            if (isset($token_info['data']['id'])) {
+                $res_id = $token_info['data']['id'];
+                $userController = new UserController();
+                $response = $userController->StatisticsQuotaAPI($res_id);
+
+                // Output the response as JSON
+                http_response_code(200);
+                echo json_encode($response);
+            } else {
+                http_response_code(400); // Bad Request
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => 'Missing res_id in token data',
+                ]);
+            }
+        } else {
+            http_response_code(401); // Unauthorized
+            echo json_encode([
+                'status' => 'error',
+                'message' => 'Unauthorized',
+            ]);
+        }
+    } else {
+        http_response_code(405); // Method Not Allowed
+        echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+    }
+    break;
+
+
             //check token
         case '/api/v1/user/check-token':
             if ($method === 'POST') {

@@ -316,6 +316,7 @@ const ReclaCard = ({ title }) => {
                     placeholder="Enter your description"
                     value={otherProblemDescription}
                     onChange={(e) => setOtherProblemDescription(e.target.value)}
+                    maxLength={255} // Set max length
                   />
                 )}
               </>
