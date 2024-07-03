@@ -60,15 +60,17 @@ class residant
         }
     }
 
-    public function profile($jwt)
+    public function profile($res_id)
     {
         try {
-            $jwtHandler = new JwtHandler();
-            $token_info = $jwtHandler->verifyJwtToken($jwt);
-            $res_id = $token_info['data']['id'];
-
             $connection = $this->db->getConnection();
-            $sql = $connection->prepare('SELECT nom, prenom, cin, email, telephone, profession FROM residant WHERE res_id = ?');
+            $sql = $connection->prepare('
+                SELECT r.nom, r.prenom, r.cin, r.email, r.telephone, r.profession, 
+                       TO_CHAR(r.date_ajout, \'YYYY-MM-DD\') as date_ajout, l.address 
+                FROM residant r
+                LEFT JOIN logement l ON r.log_id = l.log_id
+                WHERE r.res_id = ?
+            ');
             $sql->execute([$res_id]);
             $user = $sql->fetch(PDO::FETCH_ASSOC);
 
@@ -84,6 +86,54 @@ class residant
             return array('status' => 'error', 'message' => $e->getMessage());
         }
     }
+
+    //get logement 
+    public function getlogement($res_id)
+    {
+        try {
+            // Assuming $this->db is your database connection object
+            $connection = $this->db->getConnection();
+
+            // Fetch logement with typelog_info details, resident information, and equipment names for a specific resident
+            $sql = $connection->prepare('
+            SELECT 
+                l.typelog, l.is_ameliore, l.mc, l.piece, l.address,
+                t.quotas_electricite, t.quotas_eau,
+                CONCAT(r.nom, \' \', r.prenom) AS nom,
+                json_agg(e.equip_type) FILTER (WHERE e.equip_type IS NOT NULL) AS equipment_names
+            FROM logement l
+            JOIN typelog_info t ON l.typelog = t.typelog AND l.is_ameliore = t.is_ameliore
+            LEFT JOIN residant r ON l.log_id = r.log_id
+            LEFT JOIN unnest(t.equipement_ids) WITH ORDINALITY AS u(equip_id) ON TRUE
+            LEFT JOIN equipement e ON e.equip_id = u.equip_id
+            WHERE r.res_id = ?
+            GROUP BY l.log_id, t.quotas_electricite, t.quotas_eau, r.res_id, r.nom, r.prenom
+        ');
+
+            $sql->execute([$res_id]);
+            $logements = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+            // Decode JSON arrays back to PHP arrays
+            foreach ($logements as &$logement) {
+                if (isset($logement['equipment_names'])) {
+                    $logement['equipment_names'] = json_decode($logement['equipment_names']);
+                }
+            }
+
+            return [
+                'status' => 'success',
+                'logements' => $logements
+            ];
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+
+
 
     //old password shoudlt be the same as new password
     public function changepassword($jwt, $password, $confirmedpassword)
@@ -415,6 +465,70 @@ class residant
                 return [
                     'status' => 'error',
                     'message' => 'Erreur lors de l\'ajout de la réclamation'
+                ];
+            }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    //get statistics
+    // Method to fetch consumption statistics for the last 6 months with month names
+    public function StatisticsQuota($res_id)
+    {
+        try {
+            $connection = $this->db->getConnection();
+
+            // Query to fetch consumption statistics with month names in French
+            $sql = $connection->prepare('
+            WITH months AS (
+                SELECT 
+                    to_char(date_trunc(\'month\', current_date) - interval \'1 month\' * generate_series(0, 5), \'YYYY-MM\') AS month_year,
+                    EXTRACT(MONTH FROM date_trunc(\'month\', current_date) - interval \'1 month\' * generate_series(0, 5)) AS month_number
+            )
+            SELECT 
+                m.month_year,
+                CASE m.month_number
+                    WHEN 1 THEN \'Janvier\'
+                    WHEN 2 THEN \'Février\'
+                    WHEN 3 THEN \'Mars\'
+                    WHEN 4 THEN \'Avril\'
+                    WHEN 5 THEN \'Mai\'
+                    WHEN 6 THEN \'Juin\'
+                    WHEN 7 THEN \'Juillet\'
+                    WHEN 8 THEN \'Août\'
+                    WHEN 9 THEN \'Septembre\'
+                    WHEN 10 THEN \'Octobre\'
+                    WHEN 11 THEN \'Novembre\'
+                    WHEN 12 THEN \'Décembre\'
+                END AS month_name,
+                COALESCE(SUM(c.elec_actuel), 0) AS elec_actuel,
+                COALESCE(SUM(c.eau_actuel), 0) AS eau_actuel
+            FROM 
+                months m
+            LEFT JOIN 
+                consommation c ON m.month_year = to_char(c.cons_date, \'YYYY-MM\') AND c.res_id = ?
+            GROUP BY 
+                m.month_year, m.month_number
+            ORDER BY 
+                m.month_year
+        ');
+
+            $sql->execute([$res_id]);
+            $statistics = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+            if ($statistics !== false) {
+                return [
+                    'status' => 'success',
+                    'statistics' => $statistics
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'No statistics found'
                 ];
             }
         } catch (PDOException $e) {

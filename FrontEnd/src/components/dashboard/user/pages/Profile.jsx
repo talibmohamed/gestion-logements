@@ -10,17 +10,17 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
-// import { changePasswordThunk } from "../../../../session/thunks/userthunk";
-// import { fetchUserProfileThunk } from "../../../../session/thunks/userthunk";
+import { changePasswordThunk } from "../../../../session/thunks/userthunks";
 import { EyeFilledIcon } from "./Icons/EyeFilledIcon";
 import { EyeSlashFilledIcon } from "./Icons/EyeSlashFilledIcon";
 import "./Overview.scss";
 import "leaflet/dist/leaflet.css";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Tooltip } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { toast, ToastContainer } from "react-toastify";
 
 let DefaultIcon = L.icon({
   iconUrl: markerIcon,
@@ -28,7 +28,6 @@ let DefaultIcon = L.icon({
 });
 
 L.Marker.prototype.options.icon = DefaultIcon;
-
 
 const Profile = () => {
   const position = [32.375289, -6.318726];
@@ -90,14 +89,47 @@ const Profile = () => {
 
     try {
       // Call the API function to change the password
+      const loadingToastId = toast.loading("Cancelling reclamation...", {
+        position: "bottom-right",
+        autoClose: false,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+
       const response = await dispatch(
         changePasswordThunk({ password, confirmedPassword })
       ).unwrap();
 
+      toast.dismiss(loadingToastId);
+
       if (response.status === "success") {
-        setsuccess("Mot de passe changé avec succès.");
+        toast.success(response.message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+
+        setpassword("");
       } else {
-        setErrorMessage(response.message);
+        toast.error(response.message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
       }
 
       console.log(response.message);
@@ -198,7 +230,7 @@ const Profile = () => {
                         type="text"
                         label="Date d'ajout"
                         variant="bordered"
-                        defaultValue={profData.date_creation}
+                        defaultValue={profData.date_ajout}
                         className="max-w-md"
                         size="lg"
                         labelPlacement="outside"
@@ -403,7 +435,7 @@ const Profile = () => {
               </Card>
 
               <CardBody>
-                <h3 className=" text-left mb-2">Adresse</h3>
+                <h3 className=" text-left mb-2">Address</h3>
                 <div className="map-sidebar">
                   <MapContainer
                     center={position}
@@ -414,7 +446,11 @@ const Profile = () => {
                       attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    <Marker position={position}></Marker>
+                    <Marker position={position}>
+                      <Tooltip direction="top" opacity={0.8} permanent>
+                        <span>{profData.address}</span>
+                      </Tooltip>{" "}
+                    </Marker>
                   </MapContainer>
                 </div>
               </CardBody>
@@ -422,6 +458,7 @@ const Profile = () => {
           </CardBody>
         </Card>
       </div>
+      <ToastContainer />
     </div>
   );
 };

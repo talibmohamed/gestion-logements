@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Card,
   CardHeader,
@@ -18,7 +19,6 @@ import {
 import PropTypes from "prop-types";
 import { IconMappings } from "./svgMappings.jsx";
 import { useNavigate } from "react-router-dom";
-import mockData from "./mockData.jsx";
 import cadreAImage from "../planImages/cadreA.jfif";
 import cadreNaImage from "../planImages/cadreNa.jpg";
 import agentAImage from "../planImages/agentA.jfif";
@@ -29,25 +29,38 @@ import TipsAndUpdatesOutlinedIcon from "@mui/icons-material/TipsAndUpdatesOutlin
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
 import SettingsSuggestOutlinedIcon from "@mui/icons-material/SettingsSuggestOutlined";
 import AutoFixHighOutlinedIcon from "@mui/icons-material/AutoFixHighOutlined";
+import { fetchLogementThunk } from "../../../../../session/thunks/userthunks.jsx";
 
 const imageMappings = {
   cadre: {
-    oui: cadreAImage,
-    non: cadreNaImage,
+    true: cadreAImage,
+    false: cadreNaImage,
   },
   "agent de maitrise": {
-    oui: agentAImage,
-    non: agentNaImage,
+    true: agentAImage,
+    false: agentNaImage,
   },
   ouvrier: {
-    oui: ouvrierAImage,
-    non: ouvrierNaImage,
+    true: ouvrierAImage,
+    false: ouvrierNaImage,
   },
 };
 
 const LogSection = ({ title }) => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [user] = useState(mockData); // Use mock data directly
+
+  // Call fetchLogementThunk
+  useEffect(() => {
+    console.log("fetching");
+    dispatch(fetchLogementThunk());
+  }, [dispatch]);
+
+  // Get logement from state
+  const logement = useSelector((state) => state.logements.logements);
+  console.log(logement);
+
+  const [user] = useState(logement && logement[0]); // Use the first logement from state
   const [currentImage, setCurrentImage] = useState(null);
   const [isPlanModalOpen, setPlanModalOpen] = useState(false);
   const [currentEquipments, setCurrentEquipments] = useState([]);
@@ -80,111 +93,20 @@ const LogSection = ({ title }) => {
     return SvgComponent ? <SvgComponent className="inline-block mr-2" /> : null;
   };
 
-  const handleEquipmentsClick = (user) => {
-    const typeLog = user.type_log.toLowerCase().trim();
-    const ameliored = user.ameliored.toLowerCase().trim();
-    const equipmentData = {
-      cadre: {
-        oui: [
-          "Baignoire",
-          "Douche",
-          "Climatisation central",
-          "Chauffage central",
-          "Lave-linge",
-          "Sèche-linge",
-          "Espaces de rangement (placards intégrés, dressing)",
-          "Réfrigérateur",
-          "Four à micro-ondes",
-          "Cuisinière électrique",
-          "Lave-vaisselle",
-          "Four",
-          "Balcon ou terasse spacieux",
-          "Jardins privés ou espaces verts personnels",
-          "Place de parking dédiée avec point de recharge pour véhicules électriques",
-          "Accès à des équipements de fitness en plein air",
-          "Wifi",
-          "Système de sécurité",
-        ],
-        non: [
-          "Douche",
-          "Four",
-          "Réfrigérateur",
-          "Four à micro-ondes",
-          "Cuisinière électrique",
-          "Chauffage électrique",
-          "Espaces de rangement basiques",
-          "Lave-linge",
-          "Petit balcon",
-          "Accès à un parking commun",
-          "Wifi",
-          "Système de sécurité",
-        ],
-      },
-      "agent de maitrise": {
-        oui: [
-          "Douche",
-          "Chauffage central",
-          "Lave-linge",
-          "Espaces de rangement suffisants",
-          "Réfrigérateur",
-          "Cuisinière électrique",
-          "Balcon",
-          "Place de parking partagée",
-          "Espaces verts communs",
-          "Wifi",
-          "Système de sécurité",
-        ],
-        non: [
-          "Douche",
-          "Réfrigérateur",
-          "Cuisinière à gaz",
-          "Chauffage au gaz",
-          "Rangement minimal",
-          "Accès à un parking commun",
-          "Wifi",
-          "Système de sécurité",
-          "Pas de balcon",
-        ],
-      },
-      ouvrier: {
-        oui: [
-          "Douche",
-          "Chauffage électrique",
-          "Espaces de rangement suffisants",
-          "Réfrigérateur",
-          "Cuisinière à gaz",
-          "Petit balcon",
-          "Espaces verts partagés",
-          "Parking commun",
-          "Wifi",
-          "Système de sécurité",
-        ],
-        non: [
-          "Douche",
-          "Chauffage au gaz",
-          "Réfrigérateur",
-          "Cuisinière à gaz",
-          "Rangement minimal",
-          "Accès à un parking commun",
-          "Système de sécurité",
-          "Wifi",
-          "Pas de balcon",
-        ],
-      },
-    };
-    const userEquipments = equipmentData[typeLog]?.[ameliored] || [];
-    setCurrentEquipments(userEquipments);
-    setEquipModalOpen(true);
-  };
   const handleDetailClick = (logement) => {
     setCurrentLogement(logement);
     openDetailModal();
   };
   const handleOpenModal = () => {
     const selectedImage =
-      imageMappings[user.type_log.toLowerCase()][user.ameliored.toLowerCase()];
+      imageMappings[user.typelog.toLowerCase()][user.is_ameliore.toString()];
     setCurrentImage(selectedImage);
     setPlanModalOpen(true);
+  };
+
+  const handleEquipmentsClick = (logement) => {
+    setCurrentEquipments(logement.equipment_names);
+    setEquipModalOpen(true);
   };
 
   const [isMobile, setIsMobile] = useState(false);
@@ -207,13 +129,19 @@ const LogSection = ({ title }) => {
       <div className="flex flex-col ml-4 mt-2 mb-6">
         <h2>{title}</h2>
       </div>
-      {isMobile ? (
-        <div className="gap-4 sm: grid grid-cols-1">
-        <Card className="max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm">
+      <div
+        className="gap-7 grid"
+        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}
+      >
+        <Card
+          className={`max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm`}
+        >
           <CardHeader className="flex gap-3">
-            <TipsAndUpdatesOutlinedIcon  sx={{ color:"#ff8906" }}/>
+            <TipsAndUpdatesOutlinedIcon sx={{ color: "#ff8906" }} />
             <div className="flex flex-col">
-              <h3 className="text-xl font-semibold text-[#fffffe]">Plan du logement</h3>
+              <h3 className="text-xl font-semibold text-[#fffffe]">
+                Plan du logement
+              </h3>
             </div>
           </CardHeader>
           <Divider />
@@ -261,11 +189,15 @@ const LogSection = ({ title }) => {
           </CardFooter>
         </Card>
 
-        <Card className="max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm">
+        <Card
+          className={`max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm`}
+        >
           <CardHeader className="flex gap-3 ">
-            <AutoFixHighOutlinedIcon  sx={{ color:"#ff8906" }}/>
+            <AutoFixHighOutlinedIcon sx={{ color: "#ff8906" }} />
             <div className="flex flex-col">
-              <h3 className="text-xl font-semibold text-[#fffffe]">Equipement</h3>
+              <h3 className="text-xl font-semibold text-[#fffffe]">
+                Equipement
+              </h3>
             </div>
           </CardHeader>
           <Divider />
@@ -393,18 +325,22 @@ const LogSection = ({ title }) => {
           </CardFooter>
         </Card>
 
-        <Card className="max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm">
+        <Card
+          className={`max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm`}
+        >
           <CardHeader className="flex gap-3">
-            <SettingsSuggestOutlinedIcon sx={{ color:"#ff8906" }}/>
+            <SettingsSuggestOutlinedIcon sx={{ color: "#ff8906" }} />
             <div className="flex flex-col">
-              <h3 className="text-xl font-semibold text-[#fffffe]">Détails sur logement</h3>
+              <h3 className="text-xl font-semibold text-[#fffffe]">
+                Détails sur logement
+              </h3>
             </div>
           </CardHeader>
           <Divider />
           <CardBody>
             <p className="text-lg text-pretty font-normal mx-2.5 text-[#fff3ec]">
-              Consultez les informations clés sur votre logement, telles que
-              la superficie et le quota d'électricité, pour mieux gérer vos
+              Consultez les informations clés sur votre logement, telles que la
+              superficie et le quota d'électricité, pour mieux gérer vos
               ressources.
             </p>
           </CardBody>
@@ -439,8 +375,8 @@ const LogSection = ({ title }) => {
                             <Input
                               label="Profession/Type de Logement"
                               readOnly
-                              value={currentLogement.type_log || ""}
-                              className="max-w-sm"
+                              value={currentLogement.typelog || ""}
+                              className={`max-w-sm ${isMobile ? "w-full" : ""}`}
                               classNames={{
                                 label:
                                   "group-data-[filled-within=true]:text-zinc-400",
@@ -461,8 +397,10 @@ const LogSection = ({ title }) => {
                               type="text"
                               label="Amélioré"
                               readOnly
-                              value={currentLogement.ameliored || ""}
-                              className="max-w-sm"
+                              value={
+                                currentLogement.is_ameliore ? "Oui" : "Non"
+                              }
+                              className={`max-w-sm ${isMobile ? "w-full" : ""}`}
                               classNames={{
                                 label:
                                   "group-data-[filled-within=true]:text-zinc-400",
@@ -485,8 +423,8 @@ const LogSection = ({ title }) => {
                               type="text"
                               label="Nombre de pièces"
                               readOnly
-                              value={currentLogement.nbr_piece || ""}
-                              className="max-w-sm"
+                              value={currentLogement.piece || ""}
+                              className={`max-w-sm ${isMobile ? "w-full" : ""}`}
                               classNames={{
                                 label:
                                   "group-data-[filled-within=true]:text-zinc-400",
@@ -508,7 +446,14 @@ const LogSection = ({ title }) => {
                               label="Superficie"
                               readOnly
                               value={currentLogement.mc || ""}
-                              className="max-w-sm"
+                              className={`max-w-sm ${isMobile ? "w-full" : ""}`}
+                              endContent={
+                                <div className="pointer-events-none flex items-center">
+                                  <span className="text-default-400 text-small">
+                                    m^2
+                                  </span>
+                                </div>
+                              }
                               classNames={{
                                 label:
                                   "group-data-[filled-within=true]:text-zinc-400",
@@ -531,7 +476,7 @@ const LogSection = ({ title }) => {
                               type="text"
                               label="Quota d'électricité"
                               readOnly
-                              value={currentLogement.quotaE || ""}
+                              value={currentLogement.quotas_electricite || ""}
                               endContent={
                                 <div className="pointer-events-none flex items-center">
                                   <span className="text-default-400 text-small">
@@ -539,7 +484,7 @@ const LogSection = ({ title }) => {
                                   </span>
                                 </div>
                               }
-                              className="max-w-sm"
+                              className={`max-w-sm ${isMobile ? "w-full" : ""}`}
                               classNames={{
                                 label:
                                   "group-data-[filled-within=true]:text-zinc-400",
@@ -567,8 +512,8 @@ const LogSection = ({ title }) => {
                                 </div>
                               }
                               readOnly
-                              value={currentLogement.quotaW || ""}
-                              className="max-w-sm"
+                              value={currentLogement.quotas_eau || ""}
+                              className={`max-w-sm ${isMobile ? "w-full" : ""}`}
                               classNames={{
                                 label:
                                   "group-data-[filled-within=true]:text-zinc-400",
@@ -601,18 +546,22 @@ const LogSection = ({ title }) => {
           </CardFooter>
         </Card>
 
-        <Card className="max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm">
+        <Card
+          className={`max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm`}
+        >
           <CardHeader className="flex gap-3">
-            <FlagOutlinedIcon  sx={{ color:"#ff8906" }}/>
+            <FlagOutlinedIcon sx={{ color: "#ff8906" }} />
             <div className="flex flex-col">
-              <h3 className="text-xl font-semibold text-[#fffffe]">Réclamation</h3>
+              <h3 className="text-xl font-semibold text-[#fffffe]">
+                Réclamation
+              </h3>
             </div>
           </CardHeader>
           <Divider />
           <CardBody>
             <p className="text-lg text-pretty font-normal mx-2.5 text-[#fff3ec]">
-              Signalez tout problème ou faites une réclamation concernant
-              votre logement en toute simplicité.
+              Signalez tout problème ou faites une réclamation concernant votre
+              logement en toute simplicité.
             </p>
           </CardBody>
           <Divider />
@@ -627,428 +576,6 @@ const LogSection = ({ title }) => {
           </CardFooter>
         </Card>
       </div>
-       
-      ) : (
-        <div className="gap-7 grid grid-cols-2 mx-4 md:grid-cols-4">
-          <Card className="max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm">
-            <CardHeader className="flex gap-3">
-              <TipsAndUpdatesOutlinedIcon  sx={{ color:"#ff8906" }}/>
-              <div className="flex flex-col">
-                <h3 className="text-xl font-semibold text-[#fffffe]">Plan du logement</h3>
-              </div>
-            </CardHeader>
-            <Divider />
-            <CardBody>
-              <p className="text-lg text-pretty font-normal mx-2.5 text-[#fff3ec]">
-                Visualisez le plan détaillé de votre logement pour une meilleure
-                compréhension de la disposition des pièces et des espaces.
-              </p>
-            </CardBody>
-            <Divider />
-            <CardFooter className="flex flex-row-reverse">
-              <Button variant="light" color="danger" onPress={handleOpenModal}>
-                Voir plus
-              </Button>
-              <Modal
-                isOpen={isPlanModalOpen}
-                onClose={() => setPlanModalOpen(false)}
-                classNames={{
-                  base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
-                  closeButton: "hover:bg-white/5 active:bg-white/10",
-                }}
-              >
-                <ModalContent>
-                  <ModalHeader>Plan du logement</ModalHeader>
-                  <ModalBody>
-                    <Image
-                      src={currentImage}
-                      alt="Plan du logement"
-                      width="100%"
-                      height="auto"
-                    />
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button
-                      color="danger"
-                      variant="light"
-                      className="text-sm font-medium"
-                      onPress={() => setPlanModalOpen(false)}
-                    >
-                      Fermer
-                    </Button>
-                  </ModalFooter>
-                </ModalContent>
-              </Modal>
-            </CardFooter>
-          </Card>
-
-          <Card className="max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm">
-            <CardHeader className="flex gap-3 ">
-              <AutoFixHighOutlinedIcon  sx={{ color:"#ff8906" }}/>
-              <div className="flex flex-col">
-                <h3 className="text-xl font-semibold text-[#fffffe]">Equipement</h3>
-              </div>
-            </CardHeader>
-            <Divider />
-            <CardBody>
-              <p className="text-lg text-pretty font-normal mx-2.5 text-[#fff3ec]">
-                Découvrez les équipements disponibles dans votre logement pour
-                faciliter votre quotidien et votre confort.
-              </p>
-            </CardBody>
-            <Divider />
-            <CardFooter className="flex flex-row-reverse">
-              <Button
-                variant="light"
-                color="danger"
-                onPress={() => handleEquipmentsClick(user)}
-              >
-                Voir plus
-              </Button>
-              <Modal
-                size="2xl"
-                backdrop="opaque"
-                isOpen={isEquipModalOpen}
-                onOpenChange={setEquipModalOpen}
-                scrollBehavior="inside"
-                classNames={{
-                  base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
-                  closeButton: "hover:bg-white/5 active:bg-white/10",
-                }}
-              >
-                <ModalContent>
-                  {(onClose) => (
-                    <>
-                      <ModalHeader className="text-xl">
-                        Equipement Details
-                      </ModalHeader>
-                      <ModalBody>
-                        <EquipmentSection
-                          title="Salle de bain"
-                          equipments={currentEquipments.filter((equip) =>
-                            ["Baignoire", "Douche"].includes(equip)
-                          )}
-                        />
-                        <EquipmentSection
-                          title="Chambre"
-                          equipments={currentEquipments.filter((equip) =>
-                            [
-                              "Lave-linge",
-                              "Sèche-linge",
-                              "Espaces de rangement (placards intégrés, dressing)",
-                              "Espaces de rangement suffisants",
-                              "Rangement minimal",
-                            ].includes(equip)
-                          )}
-                        />
-                        <EquipmentSection
-                          title="Cuisine"
-                          equipments={currentEquipments.filter((equip) =>
-                            [
-                              "Lave-vaisselle",
-                              "Four",
-                              "Réfrigérateur",
-                              "Cuisinière électrique",
-                              "Cuisinière à gaz",
-                              "Four à micro-ondes",
-                            ].includes(equip)
-                          )}
-                        />
-                        <EquipmentSection
-                          title="Chauffage et climatisation"
-                          equipments={currentEquipments.filter((equip) =>
-                            [
-                              "Climatisation central",
-                              "Chauffage central",
-                              "Chauffage électrique",
-                              "Chauffage au gaz",
-                            ].includes(equip)
-                          )}
-                        />
-                        <EquipmentSection
-                          title="Extérieur"
-                          equipments={currentEquipments.filter((equip) =>
-                            [
-                              "Pas de balcon",
-                              "Balcon",
-                              "Balcon ou terasse spacieux",
-                              "Petit balcon",
-                              "Jardins privés ou espaces verts personnels",
-                              "Espaces verts communs",
-                            ].includes(equip)
-                          )}
-                        />
-                        <EquipmentSection
-                          title="Services"
-                          equipments={currentEquipments.filter((equip) =>
-                            ["Wifi", "Système de sécurité"].includes(equip)
-                          )}
-                        />
-                        <EquipmentSection
-                          title="Parking et installations"
-                          equipments={currentEquipments.filter((equip) =>
-                            [
-                              "Parking commun",
-                              "Place de parking partagée",
-                              "Accès à un parking commun",
-                              "Place de parking dédiée avec point de recharge pour véhicules électriques",
-                              "Accès à des équipements de fitness en plein air",
-                            ].includes(equip)
-                          )}
-                        />
-                      </ModalBody>
-                      <ModalFooter>
-                        <Button
-                          color="danger"
-                          variant="light"
-                          className="text-sm font-medium"
-                          onPress={onClose}
-                        >
-                          Fermer
-                        </Button>
-                      </ModalFooter>
-                    </>
-                  )}
-                </ModalContent>
-              </Modal>
-            </CardFooter>
-          </Card>
-
-          <Card className="max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm">
-            <CardHeader className="flex gap-3">
-              <SettingsSuggestOutlinedIcon sx={{ color:"#ff8906" }}/>
-              <div className="flex flex-col">
-                <h3 className="text-xl font-semibold text-[#fffffe]">Détails sur logement</h3>
-              </div>
-            </CardHeader>
-            <Divider />
-            <CardBody>
-              <p className="text-lg text-pretty font-normal mx-2.5 text-[#fff3ec]">
-                Consultez les informations clés sur votre logement, telles que
-                la superficie et le quota d'électricité, pour mieux gérer vos
-                ressources.
-              </p>
-            </CardBody>
-            <Divider />
-            <CardFooter className="flex flex-row-reverse">
-              <Button
-                variant="light"
-                color="danger"
-                onPress={() => handleDetailClick(user)}
-              >
-                Voir plus
-              </Button>
-              <Modal
-                size="lg"
-                isOpen={isDetailModalOpen}
-                onClose={() => setDetailModalOpen(false)}
-                classNames={{
-                  base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
-                  closeButton: "hover:bg-white/5 active:bg-white/10",
-                }}
-              >
-                <ModalContent>
-                  {(onClose) => (
-                    <>
-                      <ModalHeader className="flex flex-col gap-1">
-                        Détails sur le logement
-                      </ModalHeader>
-                      <ModalBody>
-                        {currentLogement && (
-                          <>
-                            <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
-                              <Input
-                                label="Profession/Type de Logement"
-                                readOnly
-                                value={currentLogement.type_log || ""}
-                                className="max-w-sm"
-                                classNames={{
-                                  label:
-                                    "group-data-[filled-within=true]:text-zinc-400",
-                                  input: [
-                                    "bg-transparent",
-                                    "group-data-[has-value=true]:text-white/90",
-                                  ],
-                                  innerWrapper: "bg-transparent",
-                                  inputWrapper: [
-                                    "bg-zinc-800",
-                                    "group-data-[hover=true]:bg-zinc-700",
-                                    "group-data-[focus=true]:bg-zinc-800 ",
-                                    "!cursor-text",
-                                  ],
-                                }}
-                              />
-                              <Input
-                                type="text"
-                                label="Amélioré"
-                                readOnly
-                                value={currentLogement.ameliored || ""}
-                                className="max-w-sm"
-                                classNames={{
-                                  label:
-                                    "group-data-[filled-within=true]:text-zinc-400",
-                                  input: [
-                                    "bg-transparent",
-                                    "group-data-[has-value=true]:text-white/90",
-                                  ],
-                                  innerWrapper: "bg-transparent",
-                                  inputWrapper: [
-                                    "bg-zinc-800",
-                                    "group-data-[hover=true]:bg-zinc-700",
-                                    "group-data-[focus=true]:bg-zinc-800 ",
-                                    "!cursor-text",
-                                  ],
-                                }}
-                              />
-                            </div>
-                            <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
-                              <Input
-                                type="text"
-                                label="Nombre de pièces"
-                                readOnly
-                                value={currentLogement.nbr_piece || ""}
-                                className="max-w-sm"
-                                classNames={{
-                                  label:
-                                    "group-data-[filled-within=true]:text-zinc-400",
-                                  input: [
-                                    "bg-transparent",
-                                    "group-data-[has-value=true]:text-white/90",
-                                  ],
-                                  innerWrapper: "bg-transparent",
-                                  inputWrapper: [
-                                    "bg-zinc-800",
-                                    "group-data-[hover=true]:bg-zinc-700",
-                                    "group-data-[focus=true]:bg-zinc-800 ",
-                                    "!cursor-text",
-                                  ],
-                                }}
-                              />
-                              <Input
-                                type="text"
-                                label="Superficie"
-                                readOnly
-                                value={currentLogement.mc || ""}
-                                className="max-w-sm"
-                                classNames={{
-                                  label:
-                                    "group-data-[filled-within=true]:text-zinc-400",
-                                  input: [
-                                    "bg-transparent",
-                                    "group-data-[has-value=true]:text-white/90",
-                                  ],
-                                  innerWrapper: "bg-transparent",
-                                  inputWrapper: [
-                                    "bg-zinc-800",
-                                    "group-data-[hover=true]:bg-zinc-700",
-                                    "group-data-[focus=true]:bg-zinc-800 ",
-                                    "!cursor-text",
-                                  ],
-                                }}
-                              />
-                            </div>
-                            <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
-                              <Input
-                                type="text"
-                                label="Quota d'électricité"
-                                readOnly
-                                value={currentLogement.quotaE || ""}
-                                endContent={
-                                  <div className="pointer-events-none flex items-center">
-                                    <span className="text-default-400 text-small">
-                                      kWh
-                                    </span>
-                                  </div>
-                                }
-                                className="max-w-sm"
-                                classNames={{
-                                  label:
-                                    "group-data-[filled-within=true]:text-zinc-400",
-                                  input: [
-                                    "bg-transparent",
-                                    "group-data-[has-value=true]:text-white/90",
-                                  ],
-                                  innerWrapper: "bg-transparent",
-                                  inputWrapper: [
-                                    "bg-zinc-800",
-                                    "group-data-[hover=true]:bg-zinc-700",
-                                    "group-data-[focus=true]:bg-zinc-800 ",
-                                    "!cursor-text",
-                                  ],
-                                }}
-                              />
-                              <Input
-                                type="text"
-                                label="Quota d'eau"
-                                endContent={
-                                  <div className="pointer-events-none flex items-center">
-                                    <span className="text-default-400 text-small">
-                                      m³
-                                    </span>
-                                  </div>
-                                }
-                                readOnly
-                                value={currentLogement.quotaW || ""}
-                                className="max-w-sm"
-                                classNames={{
-                                  label:
-                                    "group-data-[filled-within=true]:text-zinc-400",
-                                  input: [
-                                    "bg-transparent",
-                                    "group-data-[has-value=true]:text-white/90",
-                                  ],
-                                  innerWrapper: "bg-transparent",
-                                  inputWrapper: [
-                                    "bg-zinc-800",
-                                    "group-data-[hover=true]:bg-zinc-700",
-                                    "group-data-[focus=true]:bg-zinc-800 ",
-                                    "!cursor-text",
-                                  ],
-                                }}
-                              />
-                            </div>
-                          </>
-                        )}
-                      </ModalBody>
-                      <ModalFooter>
-                        <Button color="danger" variant="flat" onClick={onClose}>
-                          Fermer
-                        </Button>
-                      </ModalFooter>
-                    </>
-                  )}
-                </ModalContent>
-              </Modal>
-            </CardFooter>
-          </Card>
-
-          <Card className="max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm">
-            <CardHeader className="flex gap-3">
-              <FlagOutlinedIcon  sx={{ color:"#ff8906" }}/>
-              <div className="flex flex-col">
-                <h3 className="text-xl font-semibold text-[#fffffe]">Réclamation</h3>
-              </div>
-            </CardHeader>
-            <Divider />
-            <CardBody>
-              <p className="text-lg text-pretty font-normal mx-2.5 text-[#fff3ec]">
-                Signalez tout problème ou faites une réclamation concernant
-                votre logement en toute simplicité.
-              </p>
-            </CardBody>
-            <Divider />
-            <CardFooter className="flex flex-row-reverse">
-              <Button
-                variant="light"
-                color="danger"
-                onClick={() => navigate("/dashboard/reclamation")}
-              >
-                Voir plus
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
-      )}
     </>
   );
 };

@@ -16,13 +16,13 @@ import {
 } from "@mui/icons-material";
 import { FaFileInvoiceDollar } from "react-icons/fa6";
 import logo from "./logo.svg";
-import ApartmentOutlinedIcon from '@mui/icons-material/ApartmentOutlined';
+import ApartmentOutlinedIcon from "@mui/icons-material/ApartmentOutlined";
 
 const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
   const location = useLocation();
   const navigate = useNavigate(); // Define navigate function
-  const nom = useSelector((state) => state.auth.nom);
-  const prenom = useSelector((state) => state.auth.prenom);
+  const nom = useSelector((state) => state.user.nom);
+  const prenom = useSelector((state) => state.user.prenom);
   const dispatch = useDispatch();
 
   // logout
@@ -71,7 +71,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               textAlign: "left",
               border: "0px",
               // marginTop: "3px",
-              paddingLeft: "30px"
+              paddingLeft: "30px",
             },
           }}
         >
@@ -103,7 +103,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
             <div className="menu">
               <MenuItem
                 component={<Link to="/dashboard" />}
-                icon={<HomeRoundedicon className="house-icon"/>}
+                icon={<HomeRoundedicon className="house-icon" />}
                 className={
                   location.pathname === "/dashboard" ? "active tab" : "tab"
                 }
@@ -113,7 +113,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               </MenuItem>
               <MenuItem
                 component={<Link to="/dashboard/logement" />}
-                icon={<ApartmentOutlinedIcon className="pie-icon"/>}
+                icon={<ApartmentOutlinedIcon className="pie-icon" />}
                 className={
                   location.pathname === "/dashboard/logement"
                     ? "active tab"
@@ -125,7 +125,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               </MenuItem>
               <MenuItem
                 component={<Link to="/dashboard/facture" />}
-                icon={<FaFileInvoiceDollar className="file-icon"/>}
+                icon={<FaFileInvoiceDollar className="file-icon" />}
                 className={
                   location.pathname === "/dashboard/facture"
                     ? "active tab"
@@ -137,7 +137,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               </MenuItem>
               <MenuItem
                 component={<Link to="/dashboard/reclamation" />}
-                icon={<Constructionicon className="tools-icon"/>}
+                icon={<Constructionicon className="tools-icon" />}
                 className={
                   location.pathname === "/dashboard/reclamation"
                     ? "active tab"
@@ -149,7 +149,7 @@ const SidebarComponent = ({ toggled, setToggled, setBroken }) => {
               </MenuItem>
               <MenuItem
                 component={<Link to="/dashboard/profile" />}
-                icon={<Person2icon className="ppl-icon"/>}
+                icon={<Person2icon className="ppl-icon" />}
                 className={
                   location.pathname === "/dashboard/profile"
                     ? "active tab"

@@ -134,7 +134,7 @@ export const fetchReclamation = async (jwt) => {
 
 export const annulerReclamation = async (data, jwtToken) => {
   try {
-    console.log('data');
+    console.log("data");
     const response = await axios.put(
       `${baseURL}/user/reclamation`,
       data, // Pass data as the second argument
@@ -148,6 +148,39 @@ export const annulerReclamation = async (data, jwtToken) => {
     return response.data;
   } catch (error) {
     console.error("Error in annulerReclamation:", error.message);
+    throw error;
+  }
+};
+
+// Function to add reclamation
+export const addReclamation = async (data, jwt) => {
+  try {
+    const response = await axios.post(`${baseURL}/user/reclamation`, data, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error in addReclamation:", error.message);
+    throw error;
+  }
+};
+
+// Function to fetch logement details
+export const fetchLogement = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/user/logement`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error in fetchLogement:",
+      error.response || error.message || error
+    );
     throw error;
   }
 };

@@ -42,10 +42,23 @@ class UserController
     }
 
     //profile where we gonna
-    public function profile($jwt)
+    public function profile($res_id)
     {
-        if ($jwt) {
-            $response = $this->residant->profile($jwt);
+        if ($res_id) {
+            $response = $this->residant->profile($res_id);
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(array('status' => 'error', 'message' => 'Invalid JSON data'));
+        }
+    }
+
+    //get logement 
+    public function getLogementAPI($res_id)
+    {
+        if ($res_id) {
+            $response = $this->residant->getlogement($res_id);
             http_response_code(200);
             echo json_encode($response);
         } else {
@@ -203,6 +216,25 @@ class UserController
 
             // Call the method to add reclamation
             $response = $this->residant->addReclamation($data['res_id'], $title, $description);
+
+            // Output the response as JSON and stop further execution
+            http_response_code(200);
+            echo json_encode($response);
+            exit;
+        } else {
+            // Handle missing or invalid data
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Missing or invalid data']);
+            exit;
+        }
+    }
+
+    // Method to get statistics for the user
+    public function StatisticsQuotaAPI($res_id)
+    {
+        if (isset($res_id)) {
+            // Call the method to get statistics
+            $response = $this->residant->StatisticsQuota($res_id);
 
             // Output the response as JSON and stop further execution
             http_response_code(200);

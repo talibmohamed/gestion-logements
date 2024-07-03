@@ -15,8 +15,14 @@ import {
 } from "../statisticsSlice";
 import { fetchStatistics, fetchFacture } from "../services/userapi";
 import { setFacture } from "../factureSlice";
-import { fetchReclamation, annulerReclamation } from "../services/userapi";
+import {
+  fetchReclamation,
+  annulerReclamation,
+  addReclamation,
+  fetchLogement,
+} from "../services/userapi";
 import { setReclamations } from "../reclamationSlice";
+import { setLogements } from "../logementSlice";
 
 // Thunk to handle user login
 export const loginUserThunk = createAsyncThunk(
@@ -74,6 +80,7 @@ export const changePasswordThunk = createAsyncThunk(
     console.log(jwt);
     try {
       const response = await changePassword(password, confirmedPassword, jwt);
+      console.log(response);
       return response;
     } catch (error) {
       console.error("Error changing password:", error);
@@ -81,7 +88,6 @@ export const changePasswordThunk = createAsyncThunk(
     }
   }
 );
-
 
 // Thunk to check token
 
@@ -158,8 +164,8 @@ export const fetchReclamationThunk = createAsyncThunk(
     console.log(jwt);
 
     try {
-      const response = await fetchReclamation(jwt); 
-      dispatch(setReclamations(response.reclamations)); 
+      const response = await fetchReclamation(jwt);
+      dispatch(setReclamations(response.reclamations));
       return response;
     } catch (error) {
       console.error("Error fetching reclamation:", error);
@@ -175,12 +181,50 @@ export const annulerReclamationThunk = createAsyncThunk(
       const state = getState();
       const jwt = state.auth.jwt_token;
 
-      const response = await annulerReclamation(data, jwt); 
-      // fetch fetchReclamationThunk to update 
+      const response = await annulerReclamation(data, jwt);
+      // fetch fetchReclamationThunk to update
       dispatch(fetchReclamationThunk());
-      return response; 
+      return response;
     } catch (error) {
       console.error("Error annuler reclamation:", error);
+      throw error;
+    }
+  }
+);
+
+//add reclamation
+export const addReclamationThunk = createAsyncThunk(
+  "user/addReclamation",
+  async (data, { getState, dispatch }) => {
+    try {
+      const state = getState();
+      const jwt = state.auth.jwt_token;
+
+      const response = await addReclamation(data, jwt);
+      // fetch fetchReclamationThunk to update
+      dispatch(fetchReclamationThunk());
+      return response;
+    } catch (error) {
+      console.error("Error adding reclamation:", error);
+      throw error;
+    }
+  }
+);
+
+//fetch logement details
+export const fetchLogementThunk = createAsyncThunk(
+  "user/fetchLogementDetails",
+  async (_, { getState, 
+    dispatch
+   }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+    try {
+      const response = await fetchLogement(jwt);
+      dispatch(setLogements(response.logements));
+      return response;
+    } catch (error) {
+      console.error("Error fetching logement details:", error);
       throw error;
     }
   }

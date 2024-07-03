@@ -24,6 +24,10 @@ import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined";
 // import { Carousel } from "react-responsive-carousel"; // Removed Carousel import
 // import "react-responsive-carousel/lib/styles/carousel.min.css"; // Removed import
+import { useDispatch } from "react-redux";
+import { addReclamationThunk } from "../../../../../session/thunks/userthunks"; // Import your thunk
+import { toast } from "react-toastify"; // Import react-toastify
+import "react-toastify/dist/ReactToastify.css"; // Import CSS for toasts
 
 const complaintTypes = [
   {
@@ -31,11 +35,15 @@ const complaintTypes = [
     icon: <BuildOutlinedIcon sx={{ color: "#ff8906" }} />,
     description:
       "Des réclamations concernant des problèmes de plomberie (fuites, robinets qui fuient), des pannes électriques, des dysfonctionnements des appareils électroménagers fournis par le propriétaire, etc.",
+    showing:
+      "Des réclamations concernant des problèmes de plomberie (fuites, robinets qui fuient), des pannes électriques, des dysfonctionnements des appareils électroménagers fournis par le propriétaire, etc.",
   },
   {
     title: "Infestations de parasites",
     icon: <BugReportOutlinedIcon sx={{ color: "#ff8906" }} />,
     description:
+      "Des problèmes avec des insectes, des rongeurs ou d'autres parasites peuvent nécessiter une intervention du propriétaire pour les éliminer.",
+    showing:
       "Des problèmes avec des insectes, des rongeurs ou d'autres parasites peuvent nécessiter une intervention du propriétaire pour les éliminer.",
   },
   {
@@ -43,11 +51,15 @@ const complaintTypes = [
     icon: <HomeRepairServiceOutlinedIcon sx={{ color: "#ff8906" }} />,
     description:
       "Des fissures dans les murs, des problèmes de toiture, des portes ou fenêtres qui ne se ferment pas correctement, etc.",
+    showing:
+      "Des fissures dans les murs, des problèmes de toiture, des portes ou fenêtres qui ne se ferment pas correctement, etc.",
   },
   {
     title: "Questions liées aux équipements fournis",
     icon: <KitchenOutlinedIcon sx={{ color: "#ff8906" }} />,
     description:
+      "Des réclamations concernant des équipements manquants ou des appareils endommagés fournis par le propriétaire, comme des meubles, des appareils électroménagers, etc.",
+    showing:
       "Des réclamations concernant des équipements manquants ou des appareils endommagés fournis par le propriétaire, comme des meubles, des appareils électroménagers, etc.",
   },
   {
@@ -55,18 +67,23 @@ const complaintTypes = [
     icon: <WaterDamageOutlinedIcon sx={{ color: "#ff8906" }} />,
     description:
       "Des réclamations concernant des problèmes d'humidité excessive ou de moisissure dans le logement.",
+    showing:
+      "Des réclamations concernant des problèmes d'humidité excessive ou de moisissure dans le logement.",
   },
   {
     title: "Problèmes de voisinage",
     icon: <PeopleAltOutlinedIcon sx={{ color: "#ff8906" }} />,
     description:
       "Des réclamations concernant le bruit excessif des voisins, des conflits de voisinage, etc.",
+    showing:
+      "Des réclamations concernant le bruit excessif des voisins, des conflits de voisinage, etc.",
   },
   {
     title: "Autres problèmes",
     icon: <ReportProblemOutlinedIcon sx={{ color: "#ff8906" }} />,
-    description:
+    showing:
       "Pour signaler d'autres types de problèmes non mentionnés ci-dessus.",
+    description: "", // Empty string for Autres problèmes
   },
 ];
 
@@ -77,8 +94,11 @@ const ReclaCard = ({ title }) => {
     onClose: closeModal,
   } = useDisclosure();
 
+  const dispatch = useDispatch();
+
   const [isMobile, setIsMobile] = useState(false);
   const [currentComplaint, setCurrentComplaint] = useState(null);
+  const [otherProblemDescription, setOtherProblemDescription] = useState(""); // State for user input
 
   useEffect(() => {
     const handleResize = () => {
@@ -96,6 +116,87 @@ const ReclaCard = ({ title }) => {
   const handleComplaintConfirmation = (complaint) => {
     setCurrentComplaint(complaint);
     openModal();
+  };
+
+  const handleConfirm = async () => {
+    if (currentComplaint) {
+      // Prepare the data for your thunk
+      const reclamationData = {
+        rec_type: currentComplaint.title,
+        rec_desc: currentComplaint.description,
+      };
+
+      const loadingToastId = toast.loading("Ajout de la réclamation...", {
+        position: "bottom-right",
+        autoClose: false,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+
+      try {
+        // Dispatch your thunk
+        const response = await dispatch(addReclamationThunk(reclamationData));
+
+        toast.dismiss(loadingToastId);
+
+        if (response && response.payload.status === "success") {
+          toast.success(response.payload.message, {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: 0,
+            theme: "dark",
+          });
+          closeModal(); // Close the modal after success
+        } else if (response && response.payload.status === "alert") {
+          toast.error(response.payload.message, {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: 0,
+            theme: "dark",
+          });
+        } else {
+          // Handle other statuses or errors
+          toast.error(response.payload.message, {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: 0,
+            theme: "dark",
+          });
+        }
+      } catch (error) {
+        console.error("Error adding reclamation:", error);
+        toast.error(
+          "Une erreur s'est produite lors de l'ajout de la réclamation",
+          {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: 0,
+            theme: "dark",
+          }
+        );
+      }
+    }
+    closeModal();
   };
 
   return (
@@ -124,7 +225,7 @@ const ReclaCard = ({ title }) => {
               <Divider />
               <CardBody>
                 <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
-                  {complaint.description}
+                  {complaint.showing} {/* Display "showing" */}
                 </p>
               </CardBody>
               <Divider />
@@ -134,7 +235,10 @@ const ReclaCard = ({ title }) => {
         </div>
       ) : (
         //  3x3 grid for desktop
-        <div className="grid grid-cols-3 gap-6 mx-4 mb-6 gap-y-8" style={{ display: "grid", gridTemplateRows: "repeat(2, 1fr)" }}>
+        <div
+          className="grid grid-cols-3 gap-6 mx-4 mb-6 gap-y-8"
+          style={{ display: "grid", gridTemplateRows: "repeat(2, 1fr)" }}
+        >
           {/* Render first 6 cards normally */}
           {complaintTypes.slice(0, 6).map((complaint, index) => (
             <Card
@@ -154,7 +258,7 @@ const ReclaCard = ({ title }) => {
               <Divider />
               <CardBody>
                 <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
-                  {complaint.description}
+                  {complaint.showing}
                 </p>
               </CardBody>
               <Divider />
@@ -162,7 +266,10 @@ const ReclaCard = ({ title }) => {
             </Card>
           ))}
           {/* Render the last card in a centered column */}
-          <div className="col-span-3" style={{ display: "grid", placeItems: "center" }}>
+          <div
+            className="col-span-3"
+            style={{ display: "grid", placeItems: "center" }}
+          >
             <Card
               key={6}
               className="max-w-full bg-black bg-opacity-40 backdrop-blur-sm"
@@ -180,7 +287,7 @@ const ReclaCard = ({ title }) => {
               <Divider />
               <CardBody>
                 <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
-                  {complaintTypes[6].description}
+                  {complaintTypes[6].showing}
                 </p>
               </CardBody>
               <Divider />
@@ -197,8 +304,8 @@ const ReclaCard = ({ title }) => {
             {currentComplaint && (
               <>
                 <p>
-                  Êtes-vous sûr de vouloir signaler un{" "}
-                  {currentComplaint.title} ?
+                  Êtes-vous sûr de vouloir signaler un {currentComplaint.title}{" "}
+                  ?
                 </p>
                 {currentComplaint.title === "Autres problèmes" && (
                   <Textarea
@@ -207,6 +314,9 @@ const ReclaCard = ({ title }) => {
                     label="Description"
                     labelPlacement="outside"
                     placeholder="Enter your description"
+                    value={otherProblemDescription}
+                    onChange={(e) => setOtherProblemDescription(e.target.value)}
+                    maxLength={255} // Set max length
                   />
                 )}
               </>
@@ -217,7 +327,7 @@ const ReclaCard = ({ title }) => {
               Annuler
             </Button>
             {currentComplaint && (
-              <Button color="primary" onClick={closeModal}>
+              <Button color="primary" onClick={handleConfirm}>
                 Confirmer
               </Button>
             )}
