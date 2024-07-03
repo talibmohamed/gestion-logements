@@ -174,21 +174,44 @@ class UserController
     {
         if ($data && isset($data['jwt']) && isset($data['rec_id'])) {
 
-                // Extract user ID from the decoded token 
+            // Extract user ID from the decoded token 
 
-                $rec_id = filter_var($data['rec_id'], FILTER_VALIDATE_INT);
+            $rec_id = filter_var($data['rec_id'], FILTER_VALIDATE_INT);
 
-                // Call the method to get facture data
-                $response = $this->residant->updateReclamationStatus($data['jwt'], $rec_id);
+            // Call the method to get facture data
+            $response = $this->residant->updateReclamationStatus($data['jwt'], $rec_id);
 
-                // Output the response as JSON and stop further execution
-                http_response_code(200);
-                echo json_encode($response);
-                exit;
-            
+            // Output the response as JSON and stop further execution
+            http_response_code(200);
+            echo json_encode($response);
+            exit;
         } else {
             http_response_code(400);
             echo json_encode(array('status' => 'error11', 'message' => 'Invalid JSON data'));
+            exit;
+        }
+    }
+    // Method to add a reclamation
+    public function addReclamationAPI($data)
+    {
+        // Check if all required data is present
+        if (isset($data['res_id'], $data['rec_type'], $data['rec_desc'])) {
+
+            // Sanitize input data
+            $title = filter_var($data['rec_type']);
+            $description = filter_var($data['rec_desc']);
+
+            // Call the method to add reclamation
+            $response = $this->residant->addReclamation($data['res_id'], $title, $description);
+
+            // Output the response as JSON and stop further execution
+            http_response_code(200);
+            echo json_encode($response);
+            exit;
+        } else {
+            // Handle missing or invalid data
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Missing or invalid data']);
             exit;
         }
     }

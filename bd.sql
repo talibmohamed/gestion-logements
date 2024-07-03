@@ -124,17 +124,17 @@ SELECT cron.schedule('0 0 1 * *', $$SELECT close_and_create_consumption()$$);
 CREATE TYPE rec_etat_enum AS ENUM ('en attente', 'résolu', 'non résolu', 'annulé');
 
 
-CREATE TABLE reclamation (
-    rec_id         SERIAL PRIMARY KEY,
-    rec_desc       VARCHAR(255),
-    rec_etat       rec_etat_enum,
-    rec_date       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    rec_response   DATE,
-    res_id         INT,
-    message        VARCHAR(255),
-    FOREIGN KEY (res_id) REFERENCES residant (res_id) ON DELETE CASCADE
-);
-
+create table reclamation (
+    rec_id serial,
+    rec_type character varying(255) null,
+    rec_etat public.rec_etat_enum null,
+    rec_date timestamp without time zone null default current_timestamp,
+    rec_response date null,
+    res_id integer null,
+    rec_desc character varying(255) null,
+    constraint reclamation_pkey primary key (rec_id),
+    constraint reclamation_res_id_fkey foreign key (res_id) references residant (res_id) on delete cascade
+  );
 
 CREATE TABLE notification (
     notif_id SERIAL PRIMARY KEY,
@@ -261,6 +261,10 @@ CREATE ROLE resident_role WITH NOINHERIT;
 GRANT CONNECT ON DATABASE houselytics TO resident_role;
 GRANT USAGE ON SCHEMA public TO resident_role;
 
+GRANT USAGE, SELECT ON SEQUENCE reclamation_rec_id_seq TO resident_role;
+GRANT INSERT, UPDATE ON TABLE reclamation TO resident_role;
+
+
 -- Step 3: Grant privileges on all existing tables in the schema
 GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO resident_role;
 
@@ -270,6 +274,7 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES
 -- Step 5: Create a user and assign the resident_role to this user
 CREATE USER resident_user WITH PASSWORD 'resident_password';
 GRANT resident_role TO resident_user;
+
 
 
 

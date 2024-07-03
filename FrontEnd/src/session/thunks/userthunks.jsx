@@ -82,7 +82,6 @@ export const changePasswordThunk = createAsyncThunk(
   }
 );
 
-//console log statistics form statistics slice
 
 // Thunk to check token
 

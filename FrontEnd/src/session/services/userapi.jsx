@@ -135,7 +135,7 @@ export const fetchReclamation = async (jwt) => {
 export const annulerReclamation = async (data, jwtToken) => {
   try {
     console.log('data');
-    const response = await axios.post(
+    const response = await axios.put(
       `${baseURL}/user/reclamation`,
       data, // Pass data as the second argument
       {
