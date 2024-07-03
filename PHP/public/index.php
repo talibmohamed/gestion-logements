@@ -158,7 +158,7 @@ function route($uri, $method)
                 // Validate the JWT token
                 $token_info = $jwtHandler->verifyJwtToken($jwt_token);
 
-                if ($token_info['valid']) {
+                if ($token_info['valid'] && $token_info['data']['role'] === 'residant') {
                     $data['jwt'] = $jwt_token;
                     $userController = new UserController();
                     $response = $userController->getStatisticsAPI($data);
@@ -190,7 +190,7 @@ function route($uri, $method)
                 // Validate the JWT token
                 $token_info = $jwtHandler->verifyJwtToken($jwt_token);
 
-                if ($token_info['valid']) {
+                if ($token_info['valid'] && $token_info['data']['role'] === 'residant') {
                     $data['jwt'] = $jwt_token;
                     $userController = new UserController();
                     $userController->getFactureAPI($data);
@@ -217,7 +217,7 @@ function route($uri, $method)
                     $jwt_token = str_replace('Bearer ', '', $jwt_token);
                     // Check the JWT validation
                     $token_info = $jwtHandler->verifyJwtToken($jwt_token);
-                    if ($token_info['valid']) {
+                    if ($token_info['valid'] && $token_info['data']['role'] === 'residant') {
                         $data['jwt'] = $jwt_token;
                         $userController = new UserController();
                         $userController->getReclamationAPI($data);
@@ -239,24 +239,17 @@ function route($uri, $method)
                     // Validate the JWT token
                     $token_info = $jwtHandler->verifyJwtToken($jwt_token);
 
-                    if ($token_info['valid']) {
-                        // Get the input data from the PUT request
+                    if ($token_info['valid'] && $token_info['data']['role'] === 'residant') {
+                        // Get the input data from the POST request
                         $input = json_decode(file_get_contents('php://input'), true);
 
-                        if (isset($input['rec_id'])) {
-                            $data['jwt'] = $jwt_token;
-                            $data['rec_id'] = $input['rec_id'];
+                        if (isset($input['rec_type']) && isset($input['rec_desc'])) {
+                            $data['res_id'] = $token_info['data']['id'];
+                            $data['rec_type'] = $input['rec_type'];
+                            $data['rec_desc'] = $input['rec_desc'];
                             $userController = new UserController();
-                            $response = $userController->updateReclamationStatusAPI($data);
-
-                            // Check if the update was successful
-                            if ($response['status'] === 'success') {
-                                http_response_code(200); // OK
-                                echo json_encode($response);
-                            } else {
-                                http_response_code(400); // Bad Request or other appropriate code
-                                echo json_encode($response);
-                            }
+                            $response = $userController->addReclamationAPI($data);
+                            echo json_encode($response);
                         } else {
                             http_response_code(400); // Bad Request
                             echo json_encode([
@@ -272,6 +265,43 @@ function route($uri, $method)
                         ]);
                     }
                     exit;
+                    break;
+
+
+                case 'PUT':
+                    $jwtHandler = new JwtHandler();
+                    $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                    $jwt_token = str_replace('Bearer ', '', $jwt_token);
+
+                    // Validate the JWT token
+                    $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+
+                    if ($token_info['valid']) {
+                        // Get the input data from the PUT request
+                        $input = json_decode(file_get_contents('php://input'), true);
+
+                        if (isset($input['rec_id'])) {
+                            $data['jwt'] = $jwt_token;
+                            $data['rec_id'] = $input['rec_id'];
+                            $userController = new UserController();
+                            $response = $userController->updateReclamationStatusAPI($data);
+                            echo json_encode($response);
+                        } else {
+                            http_response_code(400); // Bad Request
+                            echo json_encode([
+                                'status' => 'error',
+                                'message' => 'Missing required parameters',
+                            ]);
+                        }
+                    } else {
+                        http_response_code(401); // Unauthorized
+                        echo json_encode([
+                            'status' => 'error',
+                            'message' => 'Unauthorized',
+                        ]);
+                    }
+                    exit;
+                    break;
             }
             break;
 
@@ -293,7 +323,7 @@ function route($uri, $method)
                 $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
                 $jwt_token = str_replace('Bearer ', '', $jwt_token);
                 $token_info = $jwtHandler->verifyJwtToken($jwt_token);
-                if ($token_info['valid']) {
+                if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
                     $adminController = new AdminController();
                     $adminController->profile($jwt_token);
                 } else {

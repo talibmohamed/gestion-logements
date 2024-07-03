@@ -391,4 +391,37 @@ class residant
             ];
         }
     }
+
+    // addReclamation
+    public function addReclamation($res_id, $rec_type, $rec_desc)
+    {
+        try {
+            $connection = $this->db->getConnection();
+
+            // Query to insert a new reclamation
+            $sql = $connection->prepare('
+            INSERT INTO reclamation (res_id, rec_type, rec_desc, rec_date, rec_etat)
+            VALUES (?, ?, ?, NOW(), \'en attente\')
+        ');
+
+            $sql->execute([$res_id, $rec_type, $rec_desc]);
+
+            if ($sql->rowCount() > 0) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Réclamation ajoutée avec succès'
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Erreur lors de l\'ajout de la réclamation'
+                ];
+            }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ];
+        }
+    }
 }

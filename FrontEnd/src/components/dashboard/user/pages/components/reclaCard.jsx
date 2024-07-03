@@ -22,84 +22,67 @@ import KitchenOutlinedIcon from "@mui/icons-material/KitchenOutlined";
 import WaterDamageOutlinedIcon from "@mui/icons-material/WaterDamageOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import ReportProblemOutlinedIcon from "@mui/icons-material/ReportProblemOutlined";
-import { Carousel } from "react-responsive-carousel";
-import "react-responsive-carousel/lib/styles/carousel.min.css";
+// import { Carousel } from "react-responsive-carousel"; // Removed Carousel import
+// import "react-responsive-carousel/lib/styles/carousel.min.css"; // Removed import
+
+const complaintTypes = [
+  {
+    title: "Problèmes de maintenance",
+    icon: <BuildOutlinedIcon sx={{ color: "#ff8906" }} />,
+    description:
+      "Des réclamations concernant des problèmes de plomberie (fuites, robinets qui fuient), des pannes électriques, des dysfonctionnements des appareils électroménagers fournis par le propriétaire, etc.",
+  },
+  {
+    title: "Infestations de parasites",
+    icon: <BugReportOutlinedIcon sx={{ color: "#ff8906" }} />,
+    description:
+      "Des problèmes avec des insectes, des rongeurs ou d'autres parasites peuvent nécessiter une intervention du propriétaire pour les éliminer.",
+  },
+  {
+    title: "Défauts structurels",
+    icon: <HomeRepairServiceOutlinedIcon sx={{ color: "#ff8906" }} />,
+    description:
+      "Des fissures dans les murs, des problèmes de toiture, des portes ou fenêtres qui ne se ferment pas correctement, etc.",
+  },
+  {
+    title: "Questions liées aux équipements fournis",
+    icon: <KitchenOutlinedIcon sx={{ color: "#ff8906" }} />,
+    description:
+      "Des réclamations concernant des équipements manquants ou des appareils endommagés fournis par le propriétaire, comme des meubles, des appareils électroménagers, etc.",
+  },
+  {
+    title: "Problèmes d'humidité ou de moisissure",
+    icon: <WaterDamageOutlinedIcon sx={{ color: "#ff8906" }} />,
+    description:
+      "Des réclamations concernant des problèmes d'humidité excessive ou de moisissure dans le logement.",
+  },
+  {
+    title: "Problèmes de voisinage",
+    icon: <PeopleAltOutlinedIcon sx={{ color: "#ff8906" }} />,
+    description:
+      "Des réclamations concernant le bruit excessif des voisins, des conflits de voisinage, etc.",
+  },
+  {
+    title: "Autres problèmes",
+    icon: <ReportProblemOutlinedIcon sx={{ color: "#ff8906" }} />,
+    description:
+      "Pour signaler d'autres types de problèmes non mentionnés ci-dessus.",
+  },
+];
 
 const ReclaCard = ({ title }) => {
   const {
-    isOpen: isMaintenanceModalOpen,
-    onOpen: openMaintenanceModal,
-    onClose: closeMaintenanceModal,
+    isOpen: isModalOpen,
+    onOpen: openModal,
+    onClose: closeModal,
   } = useDisclosure();
-
-  const {
-    isOpen: isInfestationModalOpen,
-    onOpen: openInfestationModal,
-    onClose: closeInfestationModal,
-  } = useDisclosure();
-
-  const {
-    isOpen: isStructuralModalOpen,
-    onOpen: openStructuralModal,
-    onClose: closeStructuralModal,
-  } = useDisclosure();
-
-  const {
-    isOpen: isEquipmentModalOpen,
-    onOpen: openEquipmentModal,
-    onClose: closeEquipmentModal,
-  } = useDisclosure();
-
-  const {
-    isOpen: isMoistureModalOpen,
-    onOpen: openMoistureModal,
-    onClose: closeMoistureModal,
-  } = useDisclosure();
-
-  const {
-    isOpen: isNeighborModalOpen,
-    onOpen: openNeighborModal,
-    onClose: closeNeighborModal,
-  } = useDisclosure();
-
-  const {
-    isOpen: isAutreModalOpen,
-    onOpen: openAutreModal,
-    onClose: closeAutreModal,
-  } = useDisclosure();
-
-  const handleComplaintConfirmation = (complaintType) => {
-    switch (complaintType) {
-      case "Problèmes de maintenance":
-        openMaintenanceModal();
-        break;
-      case "Infestations de parasites":
-        openInfestationModal();
-        break;
-      case "Défauts structurels":
-        openStructuralModal();
-        break;
-      case "Questions liées aux équipements fournis":
-        openEquipmentModal();
-        break;
-      case "Problèmes d'humidité ou de moisissure":
-        openMoistureModal();
-        break;
-      case "Problèmes de voisinage":
-        openNeighborModal();
-        break;
-      case "Autres problèmes":
-        openAutreModal();
-      default:
-        break;
-    }
-  };
 
   const [isMobile, setIsMobile] = useState(false);
+  const [currentComplaint, setCurrentComplaint] = useState(null);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 900);
+      setIsMobile(window.innerWidth <= 768); // Adjust breakpoint as needed
     };
 
     handleResize();
@@ -110,737 +93,114 @@ const ReclaCard = ({ title }) => {
     };
   }, []);
 
+  const handleComplaintConfirmation = (complaint) => {
+    setCurrentComplaint(complaint);
+    openModal();
+  };
+
   return (
     <>
       <div className="flex flex-col ml-4 mt-2 mb-6">
         <h1>{title}</h1>
       </div>
       {isMobile ? (
-        <>
-          <Carousel showArrows={false} showStatus={false} showThumbs={false}>
-            <div className="flex flex-col mx-4 mb-9 gap-y-4 justify-center">
-              <Card
-                className="max-w-[400px]"
-                isPressable
-                onPress={() =>
-                  handleComplaintConfirmation("Problèmes de maintenance")
-                }
-              >
-                <CardHeader className="flex gap-3 justify-center">
-                  <BuildOutlinedIcon />
-                  <div className="flex flex-col">
-                    <h3 className="text-lg font-semibold">
-                      Problèmes de maintenance
-                    </h3>
-                  </div>
-                </CardHeader>
-                <Divider />
-                <CardBody>
-                  <p className="text-base text-justify font-normal mx-2.5">
-                    Des réclamations concernant des problèmes de plomberie
-                    (fuites, robinets qui fuient), des pannes électriques, des
-                    dysfonctionnements des appareils électroménagers fournis par
-                    le propriétaire, etc.
-                  </p>
-                </CardBody>
-                <Divider />
-                <CardFooter></CardFooter>
-              </Card>
-              <Modal
-                isOpen={isMaintenanceModalOpen}
-                onClose={closeMaintenanceModal}
-              >
-                <ModalContent>
-                  <ModalHeader>Confirmation</ModalHeader>
-                  <ModalBody>
-                    <p>
-                      Êtes-vous sûr de vouloir signaler des problèmes de
-                      maintenance?
-                    </p>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button
-                      color="danger"
-                      variant="flat"
-                      onClick={closeMaintenanceModal}
-                    >
-                      Annuler
-                    </Button>
-                    <Button color="primary" onClick={closeMaintenanceModal}>
-                      Confirmer
-                    </Button>
-                  </ModalFooter>
-                </ModalContent>
-              </Modal>
-
-              <Card
-                className="max-w-[400px]"
-                isPressable
-                onPress={() =>
-                  handleComplaintConfirmation("Infestations de parasites")
-                }
-              >
-                <CardHeader className="flex gap-3 justify-center">
-                  <BugReportOutlinedIcon />
-                  <div className="flex flex-col">
-                    <h3 className="text-lg font-semibold">
-                      Infestations de parasites
-                    </h3>
-                  </div>
-                </CardHeader>
-                <Divider />
-                <CardBody>
-                  <p className="text-base text-justify font-normal mx-2.5">
-                    Des problèmes avec des insectes, des rongeurs ou d'autres
-                    parasites peuvent nécessiter une intervention du
-                    propriétaire pour les éliminer.
-                  </p>
-                </CardBody>
-                <Divider />
-                <CardFooter></CardFooter>
-              </Card>
-              <Modal
-                isOpen={isInfestationModalOpen}
-                onClose={closeInfestationModal}
-              >
-                <ModalContent>
-                  <ModalHeader>Confirmation</ModalHeader>
-                  <ModalBody>
-                    <p>
-                      Êtes-vous sûr de vouloir signaler une infestation de
-                      parasites ?
-                    </p>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button
-                      color="danger"
-                      variant="flat"
-                      onClick={closeInfestationModal}
-                    >
-                      Annuler
-                    </Button>
-                    <Button color="primary" onClick={closeInfestationModal}>
-                      Confirmer
-                    </Button>
-                  </ModalFooter>
-                </ModalContent>
-              </Modal>
-
-              <Card
-                className="max-w-[400px]"
-                isPressable
-                onPress={() =>
-                  handleComplaintConfirmation("Défauts structurels")
-                }
-              >
-                <CardHeader className="flex gap-3 justify-center">
-                  <HomeRepairServiceOutlinedIcon />
-                  <div className="flex flex-col">
-                    <h3 className="text-lg font-semibold">
-                      Défauts structurels
-                    </h3>
-                  </div>
-                </CardHeader>
-                <Divider />
-                <CardBody>
-                  <p className="text-base text-justify font-normal mx-2.5">
-                    Des fissures dans les murs, des problèmes de toiture, des
-                    portes ou fenêtres qui ne se ferment pas correctement, etc.
-                  </p>
-                </CardBody>
-                <Divider />
-                <CardFooter></CardFooter>
-              </Card>
-              <Modal
-                isOpen={isStructuralModalOpen}
-                onClose={closeStructuralModal}
-              >
-                <ModalContent>
-                  <ModalHeader>Confirmation</ModalHeader>
-                  <ModalBody>
-                    <p>
-                      Êtes-vous sûr de vouloir signaler des défauts structurels
-                      ?
-                    </p>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button
-                      color="danger"
-                      variant="flat"
-                      onClick={closeStructuralModal}
-                    >
-                      Annuler
-                    </Button>
-                    <Button color="primary" onClick={closeStructuralModal}>
-                      Confirmer
-                    </Button>
-                  </ModalFooter>
-                </ModalContent>
-              </Modal>
-            </div>
-
-            <div className="flex flex-col mx-4 gap-y-4 justify-center">
-              <Card
-                className="max-w-[400px]"
-                isPressable
-                onPress={() =>
-                  handleComplaintConfirmation(
-                    "Questions liées aux équipements fournis"
-                  )
-                }
-              >
-                <CardHeader className="flex gap-3 justify-center">
-                  <KitchenOutlinedIcon />
-                  <div className="flex flex-col">
-                    <h3 className="text-lg font-semibold">
-                      Questions liées aux équipements fournis
-                    </h3>
-                  </div>
-                </CardHeader>
-                <Divider />
-                <CardBody>
-                  <p className="text-base text-justify font-normal mx-2.5">
-                    Des réclamations concernant des équipements manquants ou des
-                    appareils endommagés fournis par le propriétaire, comme des
-                    meubles, des appareils électroménagers, etc.
-                  </p>
-                </CardBody>
-                <Divider />
-                <CardFooter></CardFooter>
-              </Card>
-              <Modal
-                isOpen={isEquipmentModalOpen}
-                onClose={closeEquipmentModal}
-              >
-                <ModalContent>
-                  <ModalHeader>Confirmation</ModalHeader>
-                  <ModalBody>
-                    <p>
-                      Êtes-vous sûr de vouloir signaler des problèmes liés aux
-                      équipements fournis ?
-                    </p>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button
-                      color="danger"
-                      variant="flat"
-                      onClick={closeEquipmentModal}
-                    >
-                      Annuler
-                    </Button>
-                    <Button color="primary" onClick={closeEquipmentModal}>
-                      Confirmer
-                    </Button>
-                  </ModalFooter>
-                </ModalContent>
-              </Modal>
-
-              <Card
-                className="max-w-[400px]"
-                isPressable
-                onPress={() =>
-                  handleComplaintConfirmation(
-                    "Problèmes d'humidité ou de moisissure"
-                  )
-                }
-              >
-                <CardHeader className="flex gap-3 justify-center">
-                  <WaterDamageOutlinedIcon />
-                  <div className="flex flex-col">
-                    <h3 className="text-lg font-semibold">
-                      Problèmes d'humidité ou de moisissure
-                    </h3>
-                  </div>
-                </CardHeader>
-                <Divider />
-                <CardBody>
-                  <p className="text-base text-justify font-normal mx-2.5">
-                    Des réclamations concernant des problèmes d'humidité
-                    excessive ou de moisissure dans le logement.
-                  </p>
-                </CardBody>
-                <Divider />
-                <CardFooter></CardFooter>
-              </Card>
-              <Modal isOpen={isMoistureModalOpen} onClose={closeMoistureModal}>
-                <ModalContent>
-                  <ModalHeader>Confirmation</ModalHeader>
-                  <ModalBody>
-                    <p>
-                      Êtes-vous sûr de vouloir signaler des problèmes d'humidité
-                      ou de moisissure ?
-                    </p>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button
-                      color="danger"
-                      variant="flat"
-                      onClick={closeMoistureModal}
-                    >
-                      Annuler
-                    </Button>
-                    <Button color="primary" onClick={closeMoistureModal}>
-                      Confirmer
-                    </Button>
-                  </ModalFooter>
-                </ModalContent>
-              </Modal>
-
-              <Card
-                className="max-w-[400px]"
-                isPressable
-                onPress={() =>
-                  handleComplaintConfirmation("Problèmes de voisinage")
-                }
-              >
-                <CardHeader className="flex gap-3 justify-center">
-                  <PeopleAltOutlinedIcon />
-                  <div className="flex flex-col">
-                    <h3 className="text-lg font-semibold">
-                      Problèmes de voisinage
-                    </h3>
-                  </div>
-                </CardHeader>
-                <Divider />
-                <CardBody>
-                  <p className="text-base text-justify font-normal mx-2.5">
-                    Des réclamations concernant le bruit excessif des voisins,
-                    des conflits de voisinage, etc.
-                  </p>
-                </CardBody>
-                <Divider />
-                <CardFooter></CardFooter>
-              </Card>
-              <Modal isOpen={isNeighborModalOpen} onClose={closeNeighborModal}>
-                <ModalContent>
-                  <ModalHeader>Confirmation</ModalHeader>
-                  <ModalBody>
-                    <p>
-                      Êtes-vous sûr de vouloir signaler des problèmes de
-                      voisinage ?
-                    </p>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button
-                      color="danger"
-                      variant="flat"
-                      onClick={closeNeighborModal}
-                    >
-                      Annuler
-                    </Button>
-                    <Button color="primary" onClick={closeNeighborModal}>
-                      Confirmer
-                    </Button>
-                  </ModalFooter>
-                </ModalContent>
-              </Modal>
-            </div>
-
-            {/* <h1>Autres réclamations</h1> */}
-            <div className="flex flex-row mx-4 mb-6 gap-x-11 justify-center">
-              <Card
-                className="max-w-[400px]"
-                isPressable
-                onPress={() => handleComplaintConfirmation("Autres problèmes")}
-              >
-                <CardHeader className="flex gap-3 justify-center">
-                  <ReportProblemOutlinedIcon />
-                  <div className="flex flex-col">
-                    <h3 className="text-lg font-semibold">Autres problèmes</h3>
-                  </div>
-                </CardHeader>
-                <Divider />
-                <CardBody>
-                  <p className="text-base text-justify font-normal mx-2.5">
-                    Pour signaler d'autres problèmes non mentionnés ci-dessus.
-                  </p>
-                </CardBody>
-                <Divider />
-                <CardFooter></CardFooter>
-              </Card>
-              <Modal
-                isOpen={isAutreModalOpen}
-                onClose={closeAutreModal}
-                size="lg"
-              >
-                <ModalContent>
-                  <ModalHeader>Confirmation</ModalHeader>
-                  <ModalBody>
-                    <p>
-                      Êtes-vous sûr de vouloir signaler un autre problème ?
-                      Veuillez fournir des détails précis sur le problème
-                      rencontré afin que nous puissions vous aider de manière
-                      adéquate.
-                    </p>
-                    <Textarea
-                      isRequired
-                      variant="bordered"
-                      label="Description"
-                      labelPlacement="outside"
-                      placeholder="Enter your description"
-                    />
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button
-                      color="danger"
-                      variant="flat"
-                      onClick={closeAutreModal}
-                    >
-                      Annuler
-                    </Button>
-                    <Button color="primary" onClick={closeAutreModal}>
-                      Confirmer
-                    </Button>
-                  </ModalFooter>
-                </ModalContent>
-              </Modal>
-            </div>
-          </Carousel>
-        </>
+        // Stack cards on top of each other on small screens
+        <div className="flex flex-col gap-6 mx-4 mb-6">
+          {complaintTypes.map((complaint, index) => (
+            <Card
+              key={index}
+              className="w-full bg-black bg-opacity-40 backdrop-blur-sm"
+              isPressable
+              onPress={() => handleComplaintConfirmation(complaint)}
+            >
+              <CardHeader className="flex gap-3 justify-center">
+                {complaint.icon}
+                <div className="flex flex-col">
+                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl:">
+                    {complaint.title}
+                  </h3>
+                </div>
+              </CardHeader>
+              <Divider />
+              <CardBody>
+                <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
+                  {complaint.description}
+                </p>
+              </CardBody>
+              <Divider />
+              <CardFooter></CardFooter>
+            </Card>
+          ))}
+        </div>
       ) : (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mx-4 mb-6">
+        //  3x3 grid for desktop
+        <div className="grid grid-cols-3 gap-6 mx-4 mb-6 gap-y-8" style={{ display: "grid", gridTemplateRows: "repeat(2, 1fr)" }}>
+          {/* Render first 6 cards normally */}
+          {complaintTypes.slice(0, 6).map((complaint, index) => (
             <Card
-              className="max-w-full bg-black bg-opacity-20 backdrop-blur-sm"
-              isPressable
-              onPress={() =>
-                handleComplaintConfirmation("Problèmes de maintenance")
-              }
-            >
-              <CardHeader className="flex gap-3 justify-center">
-                <BuildOutlinedIcon sx={{ color:"#ff8906" }}/>
-                <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl: text-base ">
-                    Problèmes de maintenance
-                  </h3>
-                </div>
-              </CardHeader>
-              <Divider />
-              <CardBody>
-                <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
-                  Des réclamations concernant des problèmes de plomberie
-                  (fuites, robinets qui fuient), des pannes électriques, des
-                  dysfonctionnements des appareils électroménagers fournis par
-                  le propriétaire, etc.
-                </p>
-              </CardBody>
-              <Divider />
-              <CardFooter></CardFooter>
-            </Card>
-            <Modal
-              isOpen={isMaintenanceModalOpen}
-              onClose={closeMaintenanceModal}
-            >
-              <ModalContent>
-                <ModalHeader>Confirmation</ModalHeader>
-                <ModalBody>
-                  <p>
-                    Êtes-vous sûr de vouloir signaler des problèmes de
-                    maintenance?
-                  </p>
-                </ModalBody>
-                <ModalFooter>
-                  <Button
-                    color="danger"
-                    variant="flat"
-                    onClick={closeMaintenanceModal}
-                  >
-                    Annuler
-                  </Button>
-                  <Button color="primary" onClick={closeMaintenanceModal}>
-                    Confirmer
-                  </Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
-
-            <Card
-              className="max-w-full bg-black bg-opacity-30 backdrop-blur-sm"
-              isPressable
-              onPress={() =>
-                handleComplaintConfirmation("Infestations de parasites")
-              }
-            >
-              <CardHeader className="flex gap-3 justify-center">
-                <BugReportOutlinedIcon  sx={{ color:"#ff8906" }}/>
-                <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl: text-base">
-                    Infestations de parasites
-                  </h3>
-                </div>
-              </CardHeader>
-              <Divider />
-              <CardBody>
-                <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
-                  Des problèmes avec des insectes, des rongeurs ou d'autres
-                  parasites peuvent nécessiter une intervention du propriétaire
-                  pour les éliminer.
-                </p>
-              </CardBody>
-              <Divider />
-              <CardFooter></CardFooter>
-            </Card>
-            <Modal
-              isOpen={isInfestationModalOpen}
-              onClose={closeInfestationModal}
-            >
-              <ModalContent>
-                <ModalHeader>Confirmation</ModalHeader>
-                <ModalBody>
-                  <p>
-                    Êtes-vous sûr de vouloir signaler une infestation de
-                    parasites ?
-                  </p>
-                </ModalBody>
-                <ModalFooter>
-                  <Button
-                    color="danger"
-                    variant="flat"
-                    onClick={closeInfestationModal}
-                  >
-                    Annuler
-                  </Button>
-                  <Button color="primary" onClick={closeInfestationModal}>
-                    Confirmer
-                  </Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
-
-            <Card
+              key={index}
               className="max-w-full bg-black bg-opacity-40 backdrop-blur-sm"
               isPressable
-              onPress={() => handleComplaintConfirmation("Défauts structurels")}
+              onPress={() => handleComplaintConfirmation(complaint)}
             >
               <CardHeader className="flex gap-3 justify-center">
-                <HomeRepairServiceOutlinedIcon sx={{ color:"#ff8906" }}/>
+                {complaint.icon}
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl: text-base">Défauts structurels</h3>
-                </div>
-              </CardHeader>
-              <Divider />
-              <CardBody>
-                <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
-                  Des fissures dans les murs, des problèmes de toiture, des
-                  portes ou fenêtres qui ne se ferment pas correctement, etc.
-                </p>
-              </CardBody>
-              <Divider />
-              <CardFooter></CardFooter>
-            </Card>
-            <Modal
-              isOpen={isStructuralModalOpen}
-              onClose={closeStructuralModal}
-            >
-              <ModalContent>
-                <ModalHeader>Confirmation</ModalHeader>
-                <ModalBody>
-                  <p>
-                    Êtes-vous sûr de vouloir signaler des défauts structurels ?
-                  </p>
-                </ModalBody>
-                <ModalFooter>
-                  <Button
-                    color="danger"
-                    variant="flat"
-                    onClick={closeStructuralModal}
-                  >
-                    Annuler
-                  </Button>
-                  <Button color="primary" onClick={closeStructuralModal}>
-                    Confirmer
-                  </Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
-
-            <Card
-              className="max-w-full bg-black bg-opacity-20 backdrop-blur-sm"
-              isPressable
-              onPress={() =>
-                handleComplaintConfirmation(
-                  "Questions liées aux équipements fournis"
-                )
-              }
-            >
-              <CardHeader className="flex gap-3 justify-center">
-                <KitchenOutlinedIcon  sx={{ color:"#ff8906" }}/>
-                <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl: text-base">
-                    Questions liées aux équipements fournis
+                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl:">
+                    {complaint.title}
                   </h3>
                 </div>
               </CardHeader>
               <Divider />
               <CardBody>
                 <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
-                  Des réclamations concernant des équipements manquants ou des
-                  appareils endommagés fournis par le propriétaire, comme des
-                  meubles, des appareils électroménagers, etc.
+                  {complaint.description}
                 </p>
               </CardBody>
               <Divider />
               <CardFooter></CardFooter>
             </Card>
-            <Modal isOpen={isEquipmentModalOpen} onClose={closeEquipmentModal}>
-              <ModalContent>
-                <ModalHeader>Confirmation</ModalHeader>
-                <ModalBody>
-                  <p>
-                    Êtes-vous sûr de vouloir signaler des problèmes liés aux
-                    équipements fournis ?
-                  </p>
-                </ModalBody>
-                <ModalFooter>
-                  <Button
-                    color="danger"
-                    variant="flat"
-                    onClick={closeEquipmentModal}
-                  >
-                    Annuler
-                  </Button>
-                  <Button color="primary" onClick={closeEquipmentModal}>
-                    Confirmer
-                  </Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
-
+          ))}
+          {/* Render the last card in a centered column */}
+          <div className="col-span-3" style={{ display: "grid", placeItems: "center" }}>
             <Card
-              className="max-w-full bg-black bg-opacity-30 backdrop-blur-sm"
-              isPressable
-              onPress={() =>
-                handleComplaintConfirmation(
-                  "Problèmes d'humidité ou de moisissure"
-                )
-              }
-            >
-              <CardHeader className="flex gap-3 justify-center">
-                <WaterDamageOutlinedIcon  sx={{ color:"#ff8906" }}/>
-                <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl: text-base">
-                    Problèmes d'humidité ou de moisissure
-                  </h3>
-                </div>
-              </CardHeader>
-              <Divider />
-              <CardBody>
-                <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
-                  Des réclamations concernant des problèmes d'humidité excessive
-                  ou de moisissure dans le logement.
-                </p>
-              </CardBody>
-              <Divider />
-              <CardFooter></CardFooter>
-            </Card>
-            <Modal isOpen={isMoistureModalOpen} onClose={closeMoistureModal}>
-              <ModalContent>
-                <ModalHeader>Confirmation</ModalHeader>
-                <ModalBody>
-                  <p>
-                    Êtes-vous sûr de vouloir signaler des problèmes d'humidité
-                    ou de moisissure ?
-                  </p>
-                </ModalBody>
-                <ModalFooter>
-                  <Button
-                    color="danger"
-                    variant="flat"
-                    onClick={closeMoistureModal}
-                  >
-                    Annuler
-                  </Button>
-                  <Button color="primary" onClick={closeMoistureModal}>
-                    Confirmer
-                  </Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
-
-            <Card
+              key={6}
               className="max-w-full bg-black bg-opacity-40 backdrop-blur-sm"
               isPressable
-              onPress={() =>
-                handleComplaintConfirmation("Problèmes de voisinage")
-              }
+              onPress={() => handleComplaintConfirmation(complaintTypes[6])}
             >
               <CardHeader className="flex gap-3 justify-center">
-                <PeopleAltOutlinedIcon sx={{ color:"#ff8906" }}/>
+                {complaintTypes[6].icon}
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl: text-base">
-                    Problèmes de voisinage
+                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl:">
+                    {complaintTypes[6].title}
                   </h3>
                 </div>
               </CardHeader>
               <Divider />
               <CardBody>
                 <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
-                  Des réclamations concernant le bruit excessif des voisins, des
-                  conflits de voisinage, etc.
+                  {complaintTypes[6].description}
                 </p>
               </CardBody>
               <Divider />
               <CardFooter></CardFooter>
             </Card>
-            <Modal isOpen={isNeighborModalOpen} onClose={closeNeighborModal}>
-              <ModalContent>
-                <ModalHeader>Confirmation</ModalHeader>
-                <ModalBody>
-                  <p>
-                    Êtes-vous sûr de vouloir signaler des problèmes de voisinage
-                    ?
-                  </p>
-                </ModalBody>
-                <ModalFooter>
-                  <Button
-                    color="danger"
-                    variant="flat"
-                    onClick={closeNeighborModal}
-                  >
-                    Annuler
-                  </Button>
-                  <Button color="primary" onClick={closeNeighborModal}>
-                    Confirmer
-                  </Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
+          </div>
+        </div>
+      )}
 
-            <Card
-              className="col-start-2 bg-black bg-opacity-30 backdrop-blur-sm"
-              isPressable
-              onPress={() => handleComplaintConfirmation("Autres problèmes")}
-            >
-              <CardHeader className="flex gap-3 justify-center">
-                <ReportProblemOutlinedIcon sx={{ color:"#ff8906" }} />
-                <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold text-[#fffffe] 2xl: text-base ">Autres problèmes</h3>
-                </div>
-              </CardHeader>
-              <Divider />
-              <CardBody>
-                <p className="text-base text-justify font-normal mx-2.5 text-[#fff3ec]">
-                  Pour signaler d'autres types de problèmes non mentionnés
-                  ci-dessus.
+      <Modal isOpen={isModalOpen} onClose={closeModal} size="lg">
+        <ModalContent>
+          <ModalHeader>Confirmation</ModalHeader>
+          <ModalBody>
+            {currentComplaint && (
+              <>
+                <p>
+                  Êtes-vous sûr de vouloir signaler un{" "}
+                  {currentComplaint.title} ?
                 </p>
-              </CardBody>
-              <Divider />
-              <CardFooter></CardFooter>
-            </Card>
-            <Modal
-              isOpen={isAutreModalOpen}
-              onClose={closeAutreModal}
-              size="lg"
-            >
-              <ModalContent>
-                <ModalHeader>Confirmation</ModalHeader>
-                <ModalBody>
-                  <p>
-                    Êtes-vous sûr de vouloir signaler un autre problème ?
-                    Veuillez fournir des détails précis sur le problème
-                    rencontré afin que nous puissions vous aider de manière
-                    adéquate.
-                  </p>
+                {currentComplaint.title === "Autres problèmes" && (
                   <Textarea
                     isRequired
                     variant="bordered"
@@ -848,24 +208,22 @@ const ReclaCard = ({ title }) => {
                     labelPlacement="outside"
                     placeholder="Enter your description"
                   />
-                </ModalBody>
-                <ModalFooter>
-                  <Button
-                    color="danger"
-                    variant="flat"
-                    onClick={closeAutreModal}
-                  >
-                    Annuler
-                  </Button>
-                  <Button color="primary" onClick={closeAutreModal}>
-                    Confirmer
-                  </Button>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
-          </div>
-        </>
-      )}
+                )}
+              </>
+            )}
+          </ModalBody>
+          <ModalFooter>
+            <Button color="danger" variant="flat" onClick={closeModal}>
+              Annuler
+            </Button>
+            {currentComplaint && (
+              <Button color="primary" onClick={closeModal}>
+                Confirmer
+              </Button>
+            )}
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
