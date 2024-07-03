@@ -34,6 +34,7 @@ import {
   updateReclamationThunk,
   deleteReclamationThunk,
 } from "../../../../../session/thunks/adminthunk.jsx";
+
 const INITIAL_VISIBLE_COLUMNS = [
   "rec_id",
   "nom",
