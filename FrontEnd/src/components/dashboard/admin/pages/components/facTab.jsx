@@ -730,7 +730,7 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                             }
                           >
                             {(item) => (
-                              <AutocompleteItem key={item.res_id}>
+                              <AutocompleteItem key={item.res_id} textValue={`${item.nom} ${item.prenom} (RES${item.res_id})`}>
                                 <div
                                   style={{
                                     display: "flex",

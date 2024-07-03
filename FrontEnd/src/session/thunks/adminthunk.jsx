@@ -30,7 +30,10 @@ import {
   updateFacture,
   deleteFacture,
 } from "../services/adminapi";
-import { fetchReclamations } from "../services/adminapi";
+
+import { fetchReclamations,
+  updateReclamation,
+  deleteReclamation } from "../services/adminapi";
 
 import { sendNotification } from "../services/adminapi";
 import { fetchConsums, addConsum, updateConsum } from "../services/adminapi";
@@ -489,6 +492,48 @@ export const fetchReclamationsThunk = createAsyncThunk(
       return response; // Return response if needed by the caller
     } catch (error) {
       console.error("Error fetching reclamations:", error);
+      throw error;
+    }
+  }
+);
+
+
+// Thunk to update an existing Reclamation
+export const updateReclamationThunk = createAsyncThunk(
+  "Reclamations/updateReclamation",
+  async (Reclamation, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    try {
+      const response = await updateReclamation(jwt, Reclamation);
+      // Fetch all Reclamations again to update the state
+      dispatch(fetchReclamationsThunk());
+      return response;
+    } catch (error) {
+      console.error("Error updating Reclamation:", error);
+      throw error;
+    }
+  }
+);
+
+// Thunk to delete a reclamation
+export const deleteReclamationThunk = createAsyncThunk(
+  "reclamations/deleteReclamation",
+  async (data, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+
+    console.log(jwt);
+
+    try {
+      const response = await deleteReclamation(jwt, data);
+      // Fetch all reclamations again to update the state
+      dispatch(fetchReclamationsThunk());
+      console.log(response);
+      return response; // Ensure to return the response from deletereclamation
+    } catch (error) {
+      console.error("Error deleting reclamation:", error);
       throw error;
     }
   }

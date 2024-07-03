@@ -462,3 +462,43 @@ export const fetchReclamations = async (jwt) => {
     throw error;
   }
 }
+
+
+
+// Function to update a Facture
+export const updateReclamation = async (jwtToken, reclamationData) => {
+  try {
+    const response = await axios.put(
+      `${baseURL}/admin/Reclamation`,
+      reclamationData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      }
+    );
+    console.log(response);
+    return response.data;
+  } catch (error) {
+    console.error("Error in updateReclamation:", error);
+    throw error;
+  }
+};
+
+// Function to delete a reclamation
+export const deleteReclamation = async (jwtToken, data) => {
+  try {
+    const response = await axios.delete(`${baseURL}/admin/reclamation`, {
+      headers: {
+        Authorization: `Bearer ${jwtToken}`,
+        "Content-Type": "application/json",
+      },
+      data: data, // Pass data object directly to Axios
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error in deleteReclamation:", error);
+    throw error;
+  }
+};

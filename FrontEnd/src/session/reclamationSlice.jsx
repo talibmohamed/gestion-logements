@@ -11,9 +11,6 @@ const reclamationSlice = createSlice({
     setReclamations: (state, action) => {
       state.reclamations = action.payload;
     },
-    addReclamation: (state, action) => {
-      state.reclamations.push(action.payload);
-    },
     removeReclamation: (state, action) => {
       state.reclamations = state.reclamations.filter(
         (reclamation) => reclamation.res_id !== action.payload.res_id

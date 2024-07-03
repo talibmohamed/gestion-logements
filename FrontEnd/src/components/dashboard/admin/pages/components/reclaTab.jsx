@@ -30,24 +30,25 @@ import { DeleteIcon } from "../Icons/DeleteIcon";
 import { EyeIcon } from "../Icons/EyeIcon";
 import { VerticalDotsIcon } from "../Icons/VerticalDotsIcon";
 import PropTypes from "prop-types";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchReclamationsThunk } from "../../../../../session/thunks/adminthunk";
-
+import {
+  updateReclamationThunk,
+  deleteReclamationThunk,
+} from "../../../../../session/thunks/adminthunk.jsx";
 const INITIAL_VISIBLE_COLUMNS = [
-  "id_recl",
+  "rec_id",
   "nom",
-  "type_recl",
-  "date",
-  "sol",
-  "status",
+  "rec_type",
+  "rec_date",
+  "rec_response",
+  "rec_etat",
   "actions",
 ];
 
 const SMALL_DEVICE_COLUMNS = [
-  "id_recl",
+  "rec_id",
   "nom",
-  "type_recl",
-  "status",
+  "rec_type",
+  "rec_etat",
   "actions",
 ];
 
@@ -64,7 +65,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
   const [sortDescriptor, setSortDescriptor] = React.useState({
-    column: "status",
+    column: "rec_etat",
     direction: "ascending",
   });
   const [page, setPage] = React.useState(1);
@@ -88,6 +89,20 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     onOpen: openDeleteModal,
     onOpenChange: setDeleteModalOpen,
   } = useDisclosure();
+
+  const handleEditClick = (reclamation) => {
+    setCurrentReclamation({
+      rec_id: reclamation.rec_id,
+      nom: reclamation.nom,
+      rec_type: reclamation.rec_type,
+      rec_desc: reclamation.rec_desc,
+      rec_date: reclamation.rec_date,
+      rec_etat: reclamation.rec_etat,
+      rec_response: reclamation.rec_response,
+    });
+    setEditModalOpen(true);
+  };
+
 
   const [isMobile, setIsMobile] = useState(false);
 
@@ -125,7 +140,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
       Array.from(statusFilter).length !== statusReclOptions.length
     ) {
       filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.status)
+        Array.from(statusFilter).includes(user.rec_etat)
       );
     }
 
@@ -160,8 +175,8 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     setCurrentReclamation(reclamation);
     openEditModal();
   };
-  const handleStatusChange = (status) => {
-    setCurrentReclamation({ ...currentReclamation, status });
+  const handleStatusChange = (rec_etat) => {
+    setCurrentReclamation({ ...currentReclamation, rec_etat });
   };
   const handleDeleteIconClick = (reclamation) => {
     setCurrentReclamation(reclamation);
@@ -181,6 +196,175 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
   //   dispatch(fetchReclamationsThunk()); 
   // }, [dispatch]); 
 
+  
+  const handleEditReclamation = async () => {
+    // Validate all fields before dispatching
+    if (
+     currentReclamation.rec_id === "" ||
+      currentReclamation.nom === "" ||
+      currentReclamation.rec_type === "" ||
+      currentReclamation.rec_desc === "" ||
+      currentReclamation.rec_date === "" ||
+      currentReclamation.rec_etat === "" ||
+      currentReclamation.rec_response === ""
+    ) {
+      // Handle invalid form data
+      return;
+    }
+
+    // Prepare the data to dispatch
+    const reclamationData = {
+      rec_id: currentReclamation.rec_id,
+      nom: currentReclamation.nom,
+      rec_type: currentReclamation.rec_type,
+      rec_desc: currentReclamation.rec_desc,
+      rec_date: currentReclamation.rec_date,
+      rec_etat: currentReclamation.rec_etat,
+      rec_response: currentReclamatio
+    };
+
+    console.log(reclamationData);
+
+    // Show loading toast while processing
+    const loadingToastId = toast.loading("Updating reclamation...", {
+      position: "bottom-right",
+      autoClose: false,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: false,
+      draggable: true,
+      progress: 0,
+      theme: "dark",
+    });
+
+    try {
+      // Dispatch the action to update reclamation
+      const response = await dispatch(updateReclamationThunk(reclamationData));
+
+      // Clear loading toast
+      toast.dismiss(loadingToastId);
+
+      // Display success message
+      if (response && response.payload.status === "success") {
+        toast.success("reclamation edited successfully", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+
+        // Clear the form or close modal after successful submission
+        setEditModalOpen(false);
+      } else if (response && response.payload.status === "alert") {
+        toast.error(response.payload.message, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      } else {
+        // Handle other statuses or errors
+        toast.error("Failed to edit reclamation", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      }
+    } catch (error) {
+      console.error("Error editing reclamation:", error);
+      toast.error("An error occurred while editing reclamation", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+    }
+  };
+
+ //delete a reclamation
+ const handleDeleteReclamation = async () => {
+  // Get the Invoice ID
+  const rec_id = currentReclamation.frec_id;
+
+  // Validate all fields before dispatching
+  if (!rec_id) {
+    console.error("Invalid invoice ID for deletion:", rec_id);
+    return;
+  }
+
+  // Prepare data for deletion
+  const data = {
+    rec_id: rec_id,
+  };
+
+  console.log(data);
+
+  try {
+    // Dispatch action to delete invoice
+    const response = await dispatch(deleteReclamationThunk(data));
+
+    console.log(response);
+
+    // Handle response
+    if (response && response.payload.status === "success") {
+      toast.success("Reclamation deleted successfully", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+    } else {
+      // Handle other statuses or errors
+      toast.error("Failed to delete invoice", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+    }
+
+    // Clear the form or close modal after successful deletion
+    setDeleteModalOpen(false);
+  } catch (error) {
+    console.error("Error deleting invoice:", error);
+    toast.error("An error occurred while deleting invoice", {
+      position: "bottom-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: 0,
+      theme: "dark",
+    });
+  }
+};
+
   const renderCell = React.useCallback((user, columnKey) => {
     const cellValue = user[columnKey];
 
@@ -195,7 +379,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
         return (
           <Chip
             className="capitalize"
-            color={statusColorMap[user.status]}
+            color={statusColorMap[user.rec_etat]}
             size="sm"
             variant="flat"
           >
@@ -432,7 +616,6 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                       label="Résidant"
                       variant="bordered"
                       labelPlacement="outside"
-                      defaultValue={currentReclamation.nom}
                       className="max-w-sm"
                         classNames={{
                           label:
@@ -452,13 +635,21 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
+                        defaultValue={currentReclamation.nom}
+                        onChange={(e) => 
+                          setCurrentReclamation({
+                            ...currentReclamation,
+                            nom: e.target.value,
+                          })
+
+                        }
                     />
                     <Input
                       isReadOnly
                       label="Type de Réclamation"
                       variant="bordered"
                       labelPlacement="outside"
-                      defaultValue={currentReclamation.type_recl}
+                      defaultValue={currentReclamation.rec_type}
                       className="max-w-sm"
                         classNames={{
                           label:
@@ -478,13 +669,19 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
+                        onChange={(e) => 
+                          setCurrentReclamation({
+                            ...currentReclamation,
+                            type_rec: e.target.value,
+                          })
+                        }
                     />
                     <Textarea
                       isReadOnly
                       label="Description"
                       variant="bordered"
                       labelPlacement="outside"
-                      defaultValue={currentReclamation.desc}
+                      defaultValue={currentReclamation.rec_desc}
                       className="max-w-sm"
                         classNames={{
                           label:
@@ -504,13 +701,20 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
+                        
+                        onChange={(e) => 
+                          setCurrentReclamation({
+                            ...currentReclamation,
+                            rec_desc: e.target.value,
+                          })
+                        }
                     />
                     <Input
                       isReadOnly
                       label="Date de Réclamation"
                       variant="bordered"
                       labelPlacement="outside"
-                      defaultValue={currentReclamation.date}
+                      defaultValue={currentReclamation.rec_date}
                       className="max-w-sm"
                         classNames={{
                           label:
@@ -530,13 +734,19 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
+                        onChange={(e) => 
+                          setCurrentReclamation({
+                            ...currentReclamation,
+                            rec_date: e.target.value,
+                          })
+                        }
                     />
                     <Input
                       isReadOnly
                       label="Status"
                       variant="bordered"
                       labelPlacement="outside"
-                      defaultValue={currentReclamation.status}
+                      defaultValue={currentReclamation.rec_etat}
                       className="max-w-sm"
                         classNames={{
                           label:
@@ -556,13 +766,19 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
+                        onChange={(e) => 
+                          setCurrentReclamation({
+                            ...currentReclamation,
+                            rec_etat: e.target.value,
+                          })
+                        }
                     />
                     <Input
                       isReadOnly
                       label="Date de Résolution"
                       variant="bordered"
                       labelPlacement="outside"
-                      defaultValue={currentReclamation.sol}
+                      defaultValue={currentReclamation.rec_response}
                       className="max-w-sm"
                         classNames={{
                           label:
@@ -582,6 +798,12 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
+                        onChange={(e) => 
+                          setCurrentReclamation({
+                            ...currentReclamation,
+                            rec_response: e.target.value,
+                          })
+                        }
                     />
                   </div>
                 ) : (
@@ -612,6 +834,12 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
+                        onChange={(e) => 
+                          setCurrentReclamation({
+                            ...currentReclamation,
+                            nom: e.target.value,
+                          })
+                        }
                       />
                       <Input
                         isReadOnly
@@ -638,6 +866,12 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
+                        onChange={(e) => 
+                          setCurrentReclamation({
+                            ...currentReclamation,
+                            num_de_log: e.target.value,
+                          })
+                        }
                       />
                     </div>
 
@@ -667,6 +901,12 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
+                        onChange={(e) => 
+                          setCurrentReclamation({
+                            ...currentReclamation,
+                            type_log: e.target.value,
+                          })
+                        }
                       />
                       <Input
                         isReadOnly
@@ -695,6 +935,12 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
+                        onChange={(e) => 
+                          setCurrentReclamation({
+                            ...currentReclamation,
+                            ameliored: e.target.value,
+                          })
+                        }
                       />
                     </div>
                     <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
@@ -703,7 +949,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                         type="text"
                         label="Description:"
                         variant="bordered"
-                        defaultValue={currentReclamation.desc}
+                        defaultValue={currentReclamation.rec_desc}
                         className="max-w-sm"
                         classNames={{
                           label:
@@ -723,6 +969,12 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
+                        onChange={(e) => 
+                          setCurrentReclamation({
+                            ...currentReclamation,
+                            rec_desc: e.target.value,
+                          })
+                        }
                       />
                     </div>
                   </>
@@ -802,11 +1054,11 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                         "!cursor-text",
                       ],
                     }}
-                    defaultValue={currentReclamation?.desc}
+                    defaultValue={currentReclamation?.rec_desc}
                     onChange={(e) =>
                       setCurrentReclamation({
                         ...currentReclamation,
-                        nom: e.target.value,
+                        rec_desc: e.target.value,
                       })
                     }
                   />
@@ -832,11 +1084,11 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                         "!cursor-text",
                       ],
                     }}
-                    defaultValue={currentReclamation?.date}
+                    defaultValue={currentReclamation?.rec_date}
                     onChange={(e) =>
                       setCurrentReclamation({
                         ...currentReclamation,
-                        nom: e.target.value,
+                        rec_date: e.target.value,
                       })
                     }
                   />
@@ -867,7 +1119,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                         "text-white/90",
                       ],
                     }}
-                    defaultValue={currentReclamation?.status}
+                    defaultValue={currentReclamation?.rec_etat}
                     onSelectionChange={(keys) =>
                       handleStatusChange(keys.currentKey)
                     }
@@ -888,7 +1140,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                 <Button color="danger" variant="flat" onClick={onClose}>
                   Fermer
                 </Button>
-                <Button color="primary" onClick={handleEditIconClick}>
+                <Button color="primary" onClick={handleEditReclamation}>
                   Sauvegarder
                 </Button>
               </ModalFooter>
@@ -922,8 +1174,23 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                   onPress={onClose}
                 >
                   Fermer
-                </Button>
-                <Button color="primary">Continuer</Button>
+                  </Button>
+                {currentReclamation && currentReclamation.nom && (
+                  <Button
+                    color="primary"
+                    onClick={() => {
+                      console.log("Current reclamation:", currentReclamation);
+                      if (currentReclamation && currentReclamation.rec_type) {
+                        handleDeleteReclamation(currentReclamation.rec_type);
+                      } else {
+                        console.error(
+                          "Invalid Reclamation ID for deletion:",
+                          currentReclamation?.rec_type
+                        );
+                      }
+                    }}
+                  >Continuer</Button>
+                )}
               </ModalFooter>
             </>
           )}
@@ -943,12 +1210,13 @@ ReclamationTable.propTypes = {
   rows: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-      id_recl: PropTypes.string.isRequired,
+      rec_id: PropTypes.string.isRequired,
       nom: PropTypes.string.isRequired,
-      desc: PropTypes.string.isRequired,
-      date: PropTypes.string.isRequired,
-      status: PropTypes.string.isRequired,
-      sol: PropTypes.string.isRequired,
+      rec_type: PropTypes.string.isRequired,
+      rec_desc: PropTypes.string.isRequired,
+      rec_date: PropTypes.string.isRequired,
+      rec_etat: PropTypes.string.isRequired,
+      rec_response: PropTypes.string.isRequired,
     })
   ).isRequired,
   statusReclaOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
