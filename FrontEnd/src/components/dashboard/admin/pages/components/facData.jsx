@@ -11,19 +11,19 @@ const columns = [
     { name: "Actions", uid :"actions"},
 ];
 
-const users = [
-  { id: 2, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "en retard", fac_total: "$10" },
-  { id: 3, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "en attente", fac_total: "$10" },
-  { id: 4, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "payée", fac_total: "$10" },
-  { id: 5, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "payée", fac_total: "$10" },
-  { id: 6, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "payée", fac_total: "$10" },
-  { id: 7, fac_id: "#1313313", fac_type: "Eau", fac_date: "01/01/2025", fac_echeance: "02/22/2024", fac_etat: "en retard", fac_total: "$10" },
-  { id: 8, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "en attente", fac_total: "$10" },
-  { id: 9, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "payée", fac_total: "$10" },
-  { id: 10, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "payée", fac_total: "$10" },
-  { id: 1, fac_id: "#1313313",  fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "payée", fac_total: "$10" },
-  ];
+// const users = [
+//   { id: 2, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "en retard", fac_total: "$10" },
+//   { id: 3, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "en attente", fac_total: "$10" },
+//   { id: 4, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "payée", fac_total: "$10" },
+//   { id: 5, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "payée", fac_total: "$10" },
+//   { id: 6, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "payée", fac_total: "$10" },
+//   { id: 7, fac_id: "#1313313", fac_type: "Eau", fac_date: "01/01/2025", fac_echeance: "02/22/2024", fac_etat: "en retard", fac_total: "$10" },
+//   { id: 8, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "en attente", fac_total: "$10" },
+//   { id: 9, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "payée", fac_total: "$10" },
+//   { id: 10, fac_id: "#1313313", fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "payée", fac_total: "$10" },
+//   { id: 1, fac_id: "#1313313",  fac_type: "Eau", fac_date: "02/22/2024", fac_echeance: "02/22/2024", fac_etat: "payée", fac_total: "$10" },
+//   ];
 
 const statusOptions = ["payée", "en retard", "en attente"];
 
-export {columns, users, statusOptions};
+export {columns, statusOptions};

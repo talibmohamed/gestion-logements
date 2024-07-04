@@ -355,7 +355,9 @@ const InvoiceTable = ({ columns, rows, statusOptions, title }) => {
                     
                   </ModalBody>
                   <ModalFooter>
-                    <Button color="danger" variant="flat" onClick={onClose}>
+                    <Button color="danger"
+                  variant="light"
+                  className="text-sm font-medium"  onClick={onClose}>
                       Fermer
                     </Button>
                   </ModalFooter>

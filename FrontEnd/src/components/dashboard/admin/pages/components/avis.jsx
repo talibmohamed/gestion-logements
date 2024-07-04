@@ -104,7 +104,10 @@ const Avis = () => {
         <h2 className="mx-2 mb-4 flex justify-between items-center">
           Envoyer un avis de facture en retard
           <div className="flex gap-3">
-            <Button color="danger" variant="flat" onClick={handleSendAvis}>
+          <Button
+                  color="danger"
+                  variant="light"
+                  className="text-sm font-medium" onClick={handleSendAvis}>
               Envoyer !
             </Button>
           </div>
