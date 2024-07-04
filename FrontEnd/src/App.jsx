@@ -12,6 +12,7 @@ import AdminLogin from "./components/login/admin/login";
 import UserForm from "./components/login/FirstTime/form";
 import AdminDashboard from "./components/dashboard/admin/dashboard";
 import UserDashboard from "./components/dashboard/user/dashboard";
+import ResetPassword from "./components/login/reset password/resetPassword"; // Assuming you have a component for reset password
 import "./App.css";
 
 // Custom hook to get query parameters
@@ -90,6 +91,7 @@ function App() {
         <Route path="/user" element={renderUserRoute()} />
         <Route path="/admin" element={renderAdminRoute()} />
         <Route path="/form" element={<FormRoute />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="*" element={renderCatchAllRoute()} />
       </Routes>
     </Router>

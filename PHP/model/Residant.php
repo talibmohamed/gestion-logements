@@ -568,12 +568,13 @@ class residant
                 ];
             }
 
-            // Generate a random token
-            $token = bin2hex(random_bytes(16));
+            // Generate JWT token and update login token
+            $jwtHandler = new JwtHandler();
+            $login_token = $jwtHandler->generateJwtToken($user['res_id'], 'residant');
 
             // Insert the token into the database
             $stmt = $connection->prepare("UPDATE residant SET login_token = ? WHERE email = ?");
-            $stmt->execute([$token, $email]);
+            $stmt->execute([$login_token, $email]);
 
             // Send email with reset link
             $resetLink = "http://localhost:5173/reset-password?token=$token";
@@ -620,7 +621,7 @@ class residant
                 <div class='container'>
                     <h2>Mot de passe oublié</h2>
                     <p>Vous avez demandé une réinitialisation de mot de passe. Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
-                    <p><a href='$resetLink'>Réinitialiser le mot de passe</a></
+                    <p><a href='$resetLink'>Réinitialiser le mot de passe</a></p>
                     <p>Si vous n'avez pas demandé de réinitialisation de mot de passe, ignorez cet email.</p>
                     <p>Cordialement,<br>houselytics</p>
                     <p class='footer'>Ceci est un email automatique, merci de ne pas y répondre.</p>

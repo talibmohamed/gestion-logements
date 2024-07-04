@@ -256,3 +256,18 @@ export const fetchStatisticsGraphThunk = createAsyncThunk(
     }
   }
 );
+
+
+//call forgotPassword
+export const forgotPasswordThunk = createAsyncThunk(
+  "user/forgotPassword",
+  async (email, { dispatch }) => {
+    try {
+      const response = await forgotPassword(email);
+      return response;
+    } catch (error) {
+      console.error("Error forgot password:", error);
+      throw error;
+    }
+  }
+);
