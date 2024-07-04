@@ -17,7 +17,7 @@ const Avis = () => {
     };
 
     // Show loading toast while processing
-    const loadingToastId = toast.loading("Adding facture...", {
+    const loadingToastId = toast.loading("envoyer un avis...", {
       position: "bottom-right",
       autoClose: false,
       hideProgressBar: false,

@@ -60,7 +60,7 @@ const LogSection = ({ title }) => {
   const logement = useSelector((state) => state.logements.logements);
   console.log(logement);
 
-  const [user] = useState(logement && logement[0]); // Use the first logement from state
+  const user = logement && logement.length > 0 ? logement[0] : {};
   const [currentImage, setCurrentImage] = useState(null);
   const [isPlanModalOpen, setPlanModalOpen] = useState(false);
   const [currentEquipments, setCurrentEquipments] = useState([]);
@@ -132,7 +132,9 @@ const LogSection = ({ title }) => {
       <div
         className="gap-7 grid"
         style={{
-          gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(300px, 1fr))",
+          gridTemplateColumns: isMobile
+            ? "1fr"
+            : "repeat(auto-fit, minmax(300px, 1fr))",
         }}
       >
         <Card

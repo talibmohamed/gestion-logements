@@ -751,33 +751,46 @@ function route($uri, $method)
             break;
 
 
-            //get logement gistorick statistics
-        case '/api/v1/admin/logement-statistics':
-            if ($method === 'GET') {
-                $jwtHandler = new JwtHandler();
-                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-                $jwt_token = str_replace('Bearer ', '', $jwt_token);
-                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
-
-                if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
-                    $adminController = new AdminController();
-                    $response = $adminController->getLogementStatistiquesAPI();
-
-                    // Output the response as JSON
-                    http_response_code(200);
-                    echo json_encode($response);
-                } else {
-                    http_response_code(401); // Unauthorized
-                    echo json_encode([
-                        'status' => 'error',
-                        'message' => 'Unauthorized',
-                    ]);
-                }
+            //mot de passe oublier
+        case '/api/v1/user/forgot-password':
+            if ($method === 'POST') {
+                $userController = new UserController();
+                $userController->forgotPasswordAPI($data);
             } else {
-                http_response_code(405); // Method Not Allowed
+                http_response_code(405);
                 echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
             }
             break;
+
+
+
+        //     //get logement gistorick statistics
+        // case '/api/v1/admin/logement-statistics':
+        //     if ($method === 'GET') {
+        //         $jwtHandler = new JwtHandler();
+        //         $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+        //         $jwt_token = str_replace('Bearer ', '', $jwt_token);
+        //         $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+
+        //         if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
+        //             $adminController = new AdminController();
+        //             $response = $adminController->getLogementStatistiquesAPI();
+
+        //             // Output the response as JSON
+        //             http_response_code(200);
+        //             echo json_encode($response);
+        //         } else {
+        //             http_response_code(401); // Unauthorized
+        //             echo json_encode([
+        //                 'status' => 'error',
+        //                 'message' => 'Unauthorized',
+        //             ]);
+        //         }
+        //     } else {
+        //         http_response_code(405); // Method Not Allowed
+        //         echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
+        //     }
+        //     break;
 
         default:
             http_response_code(404);

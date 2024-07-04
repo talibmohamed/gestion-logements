@@ -106,7 +106,6 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     setEditModalOpen(true);
   };
 
-
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -194,18 +193,17 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
   // console.log(reclamation);
   // console.log("1");
 
-
   // useEffect(() => {
-  //   dispatch(fetchReclamationsThunk()); 
-  // }, [dispatch]); 
+  //   dispatch(fetchReclamationsThunk());
+  // }, [dispatch]);
 
   const dispatch = useDispatch();
-  
+
   const handleEditReclamation = async () => {
     // Validate all fields before dispatching
     if (
       currentReclamation.rec_id === "" ||
-      currentReclamation.rec_etat === "" 
+      currentReclamation.rec_etat === ""
     ) {
       // Handle invalid form data
       return;
@@ -237,10 +235,14 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
 
       // Clear loading toast
       toast.dismiss(loadingToastId);
+      console.log('response');
+      console.log(response);
+
+      console.log('response');
 
       // Display success message
       if (response && response.payload.status === "success") {
-        toast.success("reclamation edited successfully", {
+        toast.success(response.payload.message, {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -266,7 +268,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
         });
       } else {
         // Handle other statuses or errors
-        toast.error("Failed to edit reclamation", {
+        toast.error(response.payload.status, {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -292,45 +294,61 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     }
   };
 
- //delete a reclamation
- const handleDeleteReclamation = async () => {
-  // Get the Invoice ID
-  const rec_id = currentReclamation.rec_id;
+  //delete a reclamation
+  const handleDeleteReclamation = async () => {
+    // Get the Invoice ID
+    const rec_id = currentReclamation.rec_id;
 
-  // Validate all fields before dispatching
-  if (!rec_id) {
-    console.error("Invalid invoice ID for deletion:", rec_id);
-    return;
-  }
+    // Validate all fields before dispatching
+    if (!rec_id) {
+      console.error("Invalid invoice ID for deletion:", rec_id);
+      return;
+    }
 
-  // Prepare data for deletion
-  const data = {
-    rec_id: rec_id,
-  };
+    // Prepare data for deletion
+    const data = {
+      rec_id: rec_id,
+    };
 
-  console.log(data);
+    console.log(data);
 
-  try {
-    // Dispatch action to delete invoice
-    const response = await dispatch(deleteReclamationThunk(data));
+    try {
+      // Dispatch action to delete invoice
+      const response = await dispatch(deleteReclamationThunk(data));
 
-    console.log(response);
+      console.log(response);
 
-    // Handle response
-    if (response && response.payload.status === "success") {
-      toast.success("Reclamation deleted successfully", {
-        position: "bottom-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: false,
-        draggable: true,
-        progress: 0,
-        theme: "dark",
-      });
-    } else {
-      // Handle other statuses or errors
-      toast.error("Failed to delete invoice", {
+      // Handle response
+      if (response && response.payload.status === "success") {
+        toast.success(response.payload.status, {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      } else {
+        // Handle other statuses or errors
+        toast.error("Failed to delete invoice", {
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: 0,
+          theme: "dark",
+        });
+      }
+
+      // Clear the form or close modal after successful deletion
+      setDeleteModalOpen(false);
+    } catch (error) {
+      console.error("Error deleting invoice:", error);
+      toast.error("An error occurred while deleting invoice", {
         position: "bottom-right",
         autoClose: 5000,
         hideProgressBar: false,
@@ -341,45 +359,30 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
         theme: "dark",
       });
     }
+  };
 
-    // Clear the form or close modal after successful deletion
-    setDeleteModalOpen(false);
-  } catch (error) {
-    console.error("Error deleting invoice:", error);
-    toast.error("An error occurred while deleting invoice", {
-      position: "bottom-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: false,
-      draggable: true,
-      progress: 0,
-      theme: "dark",
-    });
-  }
-};
+  const renderCell = React.useCallback(
+    (item, columnKey) => {
+      const cellValue = item[columnKey];
 
-  const renderCell = React.useCallback((item, columnKey) => {
-    const cellValue = item[columnKey];
-
-    switch (columnKey) {
-      case "role":
-        return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-          </div>
-        );
-      case "status":
-        return (
-          <Chip
-            className="capitalize"
-            color={statusColorMap[item.rec_etat]}
-            size="sm"
-            variant="flat"
-          >
-            {cellValue}
-          </Chip>
-        );
+      switch (columnKey) {
+        case "role":
+          return (
+            <div className="flex flex-col">
+              <p className="text-bold text-small capitalize">{cellValue}</p>
+            </div>
+          );
+        case "status":
+          return (
+            <Chip
+              className="capitalize"
+              color={statusColorMap[item.rec_etat]}
+              size="sm"
+              variant="flat"
+            >
+              {cellValue}
+            </Chip>
+          );
         case "actions":
           return (
             <div className="relative flex items-center gap-2">
@@ -521,8 +524,10 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
           );
         default:
           return cellValue;
-    }
-  }, [isMobile]);
+      }
+    },
+    [isMobile]
+  );
 
   const topContent = React.useMemo(() => {
     return (
@@ -607,38 +612,36 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
               <ModalBody>
                 {isMobile ? (
                   <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4">
-                  <Input
+                    <Input
                       isReadOnly
                       label="Résidant"
                       variant="bordered"
                       labelPlacement="outside"
                       className="max-w-sm"
-                        classNames={{
-                          label:
-                            "group-data-[filled-within=true]:text-zinc-400",
-                          input: [
-                            "bg-transparent",
-                            "group-data-[has-value=true]:text-white/90",
-                          ],
-                          innerWrapper: "bg-transparent",
-                          inputWrapper: [
-                            "bg-transparent",
-                            "group-data-[hover=true]:bg-zinc-800",
-                            "group-data-[hover=true]:border-zinc-500",
-                            "group-data-[focus=true]:bg-transparent ",
-                            "group-data-[focus=true]:border-zinc-400 ",
-                            "!cursor-text",
-                            "border-zinc-600",
-                          ],
-                        }}
-                        defaultValue={currentReclamation.nom}
-                        onChange={(e) => 
-                          setCurrentReclamation({
-                            ...currentReclamation,
-                            nom: e.target.value,
-                          })
-
-                        }
+                      classNames={{
+                        label: "group-data-[filled-within=true]:text-zinc-400",
+                        input: [
+                          "bg-transparent",
+                          "group-data-[has-value=true]:text-white/90",
+                        ],
+                        innerWrapper: "bg-transparent",
+                        inputWrapper: [
+                          "bg-transparent",
+                          "group-data-[hover=true]:bg-zinc-800",
+                          "group-data-[hover=true]:border-zinc-500",
+                          "group-data-[focus=true]:bg-transparent ",
+                          "group-data-[focus=true]:border-zinc-400 ",
+                          "!cursor-text",
+                          "border-zinc-600",
+                        ],
+                      }}
+                      defaultValue={currentReclamation.nom}
+                      onChange={(e) =>
+                        setCurrentReclamation({
+                          ...currentReclamation,
+                          nom: e.target.value,
+                        })
+                      }
                     />
                     <Input
                       isReadOnly
@@ -647,30 +650,29 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                       labelPlacement="outside"
                       defaultValue={currentReclamation.rec_type}
                       className="max-w-sm"
-                        classNames={{
-                          label:
-                            "group-data-[filled-within=true]:text-zinc-400",
-                          input: [
-                            "bg-transparent",
-                            "group-data-[has-value=true]:text-white/90",
-                          ],
-                          innerWrapper: "bg-transparent",
-                          inputWrapper: [
-                            "bg-transparent",
-                            "group-data-[hover=true]:bg-zinc-800",
-                            "group-data-[hover=true]:border-zinc-500",
-                            "group-data-[focus=true]:bg-transparent ",
-                            "group-data-[focus=true]:border-zinc-400 ",
-                            "!cursor-text",
-                            "border-zinc-600",
-                          ],
-                        }}
-                        onChange={(e) => 
-                          setCurrentReclamation({
-                            ...currentReclamation,
-                            type_rec: e.target.value,
-                          })
-                        }
+                      classNames={{
+                        label: "group-data-[filled-within=true]:text-zinc-400",
+                        input: [
+                          "bg-transparent",
+                          "group-data-[has-value=true]:text-white/90",
+                        ],
+                        innerWrapper: "bg-transparent",
+                        inputWrapper: [
+                          "bg-transparent",
+                          "group-data-[hover=true]:bg-zinc-800",
+                          "group-data-[hover=true]:border-zinc-500",
+                          "group-data-[focus=true]:bg-transparent ",
+                          "group-data-[focus=true]:border-zinc-400 ",
+                          "!cursor-text",
+                          "border-zinc-600",
+                        ],
+                      }}
+                      onChange={(e) =>
+                        setCurrentReclamation({
+                          ...currentReclamation,
+                          type_rec: e.target.value,
+                        })
+                      }
                     />
                     <Textarea
                       isReadOnly
@@ -679,31 +681,29 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                       labelPlacement="outside"
                       defaultValue={currentReclamation.rec_desc}
                       className="max-w-sm"
-                        classNames={{
-                          label:
-                            "group-data-[filled-within=true]:text-zinc-400",
-                          input: [
-                            "bg-transparent",
-                            "group-data-[has-value=true]:text-white/90",
-                          ],
-                          innerWrapper: "bg-transparent",
-                          inputWrapper: [
-                            "bg-transparent",
-                            "group-data-[hover=true]:bg-zinc-800",
-                            "group-data-[hover=true]:border-zinc-500",
-                            "group-data-[focus=true]:bg-transparent ",
-                            "group-data-[focus=true]:border-zinc-400 ",
-                            "!cursor-text",
-                            "border-zinc-600",
-                          ],
-                        }}
-                        
-                        onChange={(e) => 
-                          setCurrentReclamation({
-                            ...currentReclamation,
-                            rec_desc: e.target.value,
-                          })
-                        }
+                      classNames={{
+                        label: "group-data-[filled-within=true]:text-zinc-400",
+                        input: [
+                          "bg-transparent",
+                          "group-data-[has-value=true]:text-white/90",
+                        ],
+                        innerWrapper: "bg-transparent",
+                        inputWrapper: [
+                          "bg-transparent",
+                          "group-data-[hover=true]:bg-zinc-800",
+                          "group-data-[hover=true]:border-zinc-500",
+                          "group-data-[focus=true]:bg-transparent ",
+                          "group-data-[focus=true]:border-zinc-400 ",
+                          "!cursor-text",
+                          "border-zinc-600",
+                        ],
+                      }}
+                      onChange={(e) =>
+                        setCurrentReclamation({
+                          ...currentReclamation,
+                          rec_desc: e.target.value,
+                        })
+                      }
                     />
                     <Input
                       isReadOnly
@@ -712,30 +712,29 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                       labelPlacement="outside"
                       defaultValue={currentReclamation.rec_date}
                       className="max-w-sm"
-                        classNames={{
-                          label:
-                            "group-data-[filled-within=true]:text-zinc-400",
-                          input: [
-                            "bg-transparent",
-                            "group-data-[has-value=true]:text-white/90",
-                          ],
-                          innerWrapper: "bg-transparent",
-                          inputWrapper: [
-                            "bg-transparent",
-                            "group-data-[hover=true]:bg-zinc-800",
-                            "group-data-[hover=true]:border-zinc-500",
-                            "group-data-[focus=true]:bg-transparent ",
-                            "group-data-[focus=true]:border-zinc-400 ",
-                            "!cursor-text",
-                            "border-zinc-600",
-                          ],
-                        }}
-                        onChange={(e) => 
-                          setCurrentReclamation({
-                            ...currentReclamation,
-                            rec_date: e.target.value,
-                          })
-                        }
+                      classNames={{
+                        label: "group-data-[filled-within=true]:text-zinc-400",
+                        input: [
+                          "bg-transparent",
+                          "group-data-[has-value=true]:text-white/90",
+                        ],
+                        innerWrapper: "bg-transparent",
+                        inputWrapper: [
+                          "bg-transparent",
+                          "group-data-[hover=true]:bg-zinc-800",
+                          "group-data-[hover=true]:border-zinc-500",
+                          "group-data-[focus=true]:bg-transparent ",
+                          "group-data-[focus=true]:border-zinc-400 ",
+                          "!cursor-text",
+                          "border-zinc-600",
+                        ],
+                      }}
+                      onChange={(e) =>
+                        setCurrentReclamation({
+                          ...currentReclamation,
+                          rec_date: e.target.value,
+                        })
+                      }
                     />
                     <Input
                       isReadOnly
@@ -744,30 +743,29 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                       labelPlacement="outside"
                       defaultValue={currentReclamation.rec_etat}
                       className="max-w-sm"
-                        classNames={{
-                          label:
-                            "group-data-[filled-within=true]:text-zinc-400",
-                          input: [
-                            "bg-transparent",
-                            "group-data-[has-value=true]:text-white/90",
-                          ],
-                          innerWrapper: "bg-transparent",
-                          inputWrapper: [
-                            "bg-transparent",
-                            "group-data-[hover=true]:bg-zinc-800",
-                            "group-data-[hover=true]:border-zinc-500",
-                            "group-data-[focus=true]:bg-transparent ",
-                            "group-data-[focus=true]:border-zinc-400 ",
-                            "!cursor-text",
-                            "border-zinc-600",
-                          ],
-                        }}
-                        onChange={(e) => 
-                          setCurrentReclamation({
-                            ...currentReclamation,
-                            rec_etat: e.target.value,
-                          })
-                        }
+                      classNames={{
+                        label: "group-data-[filled-within=true]:text-zinc-400",
+                        input: [
+                          "bg-transparent",
+                          "group-data-[has-value=true]:text-white/90",
+                        ],
+                        innerWrapper: "bg-transparent",
+                        inputWrapper: [
+                          "bg-transparent",
+                          "group-data-[hover=true]:bg-zinc-800",
+                          "group-data-[hover=true]:border-zinc-500",
+                          "group-data-[focus=true]:bg-transparent ",
+                          "group-data-[focus=true]:border-zinc-400 ",
+                          "!cursor-text",
+                          "border-zinc-600",
+                        ],
+                      }}
+                      onChange={(e) =>
+                        setCurrentReclamation({
+                          ...currentReclamation,
+                          rec_etat: e.target.value,
+                        })
+                      }
                     />
                     <Input
                       isReadOnly
@@ -776,30 +774,29 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                       labelPlacement="outside"
                       defaultValue={currentReclamation.rec_response}
                       className="max-w-sm"
-                        classNames={{
-                          label:
-                            "group-data-[filled-within=true]:text-zinc-400",
-                          input: [
-                            "bg-transparent",
-                            "group-data-[has-value=true]:text-white/90",
-                          ],
-                          innerWrapper: "bg-transparent",
-                          inputWrapper: [
-                            "bg-transparent",
-                            "group-data-[hover=true]:bg-zinc-800",
-                            "group-data-[hover=true]:border-zinc-500",
-                            "group-data-[focus=true]:bg-transparent ",
-                            "group-data-[focus=true]:border-zinc-400 ",
-                            "!cursor-text",
-                            "border-zinc-600",
-                          ],
-                        }}
-                        onChange={(e) => 
-                          setCurrentReclamation({
-                            ...currentReclamation,
-                            rec_response: e.target.value,
-                          })
-                        }
+                      classNames={{
+                        label: "group-data-[filled-within=true]:text-zinc-400",
+                        input: [
+                          "bg-transparent",
+                          "group-data-[has-value=true]:text-white/90",
+                        ],
+                        innerWrapper: "bg-transparent",
+                        inputWrapper: [
+                          "bg-transparent",
+                          "group-data-[hover=true]:bg-zinc-800",
+                          "group-data-[hover=true]:border-zinc-500",
+                          "group-data-[focus=true]:bg-transparent ",
+                          "group-data-[focus=true]:border-zinc-400 ",
+                          "!cursor-text",
+                          "border-zinc-600",
+                        ],
+                      }}
+                      onChange={(e) =>
+                        setCurrentReclamation({
+                          ...currentReclamation,
+                          rec_response: e.target.value,
+                        })
+                      }
                     />
                   </div>
                 ) : (
@@ -830,7 +827,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
-                        onChange={(e) => 
+                        onChange={(e) =>
                           setCurrentReclamation({
                             ...currentReclamation,
                             nom: e.target.value,
@@ -862,7 +859,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
-                        onChange={(e) => 
+                        onChange={(e) =>
                           setCurrentReclamation({
                             ...currentReclamation,
                             num_de_log: e.target.value,
@@ -897,7 +894,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
-                        onChange={(e) => 
+                        onChange={(e) =>
                           setCurrentReclamation({
                             ...currentReclamation,
                             type_log: e.target.value,
@@ -931,7 +928,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
-                        onChange={(e) => 
+                        onChange={(e) =>
                           setCurrentReclamation({
                             ...currentReclamation,
                             ameliored: e.target.value,
@@ -965,7 +962,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                             "border-zinc-600",
                           ],
                         }}
-                        onChange={(e) => 
+                        onChange={(e) =>
                           setCurrentReclamation({
                             ...currentReclamation,
                             rec_desc: e.target.value,
@@ -1120,16 +1117,16 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                       handleStatusChange(keys.currentKey)
                     }
                   >
-                    <SelectItem key="resolu" textValue="Résolu">
+                    <SelectItem key="résolu" textValue="résolu">
                       Résolu
                     </SelectItem>
-                    <SelectItem key="inacheve" textValue="Inachevé">
+                    <SelectItem key="non résolu" textValue="non résolu">
                       Inachevé
                     </SelectItem>
-                    <SelectItem key="attente" textValue="Attente">
+                    <SelectItem key="en attente" textValue="en attente">
                       Attente
                     </SelectItem>
-                    <SelectItem key="annuler" textValue="Annulée">
+                    <SelectItem key="Annulé" textValue="Annulé">
                       Annulée
                     </SelectItem>
                   </Select>
@@ -1173,7 +1170,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                   onPress={onClose}
                 >
                   Fermer
-                  </Button>
+                </Button>
                 {currentReclamation && currentReclamation.nom && (
                   <Button
                     color="primary"
@@ -1188,7 +1185,9 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                         );
                       }
                     }}
-                  >Continuer</Button>
+                  >
+                    Continuer
+                  </Button>
                 )}
               </ModalFooter>
             </>

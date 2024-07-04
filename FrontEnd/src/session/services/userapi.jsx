@@ -203,3 +203,15 @@ export const fetchStatisticsGraph = async (jwt) => {
     throw error;
   }
 };
+
+//forgot password
+export const forgotPassword = async (email) => {
+  try {
+    const response = await axios.post(`${baseURL}/user/forgot-password`, {
+      email,
+    });
+    return response.data;
+  } catch (error) {
+    throw new Error("An error occurred while processing your request");
+  }
+};

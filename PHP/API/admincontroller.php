@@ -710,8 +710,8 @@ class AdminController
             $rec_id = filter_var($data['rec_id'], FILTER_VALIDATE_INT);
             $rec_etat = htmlspecialchars($data['rec_etat'], ENT_QUOTES, 'UTF-8');
 
-            // Validate rec_etat against enum values
-            $allowed_rec_etats = ['en attente', 'en cours', 'résolu'];
+
+            $allowed_rec_etats = ['en attente', 'non résolu', 'résolu', 'annulé'];
             if (!in_array($rec_etat, $allowed_rec_etats)) {
                 http_response_code(400); // Bad Request
                 echo json_encode(['status' => 'error', 'message' => 'Invalid rec_etat value']);
@@ -839,14 +839,15 @@ class AdminController
         }
     }
 
-    //get logement statistices
-    public function getLogementStatistiquesAPI()
-    {
-        $response = $this->admin->getLogementStatistiques();
-        http_response_code(200);
-        echo json_encode($response);
-        exit;
-    }
+
+    // //get logement statistices
+    // public function getLogementStatistiquesAPI()
+    // {
+    //     $response = $this->admin->getLogementStatistiques();
+    //     http_response_code(200);
+    //     echo json_encode($response);
+    //     exit;
+    // }
     
 
 

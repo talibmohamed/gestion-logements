@@ -136,7 +136,14 @@ const Overview = () => {
     },
   ];
 
-  const xLabels = statistics?.logement_history?.months;
+  let xLabels = statistics?.logement_history?.months || [
+    "Janvier",
+    "Fevrier",
+    "Mars",
+    "Avril",
+    "May",
+    "Juin",
+  ];
 
   return (
     <div className="container mx-auto">

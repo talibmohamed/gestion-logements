@@ -247,4 +247,19 @@ class UserController
             exit;
         }
     }
+
+    
+    //forgotpassword
+    public function forgotPasswordAPI($data)
+    {
+        if ($data && isset($data['email'])) {
+            $email = $data['email'];
+            $response = $this->residant->forgotPassword($email);
+            http_response_code(200);
+            echo json_encode($response);
+        } else {
+            http_response_code(400);
+            echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
+        }
+    }
 }

@@ -550,4 +550,106 @@ class residant
             ];
         }
     }
+
+    public function forgotPassword($email)
+    {
+        try {
+            $connection = $this->db->getConnection();
+
+            // Check if the email exists in the database
+            $stmt = $connection->prepare("SELECT * FROM residant WHERE email = ?");
+            $stmt->execute([$email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$user) {
+                return [
+                    'status' => 'error',
+                    'message' => 'Aucun utilisateur trouvé avec cet email.'
+                ];
+            }
+
+            // Generate a random token
+            $token = bin2hex(random_bytes(16));
+
+            // Insert the token into the database
+            $stmt = $connection->prepare("UPDATE residant SET login_token = ? WHERE email = ?");
+            $stmt->execute([$token, $email]);
+
+            // Send email with reset link
+            $resetLink = "http://localhost:5173/reset-password?token=$token";
+            $subject = 'Réinitialisation du mot de passe';
+            $body = "
+            <html>
+            <head>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: 20px auto;
+                        padding: 20px;
+                        border: 1px solid #ccc;
+                        border-radius: 5px;
+                        background-color: #f9f9f9;
+                    }
+                    h2 {
+                        font-size: 24px;
+                        color: #333;
+                    }
+                    p {
+                        margin: 10px 0;
+                    }
+                    a {
+                        color: #007bff;
+                        text-decoration: none;
+                    }
+                    a:hover {
+                        text-decoration: underline;
+                    }
+                    .footer {
+                        margin-top: 20px;
+                        font-size: 14px;
+                        color: #555;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class='container'>
+                    <h2>Mot de passe oublié</h2>
+                    <p>Vous avez demandé une réinitialisation de mot de passe. Cliquez sur le lien ci-dessous pour réinitialiser votre mot de passe :</p>
+                    <p><a href='$resetLink'>Réinitialiser le mot de passe</a></
+                    <p>Si vous n'avez pas demandé de réinitialisation de mot de passe, ignorez cet email.</p>
+                    <p>Cordialement,<br>houselytics</p>
+                    <p class='footer'>Ceci est un email automatique, merci de ne pas y répondre.</p>
+                </div>
+            </body>
+            </html>
+        ";
+
+            if (sendEmail($email, $user['nom'], $user['prenom'], $subject, $body)) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Un email de réinitialisation a été envoyé à votre adresse.'
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'Erreur lors de l\'envoi de l\'email de réinitialisation.'
+                ];
+            }
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => 'Erreur de base de données: ' . $e->getMessage()
+            ];
+        } catch (Exception $e) {
+            return [
+                'status' => 'error',
+                'message' => 'Erreur: ' . $e->getMessage()
+            ];
+        }
+    }
 }

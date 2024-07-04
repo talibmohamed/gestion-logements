@@ -4,19 +4,16 @@ import { Box } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import PropTypes from "prop-types";
 
-
-const xLabels = ["Janvier", "Fevrier", "Mars", "Avril", "May", "Juin"];
-
-const ReclaGraph = ({ title, data }) => {
+const ReclaGraph = ({ title, data, xLabels }) => {
   const getWidth = () => {
     if (window.innerWidth <= 640) {
       return 400; // made for mobile screens
     } else if (window.innerWidth <= 900) {
       return 700; // made for tablet screens
-    } else if(window.innerWidth <= 1024){
+    } else if (window.innerWidth <= 1024) {
       return 750; // I made it for larger screens
-    } else{
-      return 1200; 
+    } else {
+      return 1200;
     }
   };
 

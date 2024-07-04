@@ -239,6 +239,7 @@ const LogTable = ({ columns, rows, title }) => {
   const dispatch = useDispatch();
 
   const handleAddLogement = async () => {
+    console.log(newLogement);
     // Validate all fields before dispatching
     if (
       newLogement.type_log === "" ||
@@ -248,7 +249,18 @@ const LogTable = ({ columns, rows, title }) => {
       newLogement.superficie === "" ||
       newLogement.address === ""
     ) {
-      // Handle invalid form data
+      // Handle invalid form data send toast
+      toast.error("Veuillez remplir tous les champs", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+
       return;
     }
 
@@ -270,6 +282,7 @@ const LogTable = ({ columns, rows, title }) => {
     // Dispatch the action to add logement
     try {
       const response = await dispatch(addLogementThunk(logementData));
+      console.log(response);
 
       // Display success message
       if (response && response.payload.status === "success") {
@@ -1034,11 +1047,12 @@ const LogTable = ({ columns, rows, title }) => {
                         "text-white/90",
                       ],
                     }}
-                    name={newLogement?.statut}
+                    name="statut" // Make sure this matches the state property in newLogement
+                    value={newLogement.statut} // Reflects the selected value in the component
                     onChange={(e) =>
                       setNewLogement({
                         ...newLogement,
-                        statut: e.target.name,
+                        statut: e.target.value, // Update the state with the selected value
                       })
                     }
                   >
@@ -1048,14 +1062,8 @@ const LogTable = ({ columns, rows, title }) => {
                     <SelectItem key="occupé" value="occupé">
                       occupé
                     </SelectItem>
-                    <SelectItem key="non_disponible" value="non_disponible">
-                      non disponible
-                    </SelectItem>
-                    <SelectItem key="en_maintenance" value="en_maintenance">
+                    <SelectItem key="en maintenance" value="en maintenance">
                       en maintenance
-                    </SelectItem>
-                    <SelectItem key="autre" value="autre">
-                      autre
                     </SelectItem>
                   </Select>
                 </div>

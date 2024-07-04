@@ -1,14 +1,13 @@
-import React,{useEffect} from "react";
+import React, { useEffect } from "react";
 import "./Statics.scss";
 import { columns, statusReclOptions } from "./components/reclaData.jsx";
 import ReclamationTable from "./components/reclaTab.jsx";
 import ReclaGraph from "./components/reclaGraph";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, CardBody } from "@nextui-org/react";
-import {
-  fetchReclamationsThunk,
-} from "../../../../session/thunks/adminthunk";
-
+import { fetchReclamationsThunk } from "../../../../session/thunks/adminthunk";
+import { ToastContainer } from "react-toastify";
+import { fetchStatisticsThunk } from "../../../../session/thunks/adminthunk";
 const Reclamation = () => {
   const dispatch = useDispatch();
   const reclamations = useSelector((state) => state.reclamation.reclamations);
@@ -17,6 +16,7 @@ const Reclamation = () => {
     const fetchData = async () => {
       try {
         const response = await dispatch(fetchReclamationsThunk()).unwrap();
+        await dispatch(fetchStatisticsThunk());
         console.log(response);
       } catch (error) {
         console.error("Error fetching reclamations:", error);
@@ -26,7 +26,6 @@ const Reclamation = () => {
     fetchData();
   }, [dispatch]);
 
-  
   // Transform reclamations data to match the table's expected structure
   const transformedReclamations = reclamations.map((reclamation) => ({
     id: reclamation.rec_id,
@@ -38,12 +37,26 @@ const Reclamation = () => {
     rec_etat: reclamation.rec_etat,
     rec_response: reclamation.rec_response,
   }));
+
+  const statistics = useSelector((state) => state.statistics.statistics);
+
   const sampleData = [
     {
       label: "total des réclamations par mois",
-      data: [20, 10, 10, 3, 6, 11],
+      data: statistics?.reclamation?.reclamation_counts || [0, 0, 0, 0, 0, 0],
       color: "#96A7FF",
     },
+  ];
+
+  //mouths and default values
+
+  let xLabels = statistics?.logement_history?.months || [
+    "Janvier",
+    "Fevrier",
+    "Mars",
+    "Avril",
+    "May",
+    "Juin",
   ];
 
   return (
@@ -63,8 +76,13 @@ const Reclamation = () => {
         </CardBody>
       </Card>
       <div className=" w-full reclGraph">
-        <ReclaGraph title="Graphe linéaire des logements" data={sampleData} />
+        <ReclaGraph
+          title="Graphe linéaire des logements"
+          data={sampleData}
+          xLabels={xLabels}
+        />
       </div>
+      <ToastContainer />
     </div>
   );
 };

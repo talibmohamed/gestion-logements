@@ -240,147 +240,196 @@ class admin
 
     public function getStatistics()
     {
-        $connection = $this->db->getConnection();
-        $curmois = date('n'); // Current month
-        $curyear = date('Y'); // Current year
+        try {
+            $connection = $this->db->getConnection();
+            $curmois = date('n'); // Current month
+            $curyear = date('Y'); // Current year
 
-        // Logement Statistics
-        // Prepare and execute the query to count all logements
-        $allStmt = $connection->prepare("SELECT COUNT(*) FROM logement");
-        $allStmt->execute();
-        $allLogements = $allStmt->fetchColumn();
+            // Logement Statistics
+            // Prepare and execute the query to count all logements
+            $allStmt = $connection->prepare("SELECT COUNT(*) FROM logement");
+            $allStmt->execute();
+            $allLogements = $allStmt->fetchColumn();
 
-        // Prepare and execute the query to count logements by statut
-        $statutStmt = $connection->prepare("SELECT statut, COUNT(*) AS count FROM logement GROUP BY statut");
-        $statutStmt->execute();
-        $statutCounts = $statutStmt->fetchAll(PDO::FETCH_ASSOC);
+            // Prepare and execute the query to count logements by statut
+            $statutStmt = $connection->prepare("SELECT statut, COUNT(*) AS count FROM logement GROUP BY statut");
+            $statutStmt->execute();
+            $statutCounts = $statutStmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Facture Statistics
-        // Calculate the number of paid factures for the current month
-        $paidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'payée' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
-        $paidStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
-        $paidStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
-        $paidStmt->execute();
-        $paidCount = $paidStmt->fetchColumn();
-
-        // Calculate the number of overdue factures for the current month
-        $overdueStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'en attente' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
-        $overdueStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
-        $overdueStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
-        $overdueStmt->execute();
-        $overdueCount = $overdueStmt->fetchColumn();
-
-        // Calculate the number of unpaid factures for the previous month
-        $lastMonth = $curmois - 1;
-        if ($lastMonth == 0) {
-            $lastMonth = 12; // Handle December of the previous year
-            $lastYear = $curyear - 1;
-        } else {
-            $lastYear = $curyear;
-        }
-        $unpaidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'en retard' AND DATE_PART('month', fac_date) = :lastMonth AND DATE_PART('year', fac_date) = :lastYear");
-        $unpaidStmt->bindValue(':lastMonth', $lastMonth, PDO::PARAM_INT);
-        $unpaidStmt->bindValue(':lastYear', $lastYear, PDO::PARAM_INT);
-        $unpaidStmt->execute();
-        $unpaidCount = $unpaidStmt->fetchColumn();
-
-        // Combine results into a single associative array
-        $logementStats = array();
-        foreach ($statutCounts as $statutCount) {
-            $logementStats[$statutCount['statut']] = $statutCount['count'];
-        }
-
-
-        // Prepare the SQL query
-        $historyStmt = $connection->prepare("
-        WITH months AS (
-            -- Generate a series of the last 6 months excluding the current month
-            SELECT 
-                TO_CHAR(DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 month' * generate_series, 'YYYY-MM') AS month_year,
-                EXTRACT(MONTH FROM DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 month' * generate_series) AS month_number
-            FROM generate_series(1, 6) AS t(generate_series)
-        )
-        SELECT 
-            m.month_year AS mois_annee,
-            CASE m.month_number
-                WHEN 1 THEN 'Janvier'
-                WHEN 2 THEN 'Février'
-                WHEN 3 THEN 'Mars'
-                WHEN 4 THEN 'Avril'
-                WHEN 5 THEN 'Mai'
-                WHEN 6 THEN 'Juin'
-                WHEN 7 THEN 'Juillet'
-                WHEN 8 THEN 'Août'
-                WHEN 9 THEN 'Septembre'
-                WHEN 10 THEN 'Octobre'
-                WHEN 11 THEN 'Novembre'
-                WHEN 12 THEN 'Décembre'
-            END AS month_name,
-            COALESCE(SUM(CASE WHEN lh.statut = 'disponible' THEN 1 ELSE 0 END), 0) AS disponible_count,
-            COALESCE(SUM(CASE WHEN lh.statut = 'en maintenance' THEN 1 ELSE 0 END), 0) AS en_maintenance_count,
-            COALESCE(SUM(CASE WHEN lh.statut = 'occupé' THEN 1 ELSE 0 END), 0) AS occupe_count
-        FROM 
-            months m
-        LEFT JOIN 
-            logement_history lh ON m.month_year = lh.month_year
-        GROUP BY 
-            m.month_year, m.month_number
-        ORDER BY 
-            m.month_year ASC
-    ");
-
-        // Execute the query
-        $historyStmt->execute();
-
-        // Initialize arrays to hold data
-        $disponible = [];
-        $enMaintenance = [];
-        $occupe = [];
-        $months = [];
-
-        // Fetch the results into an associative array
-        $results = $historyStmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Process the results into separate arrays
-        foreach ($results as $row) {
-            $months[] = $row['month_name'];
-            $disponible[] = (int) $row['disponible_count'];
-            $enMaintenance[] = (int) $row['en_maintenance_count'];
-            $occupe[] = (int) $row['occupe_count'];
-        }
-
-        // Combine the processed data into a single array
-        $historyStats = [
-            'months' => $months,
-            'disponible' => $disponible,
-            'en_maintenance' => $enMaintenance,
-            'occupe' => $occupe
-        ];
-
-
-        $response = array(
-            'statistics' => array(
-                'facture' => array(
-                    'total_paid_count' => $paidCount,
-                    'total_overdue_count' => $overdueCount,
-                    'total_unpaid_count' => $unpaidCount,
-                    'last_update_date' => date('Y-m-d H:i:s') // Current date in standard format
-                ),
-                'logement' => array_merge(
-                    ['total_logements_count' => $allLogements],
-                    $logementStats
-                ),
-                'logement_history' => $historyStats
+            // Prepare and execute the query to retrieve logement history statistics
+            $historyStmt = $connection->prepare("
+            WITH months AS (
+                -- Generate a series of the last 6 months excluding the current month
+                SELECT 
+                    TO_CHAR(DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 month' * generate_series, 'YYYY-MM') AS month_year,
+                    EXTRACT(MONTH FROM DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 month' * generate_series) AS month_number
+                FROM generate_series(1, 6) AS t(generate_series)
             )
-        );
+            SELECT 
+                m.month_year AS mois_annee,
+                CASE m.month_number
+                    WHEN 1 THEN 'Janvier'
+                    WHEN 2 THEN 'Février'
+                    WHEN 3 THEN 'Mars'
+                    WHEN 4 THEN 'Avril'
+                    WHEN 5 THEN 'Mai'
+                    WHEN 6 THEN 'Juin'
+                    WHEN 7 THEN 'Juillet'
+                    WHEN 8 THEN 'Août'
+                    WHEN 9 THEN 'Septembre'
+                    WHEN 10 THEN 'Octobre'
+                    WHEN 11 THEN 'Novembre'
+                    WHEN 12 THEN 'Décembre'
+                END AS month_name,
+                COALESCE(SUM(CASE WHEN lh.statut = 'disponible' THEN 1 ELSE 0 END), 0) AS disponible_count,
+                COALESCE(SUM(CASE WHEN lh.statut = 'en maintenance' THEN 1 ELSE 0 END), 0) AS en_maintenance_count,
+                COALESCE(SUM(CASE WHEN lh.statut = 'occupé' THEN 1 ELSE 0 END), 0) AS occupe_count
+            FROM 
+                months m
+            LEFT JOIN 
+                logement_history lh ON m.month_year = lh.month_year
+            GROUP BY 
+                m.month_year, m.month_number
+            ORDER BY 
+                m.month_year ASC
+        ");
+            $historyStmt->execute();
+            $historyStats = $historyStmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Set the content type header to application/json
-        header('Content-Type: application/json');
+            // Facture Statistics
+            // Calculate the number of paid factures for the current month
+            $paidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'payée' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
+            $paidStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
+            $paidStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
+            $paidStmt->execute();
+            $paidCount = $paidStmt->fetchColumn();
 
-        // Return the JSON response
-        echo json_encode($response);
-        exit; // Ensure no further output is appended
+            // Calculate the number of overdue factures for the current month
+            $overdueStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'en attente' AND DATE_PART('month', fac_date) = :curmois AND DATE_PART('year', fac_date) = :curyear");
+            $overdueStmt->bindValue(':curmois', $curmois, PDO::PARAM_INT);
+            $overdueStmt->bindValue(':curyear', $curyear, PDO::PARAM_INT);
+            $overdueStmt->execute();
+            $overdueCount = $overdueStmt->fetchColumn();
+
+            // Calculate the number of unpaid factures for the previous month
+            $lastMonth = $curmois - 1;
+            if ($lastMonth == 0) {
+                $lastMonth = 12; // Handle December of the previous year
+                $lastYear = $curyear - 1;
+            } else {
+                $lastYear = $curyear;
+            }
+            $unpaidStmt = $connection->prepare("SELECT COUNT(*) FROM facture WHERE fac_etat = 'en retard' AND DATE_PART('month', fac_date) = :lastMonth AND DATE_PART('year', fac_date) = :lastYear");
+            $unpaidStmt->bindValue(':lastMonth', $lastMonth, PDO::PARAM_INT);
+            $unpaidStmt->bindValue(':lastYear', $lastYear, PDO::PARAM_INT);
+            $unpaidStmt->execute();
+            $unpaidCount = $unpaidStmt->fetchColumn();
+
+            // Reclamation Statistics
+            // Prepare the SQL query to count reclamations by month for the last 6 months
+            $reclamationStmt = $connection->prepare("
+            WITH months AS (
+                SELECT 
+                    TO_CHAR(DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 month' * generate_series, 'YYYY-MM') AS month_year,
+                    EXTRACT(MONTH FROM DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 month' * generate_series) AS month_number
+                FROM generate_series(0, 5) AS t(generate_series)
+            )
+            SELECT 
+                m.month_year AS mois_annee,
+                CASE EXTRACT(MONTH FROM TO_DATE(m.month_year, 'YYYY-MM'))
+                    WHEN 1 THEN 'Janvier'
+                    WHEN 2 THEN 'Février'
+                    WHEN 3 THEN 'Mars'
+                    WHEN 4 THEN 'Avril'
+                    WHEN 5 THEN 'Mai'
+                    WHEN 6 THEN 'Juin'
+                    WHEN 7 THEN 'Juillet'
+                    WHEN 8 THEN 'Août'
+                    WHEN 9 THEN 'Septembre'
+                    WHEN 10 THEN 'Octobre'
+                    WHEN 11 THEN 'Novembre'
+                    WHEN 12 THEN 'Décembre'
+                END AS month_name,
+                COALESCE(COUNT(r.rec_id), 0) AS reclamation_count
+            FROM 
+                months m
+            LEFT JOIN 
+                reclamation r ON m.month_year = TO_CHAR(DATE_TRUNC('MONTH', r.rec_date), 'YYYY-MM')
+            GROUP BY 
+                m.month_year, month_name
+            ORDER BY 
+                m.month_year ASC
+        ");
+            $reclamationStmt->execute();
+            $reclamationStats = $reclamationStmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Process reclamation statistics into separate arrays for months and counts
+            $reclamationMonths = [];
+            $reclamationCounts = [];
+            foreach ($reclamationStats as $stat) {
+                $reclamationMonths[] = $stat['month_name']; // Fetch month names
+                $reclamationCounts[] = (int) $stat['reclamation_count'];
+            }
+
+            // Format logement statistics into a structured array
+            $logementStats = [
+                'total_logements_count' => $allLogements,
+            ];
+            foreach ($statutCounts as $stat) {
+                $logementStats[$stat['statut']] = (int) $stat['count'];
+            }
+
+            // Format history statistics into separate arrays for months and counts
+            $disponible = [];
+            $enMaintenance = [];
+            $occupe = [];
+            $historyMonths = [];
+            foreach ($historyStats as $row) {
+                $historyMonths[] = $row['month_name'];
+                $disponible[] = (int) $row['disponible_count'];
+                $enMaintenance[] = (int) $row['en_maintenance_count'];
+                $occupe[] = (int) $row['occupe_count'];
+            }
+
+            // Prepare the final response array
+            $response = [
+                'statistics' => [
+                    'facture' => [
+                        'total_paid_count' => $paidCount,
+                        'total_overdue_count' => $overdueCount,
+                        'total_unpaid_count' => $unpaidCount,
+                        'last_update_date' => date('Y-m-d H:i:s') // Current date in standard format
+                    ],
+                    'logement' => $logementStats,
+                    'logement_history' => [
+                        'months' => $historyMonths,
+                        'disponible' => $disponible,
+                        'en_maintenance' => $enMaintenance,
+                        'occupe' => $occupe
+                    ],
+                    'reclamation' => [
+                        'months' => $reclamationMonths,
+                        'reclamation_counts' => $reclamationCounts
+                    ]
+                ]
+            ];
+
+            // Set the content type header to application/json
+            header('Content-Type: application/json');
+
+            // Return the JSON response
+            echo json_encode($response);
+            exit; // Ensure no further output is appended
+        } catch (PDOException $e) {
+            // Handle database errors
+            error_log('Error fetching statistics: ' . $e->getMessage());
+            // Optionally return an error response
+            http_response_code(500); // Internal Server Error
+            echo json_encode(['error' => 'Unable to fetch statistics.']);
+            exit;
+        }
     }
+
 
 
     public function getAllLogement()
@@ -1335,12 +1384,25 @@ class admin
     {
         try {
             $connection = $this->db->getConnection();
+            $connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             // Extract data from $data array
             $rec_id = $data['rec_id'];
             $rec_etat = $data['rec_etat'];
 
-            // Prepare SQL statement with named placeholders
+            // Fetch existing reclamation details for notification
+            $stmt = $connection->prepare("SELECT * FROM reclamation WHERE rec_id = ?");
+            $stmt->execute([$rec_id]);
+            $reclamation = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$reclamation) {
+                return [
+                    'status' => 'error',
+                    'message' => 'Reclamation not found.'
+                ];
+            }
+
+            // Prepare SQL statement with named placeholders for update
             $sql = $connection->prepare('UPDATE reclamation SET rec_etat = :rec_etat WHERE rec_id = :rec_id');
 
             // Execute SQL statement with data bindings
@@ -1349,10 +1411,50 @@ class admin
                 ':rec_etat' => $rec_etat
             ]);
 
-            return [
-                'status' => 'success',
-                'message' => 'Reclamation updated successfully'
-            ];
+            // Insert notification into database
+            $res_id = $reclamation['res_id'];
+            $notificationTitle = 'Réclamation mise à jour';
+            $notificationDesc = "Votre réclamation a été mise à jour. État: $rec_etat.";
+            $stmtNotification = $connection->prepare('INSERT INTO notification (notif_titre, notif_desc, res_id) VALUES (:notif_titre, :notif_desc, :res_id)');
+            $stmtNotification->execute([
+                ':notif_titre' => $notificationTitle,
+                ':notif_desc' => $notificationDesc,
+                ':res_id' => $res_id
+            ]);
+
+            // Fetch residant details for email notification
+            $stmtResidant = $connection->prepare("SELECT * FROM residant WHERE res_id = ?");
+            $stmtResidant->execute([$res_id]);
+            $residant = $stmtResidant->fetch(PDO::FETCH_ASSOC);
+
+            if (!$residant) {
+                return [
+                    'status' => 'error',
+                    'message' => 'User not found.'
+                ];
+            }
+
+            // Send email notification
+            $recipientEmail = $residant['email'];
+            $recipientNom = $residant['nom'];
+            $recipientPrenom = $residant['prenom'];
+            $subject = 'Réclamation mise à jour';
+            $body = "Bonjour $recipientNom $recipientPrenom, <br><br> Votre réclamation a été mise à jour. <br> État: $rec_etat <br><br> Cordialement, <br> L'équipe Houselytics";
+
+            if (sendEmail($recipientEmail, $recipientNom, $recipientPrenom, $subject, $body)) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Réclamation mise à jour avec succès. Notification envoyée par email.'
+                ];
+            } else {
+                return [
+                    'status' => 'success',
+                    'message' => 'Réclamation mise à jour avec succès. Erreur lors de l\'envoi de la notification par email.'
+                ];
+            }
+
+            // Close the connection
+            $connection = null;
         } catch (PDOException $e) {
             // Return error response if an exception occurs
             return [
@@ -1361,6 +1463,7 @@ class admin
             ];
         }
     }
+
 
     //delete reclamation
     public function deleteReclamation($rec_id)
@@ -1470,62 +1573,65 @@ class admin
         }
     }
 
-    public function getLogementStatistiques()
-    {
-        try {
-            $connection = $this->db->getConnection();
+    // forgotPassword
+    
 
-            // Prepare the SQL query
-            $sql = $connection->prepare("
-                WITH months AS (
-                    -- Generate a series of the last 6 months excluding the current month
-                    SELECT 
-                        TO_CHAR(DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 month' * generate_series, 'YYYY-MM') AS month_year,
-                        EXTRACT(MONTH FROM DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 month' * generate_series) AS month_number
-                    FROM generate_series(1, 6) AS t(generate_series)
-                )
-                SELECT 
-                    m.month_year AS mois_annee,
-                    CASE m.month_number
-                        WHEN 1 THEN 'Janvier'
-                        WHEN 2 THEN 'Février'
-                        WHEN 3 THEN 'Mars'
-                        WHEN 4 THEN 'Avril'
-                        WHEN 5 THEN 'Mai'
-                        WHEN 6 THEN 'Juin'
-                        WHEN 7 THEN 'Juillet'
-                        WHEN 8 THEN 'Août'
-                        WHEN 9 THEN 'Septembre'
-                        WHEN 10 THEN 'Octobre'
-                        WHEN 11 THEN 'Novembre'
-                        WHEN 12 THEN 'Décembre'
-                    END AS month_name,
-                    COALESCE(COUNT(CASE WHEN lh.statut = 'disponible' THEN 1 END), 0) AS disponible,
-                    COALESCE(COUNT(CASE WHEN lh.statut = 'en maintenance' THEN 1 END), 0) AS en_maintenance,
-                    COALESCE(COUNT(CASE WHEN lh.statut = 'occupé' THEN 1 END), 0) AS occupé
-                FROM 
-                    months m
-                LEFT JOIN 
-                    logement_history lh ON m.month_year = lh.month_year
-                GROUP BY 
-                    m.month_year, m.month_number
-                ORDER BY 
-                    m.month_year DESC
-            ");
+    // public function getLogementStatistiques()
+    // {
+    //     try {
+    //         $connection = $this->db->getConnection();
 
-            // Execute the query
-            $sql->execute();
-            $statistics = $sql->fetchAll(PDO::FETCH_ASSOC);
+    //         // Prepare the SQL query
+    //         $sql = $connection->prepare("
+    //             WITH months AS (
+    //                 -- Generate a series of the last 6 months excluding the current month
+    //                 SELECT 
+    //                     TO_CHAR(DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 month' * generate_series, 'YYYY-MM') AS month_year,
+    //                     EXTRACT(MONTH FROM DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 month' * generate_series) AS month_number
+    //                 FROM generate_series(1, 6) AS t(generate_series)
+    //             )
+    //             SELECT 
+    //                 m.month_year AS mois_annee,
+    //                 CASE m.month_number
+    //                     WHEN 1 THEN 'Janvier'
+    //                     WHEN 2 THEN 'Février'
+    //                     WHEN 3 THEN 'Mars'
+    //                     WHEN 4 THEN 'Avril'
+    //                     WHEN 5 THEN 'Mai'
+    //                     WHEN 6 THEN 'Juin'
+    //                     WHEN 7 THEN 'Juillet'
+    //                     WHEN 8 THEN 'Août'
+    //                     WHEN 9 THEN 'Septembre'
+    //                     WHEN 10 THEN 'Octobre'
+    //                     WHEN 11 THEN 'Novembre'
+    //                     WHEN 12 THEN 'Décembre'
+    //                 END AS month_name,
+    //                 COALESCE(COUNT(CASE WHEN lh.statut = 'disponible' THEN 1 END), 0) AS disponible,
+    //                 COALESCE(COUNT(CASE WHEN lh.statut = 'en maintenance' THEN 1 END), 0) AS en_maintenance,
+    //                 COALESCE(COUNT(CASE WHEN lh.statut = 'occupé' THEN 1 END), 0) AS occupé
+    //             FROM 
+    //                 months m
+    //             LEFT JOIN 
+    //                 logement_history lh ON m.month_year = lh.month_year
+    //             GROUP BY 
+    //                 m.month_year, m.month_number
+    //             ORDER BY 
+    //                 m.month_year DESC
+    //         ");
 
-            return [
-                'status' => 'success',
-                'statistics' => $statistics
-            ];
-        } catch (PDOException $e) {
-            return [
-                'status' => 'error',
-                'message' => $e->getMessage()
-            ];
-        }
-    }
+    //         // Execute the query
+    //         $sql->execute();
+    //         $statistics = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+    //         return [
+    //             'status' => 'success',
+    //             'statistics' => $statistics
+    //         ];
+    //     } catch (PDOException $e) {
+    //         return [
+    //             'status' => 'error',
+    //             'message' => $e->getMessage()
+    //         ];
+    //     }
+    // }
 }
