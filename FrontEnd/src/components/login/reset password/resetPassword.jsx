@@ -7,17 +7,20 @@ import { useNavigate } from "react-router-dom";
 import { Button, Input } from "@nextui-org/react";
 import { EyeFilledIcon } from "../EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../EyeSlashFilledIcon";
-import { changePasswordThunk } from "../../../session/thunks/userthunks"; // Import the changePasswordThunk
-import { checkTokenThunk } from "../../../session/thunks/userthunks"; // Import the checkTokenThunk
+import {
+  changePasswordThunk,
+  checkTokenThunk,
+} from "../../../session/thunks/userthunks"; // Import the changePasswordThunk and checkTokenThunk
 import { logout } from "../../../session/authentication";
 
-const resetPassword = () => {
+const ResetPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmedPassword, setConfirmedPassword] = useState("");
   const [error, setError] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+  const [token, setToken] = useState(""); // Add state for the token
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [isVisible, setIsVisible] = useState(false);
   const user = useSelector((state) => state.user);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
@@ -32,10 +35,10 @@ const resetPassword = () => {
 
     try {
       const action = await dispatch(
-        changePasswordThunk({ password, confirmedPassword })
+        changePasswordThunk({ password, confirmedPassword})
       );
+
       const response = action.payload;
-      console.log(response);
 
       if (response.status === "success") {
         dispatch(logout());
@@ -52,22 +55,26 @@ const resetPassword = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const params = new URLSearchParams(location.search);
-      const token = params.get("login_token");
-      console.log(token);
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get("token");
       if (token) {
+        setToken(token); // Save the token in state
         try {
           const action = await dispatch(checkTokenThunk(token));
           const response = action.payload;
-          console.log(response);
+          if (response.status !== "success") {
+            setError("Invalid or expired token.");
+          }
         } catch (error) {
           console.error("Error:", error);
         }
+      } else {
+        setError("Token not provided.");
       }
     };
 
-    fetchData(); // Call the async function inside useEffect
-  }, []); // Empty dependency array to run once on component mount
+    fetchData();
+  }, [dispatch]);
 
   return (
     <div className="bg-background min-h-screen flex items-center justify-center">
@@ -84,7 +91,6 @@ const resetPassword = () => {
           </h2>
           {error && <div className="error">{error}</div>}
           <form className="flex flex-col gap-2" onSubmit={handleSubmit}>
-            
             <div className="password-group">
               <Input
                 isRequired
@@ -146,4 +152,4 @@ const resetPassword = () => {
   );
 };
 
-export default resetPassword;
+export default ResetPassword;

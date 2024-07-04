@@ -5,10 +5,15 @@ import sunset from "./sunset.jpeg";
 import "../style.scss";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { loginUserThunk } from "../../../session/thunks/userthunks";
+import {
+  loginUserThunk,
+  forgotPasswordThunk,
+} from "../../../session/thunks/userthunks";
 import { EyeFilledIcon } from "../EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../EyeSlashFilledIcon";
 import { MailIcon } from "./MailIcon.jsx";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import CSS for react-toastify
 import {
   Modal,
   ModalContent,
@@ -17,7 +22,6 @@ import {
   ModalFooter,
   Button,
   useDisclosure,
-  Checkbox,
   Input,
   Link,
 } from "@nextui-org/react";
@@ -26,21 +30,13 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [forgotEmail, setForgotEmail] = useState(""); // Added state for forgot email
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const toggleVisibility = () => setIsVisible(!isVisible);
-
-  //get the massage send in the url
-  const urlParams = new URLSearchParams(window.location.search);
-  const myParam = urlParams.get("message");
-
-  //set the massage in error
-  if (myParam) {
-    setError(myParam);
-  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,6 +54,71 @@ const Login = () => {
     }
   };
 
+  // Function to handle email confirmation
+  const handleConfirmEmail = async () => {
+    if (forgotEmail) {
+      console.log(forgotEmail);
+      // Show loading toast while processing
+      const loadingToastId = toast.loading("Sending email...", {
+        position: "bottom-right",
+        autoClose: false,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
+
+      try {
+        const action = await dispatch(forgotPasswordThunk(forgotEmail));
+        const response = action.payload;
+        console.log(response);
+        if (response.status === "success") {
+          toast.update(loadingToastId, {
+            render: "Email sent successfully",
+            type: "success",
+            isLoading: false,
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+        } else {
+          toast.update(loadingToastId, {
+            render: response.message,
+            type: "error",
+            isLoading: false,
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+        }
+      } catch {
+        toast.update(loadingToastId, {
+          render: "Error sending email",
+          type: "error",
+          isLoading: false,
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      }
+    } else {
+      console.log("Email not entered");
+    }
+  };
   return (
     <div className="bg-background min-h-screen flex items-center justify-center">
       {/* Login container */}
@@ -207,6 +268,7 @@ const Login = () => {
                         label="Email"
                         placeholder="Entrer votre adresse courriel"
                         variant="bordered"
+                        onChange={(e) => setForgotEmail(e.target.value)} // Update forgot email state
                         classNames={{
                           label:
                             "group-data-[filled-within=true]:text-zinc-400",
@@ -228,7 +290,13 @@ const Login = () => {
                       />
                     </ModalBody>
                     <ModalFooter>
-                      <Button color="primary" onPress={onClose}>
+                      <Button
+                        color="primary"
+                        onPress={() => {
+                          handleConfirmEmail(); // Call the function to log the email
+                          onClose(); // Close the modal
+                        }}
+                      >
                         Confirmer
                       </Button>
                     </ModalFooter>
@@ -244,6 +312,7 @@ const Login = () => {
           <img className="rounded-2xl" src={sunset} alt="Sunset" />
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };

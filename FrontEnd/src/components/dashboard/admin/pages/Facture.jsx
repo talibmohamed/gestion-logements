@@ -63,7 +63,7 @@ const Facture = () => {
         <CardBody>
           <FactureTable
             columns={columns}
-            rows={users}
+            rows={transformedFactures}
             statusOptions={statusOptions.map((option) => option.uid)}
             title="Factures"
           />

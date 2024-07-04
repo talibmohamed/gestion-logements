@@ -219,7 +219,8 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
   const dispatch = useDispatch();
 
   const handleAddFacture = async () => {
-    // Validate all fields before dispatching
+    console.log(newFacture);
+
     if (
       newFacture.fac_id === "" ||
       newFacture.nom === "" ||
@@ -722,15 +723,18 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                               popoverContent: ["bg-zinc-800", "text-white/90"],
                             }}
                             value={newFacture.res_id}
-                            onChange={(e) =>
+                            onChange={(value) =>
                               setNewFacture({
                                 ...newFacture,
-                                res_id: e.target.value,
+                                res_id: value.target.res_id, // Capture the res_id
                               })
                             }
                           >
                             {(item) => (
-                              <AutocompleteItem key={item.res_id} textValue={`${item.nom} ${item.prenom} (RES${item.res_id})`}>
+                              <AutocompleteItem
+                                key={item.res_id}
+                                textValue={`${item.nom} ${item.prenom} (RES${item.res_id})`}
+                              >
                                 <div
                                   style={{
                                     display: "flex",
@@ -800,18 +804,18 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                             className="max-w-sm"
                             classNames={{
                               label:
-                              "group-data-[filled-within=true]:text-zinc-400",
-                            input: [
-                              "bg-transparent",
-                              "group-data-[has-value=true]:text-white/90",
-                            ],
-                            innerWrapper: "bg-transparent",
-                            inputWrapper: [
-                              "bg-zinc-800",
-                              "group-data-[hover=true]:bg-zinc-800",
-                              "group-data-[focus=true]:bg-zinc-800 ",
-                              "!cursor-text",
-                            ],
+                                "group-data-[filled-within=true]:text-zinc-400",
+                              input: [
+                                "bg-transparent",
+                                "group-data-[has-value=true]:text-white/90",
+                              ],
+                              innerWrapper: "bg-transparent",
+                              inputWrapper: [
+                                "bg-zinc-800",
+                                "group-data-[hover=true]:bg-zinc-800",
+                                "group-data-[focus=true]:bg-zinc-800 ",
+                                "!cursor-text",
+                              ],
                             }}
                             startContent={
                               <div className="pointer-events-none flex items-center">
@@ -820,7 +824,7 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                                 </span>
                               </div>
                             }
-                            defaultValue={newFacture.fac_total}
+                            Value={newFacture.fac_total}
                             onChange={(e) =>
                               setNewFacture({
                                 ...newFacture,
@@ -873,61 +877,61 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                         </div>
 
                         <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4 datePicker">
-                        <DatePicker
+                          <DatePicker
                             type="date"
                             label="Mois de consommation"
                             className="max-w-sm"
                             classNames={{
                               label:
-                              "group-data-[filled-within=true]:text-zinc-400",
-                            input: [
-                              "bg-transparent",
-                              "group-data-[has-value=true]:text-white/90",
-                            ],
-                            innerWrapper: "bg-transparent",
-                            inputWrapper: [
-                              "bg-zinc-800",
-                              "group-data-[hover=true]:bg-zinc-800",
-                              "group-data-[focus=true]:bg-zinc-800 ",
-                              "!cursor-text",
-                            ],
+                                "group-data-[filled-within=true]:text-zinc-400",
+                              input: [
+                                "bg-transparent",
+                                "group-data-[has-value=true]:text-white/90",
+                              ],
+                              innerWrapper: "bg-transparent",
+                              inputWrapper: [
+                                "bg-zinc-800",
+                                "group-data-[hover=true]:bg-zinc-800",
+                                "group-data-[focus=true]:bg-zinc-800 ",
+                                "!cursor-text",
+                              ],
                             }}
-                            defaultValue={newFacture.fac_date}
-                            onChange={(e) =>
+                            tValue={newFacture.fac_date}
+                            onChange={(value) =>
                               setNewFacture({
                                 ...newFacture,
-                                fac_date: e.target.value,
+                                fac_date: value,
                               })
                             }
                           />
-                        <DatePicker
+
+                          <DatePicker
                             type="date"
                             label="Date d'echeance"
                             className="max-w-sm"
                             classNames={{
                               label:
-                              "group-data-[filled-within=true]:text-zinc-400",
-                            input: [
-                              "bg-transparent",
-                              "group-data-[has-value=true]:text-white/90",
-                            ],
-                            innerWrapper: "bg-transparent",
-                            inputWrapper: [
-                              "bg-zinc-800",
-                              "group-data-[hover=true]:bg-zinc-800",
-                              "group-data-[focus=true]:bg-zinc-800 ",
-                              "!cursor-text",
-                            ],
+                                "group-data-[filled-within=true]:text-zinc-400",
+                              input: [
+                                "bg-transparent",
+                                "group-data-[has-value=true]:text-white/90",
+                              ],
+                              innerWrapper: "bg-transparent",
+                              inputWrapper: [
+                                "bg-zinc-800",
+                                "group-data-[hover=true]:bg-zinc-800",
+                                "group-data-[focus=true]:bg-zinc-800 ",
+                                "!cursor-text",
+                              ],
                             }}
                             defaultValue={newFacture.fac_echeance}
-                            onChange={(e) =>
+                            onChange={(value) =>
                               setNewFacture({
                                 ...newFacture,
-                                fac_echeance: e.target.value,
+                                fac_echeance: value,
                               })
                             }
                           />
-
                         </div>
                       </ModalBody>
                       <ModalFooter>

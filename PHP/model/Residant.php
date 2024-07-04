@@ -197,7 +197,7 @@ class residant
                     $newJwtToken = $newJwtHandler->generateJwtToken($res_id, 'residant');
 
                     // Call the profile function with the new JWT token
-                    $profileResult = $this->profile($newJwtToken);
+                    $profileResult = $this->profile($res_id);
 
                     // Check if the profile call was successful
                     if ($profileResult['status'] === 'success') {
@@ -577,7 +577,7 @@ class residant
             $stmt->execute([$login_token, $email]);
 
             // Send email with reset link
-            $resetLink = "http://localhost:5173/reset-password?token=$token";
+            $resetLink = "http://localhost:5173/reset-password?token=$login_token";
             $subject = 'Réinitialisation du mot de passe';
             $body = "
             <html>

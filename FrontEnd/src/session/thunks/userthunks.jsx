@@ -28,6 +28,10 @@ import { setLogements } from "../logementSlice";
 import { fetchStatisticsGraph } from "../services/userapi";
 import { setgraphs } from "../graphSlice";
 
+// import for forgot password
+import { forgotPassword } from "../services/userapi";
+
+
 // Thunk to handle user login
 export const loginUserThunk = createAsyncThunk(
   "user/loginUser",
@@ -261,8 +265,9 @@ export const fetchStatisticsGraphThunk = createAsyncThunk(
 //call forgotPassword
 export const forgotPasswordThunk = createAsyncThunk(
   "user/forgotPassword",
-  async (email, { dispatch }) => {
+  async (forgotEmail, { dispatch }) => {
     try {
+      const email = forgotEmail;
       const response = await forgotPassword(email);
       return response;
     } catch (error) {
