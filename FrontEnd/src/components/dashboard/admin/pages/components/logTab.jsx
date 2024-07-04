@@ -46,7 +46,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "nom",
   "type_log",
   "ameliored",
-  "log_statut",
+  "statut",
   "mc",
   "address",
   "quotaE",
@@ -115,7 +115,7 @@ const LogTable = ({ columns, rows, statusLogOptions, title }) => {
   const [newLogement, setNewLogement] = useState({
     type_log: "",
     ameliore: "",
-    log_statut: "",
+    status: "",
     nb_pieces: "",
     superficie: "",
     address: "",
@@ -131,7 +131,7 @@ const LogTable = ({ columns, rows, statusLogOptions, title }) => {
       is_ameliore: logement.is_ameliore,
       piece: logement.piece,
       mc: logement.mc,
-      log_status: logement.log_status,
+      status: logement.status,
       address: logement.address,
     });
     setEditModalOpen(true);
@@ -239,7 +239,7 @@ const LogTable = ({ columns, rows, statusLogOptions, title }) => {
     if (
       newLogement.type_log === "" ||
       newLogement.ameliore === "" ||
-      newLogement.log_statut == "" ||
+      newLogement.status == "" ||
       newLogement.nb_pieces === "" ||
       newLogement.superficie === "" ||
       newLogement.address === ""
@@ -266,7 +266,7 @@ const LogTable = ({ columns, rows, statusLogOptions, title }) => {
     const logementData = {
       type_log: newLogement.type_log,
       is_ameliore: amelioreBoolean,
-      log_status: newLogement.log_statut,
+      status: newLogement.status,
       piece: parseInt(newLogement.nb_pieces),
       mc: parseInt(newLogement.superficie),
       address: newLogement.address,
@@ -338,7 +338,7 @@ const LogTable = ({ columns, rows, statusLogOptions, title }) => {
       currentLogement.ameliored === "" ||
       currentLogement.piece === "" ||
       currentLogement.mc === "" ||
-      currentLogement.log_statut === "" || 
+      currentLogement.status === "" || 
       currentLogement.address === ""
     ) {
       // Handle invalid form data
@@ -535,11 +535,11 @@ const LogTable = ({ columns, rows, statusLogOptions, title }) => {
               </Tooltip>
             </div>
           );
-          case "log_statut":
+          case "status":
             return (
               <Chip
                 className="capitalize"
-                color={statusColorMap[item.log_statut]}
+                color={statusColorMap[item.status]}
                 size="sm"
                 variant="flat"
               >
@@ -1769,7 +1769,7 @@ LogTable.propTypes = {
         .isRequired,
       nom: PropTypes.string.isRequired,
       type_log: PropTypes.string.isRequired,
-      log_statut: PropTypes.string.isRequired,
+      status: PropTypes.string.isRequired,
       ameliored: PropTypes.string,
       equip: PropTypes.arrayOf(PropTypes.string),
       actions: PropTypes.string,

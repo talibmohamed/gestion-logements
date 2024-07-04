@@ -56,7 +56,7 @@ const SMALL_DEVICE_COLUMNS = [
 ];
 
 const statusColorMap = {
-  annulée: "grey",
+  annulé: "grey",
   résolu: "secondary",
   "non résolu": "primary",
   "en attente": "warning",

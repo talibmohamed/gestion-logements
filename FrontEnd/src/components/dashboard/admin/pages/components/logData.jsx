@@ -8,7 +8,7 @@ const columns = [
   { name: "Pièces ( Superficie m² )", uid: "mc" },
   { name: "Electricité (kWh / mois) ", uid: "quotaE" },
   { name: "Eau (m³ / mois)", uid: "quotaW" },
-  { name: "Statut", uid: "log_statut", sortable: true },
+  { name: "Statut", uid: "status", sortable: true },
   { name: "Equipements", uid: "equip" },
   { name: "Actions", uid: "actions" },
 ];
@@ -24,7 +24,7 @@ const mockData = [
     mc: "4 (120 m²)",
     quotaE: "350 kWh",
     quotaW: "15 m³",
-    log_statut: "en maintenance",
+    status: "en maintenance",
     equip: "Meublé",
     actions: "Modifier / Supprimer",
   },]
