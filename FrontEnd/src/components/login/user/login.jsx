@@ -6,9 +6,21 @@ import "../style.scss";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { loginUserThunk } from "../../../session/thunks/userthunks";
-import { Link, Button, Input } from "@nextui-org/react";
 import { EyeFilledIcon } from "../EyeFilledIcon";
 import { EyeSlashFilledIcon } from "../EyeSlashFilledIcon";
+import { MailIcon } from "./MailIcon.jsx";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  useDisclosure,
+  Checkbox,
+  Input,
+  Link,
+} from "@nextui-org/react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -17,6 +29,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
@@ -24,14 +37,14 @@ const Login = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const myParam = urlParams.get("message");
 
-  //set the massage in error 
+  //set the massage in error
   if (myParam) {
     setError(myParam);
   }
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const action = await dispatch(loginUserThunk({ email, password }));
       const response = action.payload; // Extract the payload data
@@ -44,7 +57,6 @@ const Login = () => {
       setError(error.message);
     }
   };
-  
 
   return (
     <div className="bg-background min-h-screen flex items-center justify-center">
@@ -138,9 +150,92 @@ const Login = () => {
             </Button>
           </div>
           <div className="text-center">
-            <Link className="text-[#3b82f6] mt-4 text-sm" href="#">
+            <Link
+              onPress={onOpen}
+              className="text-[#3b82f6] mt-4 text-sm"
+              href="#"
+            >
               Mot de passe oublié?
             </Link>
+            <Modal
+              size="md"
+              classNames={{
+                base: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
+                closeButton: "hover:bg-white/5 active:bg-white/10",
+              }}
+              backdrop="opaque"
+              isOpen={isOpen}
+              onOpenChange={onOpenChange}
+              motionProps={{
+                variants: {
+                  enter: {
+                    y: 0,
+                    opacity: 1,
+                    transition: {
+                      duration: 0.3,
+                      ease: "easeOut",
+                    },
+                  },
+                  exit: {
+                    y: -20,
+                    opacity: 0,
+                    transition: {
+                      duration: 0.2,
+                      ease: "easeIn",
+                    },
+                  },
+                },
+              }}
+            >
+              <ModalContent>
+                {(onClose) => (
+                  <>
+                    <ModalHeader className="flex flex-col gap-1">
+                      Difficultés de connexion?
+                    </ModalHeader>
+                    <ModalBody>
+                      <p>
+                        Entrez votre adresse courriel et nous vous enverrons un
+                        lien pour récupérer votre compte.
+                      </p>
+                      <Input
+                        size="md"
+                        autoFocus
+                        endContent={
+                          <MailIcon className="text-2xl text-default-400 pointer-events-none flex-shrink-0" />
+                        }
+                        label="Email"
+                        placeholder="Entrer votre adresse courriel"
+                        variant="bordered"
+                        classNames={{
+                          label:
+                            "group-data-[filled-within=true]:text-zinc-400",
+                          input: [
+                            "bg-transparent",
+                            "group-data-[has-value=true]:text-white/90",
+                          ],
+                          innerWrapper: "bg-transparent",
+                          inputWrapper: [
+                            "bg-transparent",
+                            "group-data-[hover=true]:bg-zinc-800",
+                            "group-data-[hover=true]:border-zinc-500",
+                            "group-data-[focus=true]:bg-transparent ",
+                            "group-data-[focus=true]:border-zinc-400 ",
+                            "!cursor-text",
+                            "border-zinc-600",
+                          ],
+                        }}
+                      />
+                    </ModalBody>
+                    <ModalFooter>
+                      <Button color="primary" onPress={onClose}>
+                        Sign in
+                      </Button>
+                    </ModalFooter>
+                  </>
+                )}
+              </ModalContent>
+            </Modal>
           </div>
         </div>
 
