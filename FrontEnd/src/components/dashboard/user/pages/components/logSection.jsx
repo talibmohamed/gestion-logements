@@ -131,10 +131,12 @@ const LogSection = ({ title }) => {
       </div>
       <div
         className="gap-7 grid"
-        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}
+        style={{
+          gridTemplateColumns: isMobile ? "1fr" : "repeat(auto-fit, minmax(300px, 1fr))",
+        }}
       >
         <Card
-          className={`max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm`}
+          className={`max-w-full bg-[#171821] bg-opacity-10 backdrop-blur-sm`}
         >
           <CardHeader className="flex gap-3">
             <TipsAndUpdatesOutlinedIcon sx={{ color: "#ff8906" }} />
@@ -190,7 +192,7 @@ const LogSection = ({ title }) => {
         </Card>
 
         <Card
-          className={`max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm`}
+          className={`max-w-full bg-[#171821] bg-opacity-10 backdrop-blur-sm`}
         >
           <CardHeader className="flex gap-3 ">
             <AutoFixHighOutlinedIcon sx={{ color: "#ff8906" }} />
@@ -326,7 +328,7 @@ const LogSection = ({ title }) => {
         </Card>
 
         <Card
-          className={`max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm`}
+          className={`max-w-full bg-[#171821] bg-opacity-10 backdrop-blur-sm`}
         >
           <CardHeader className="flex gap-3">
             <SettingsSuggestOutlinedIcon sx={{ color: "#ff8906" }} />
@@ -547,7 +549,7 @@ const LogSection = ({ title }) => {
         </Card>
 
         <Card
-          className={`max-w-[400px] bg-[#171821] bg-opacity-10 backdrop-blur-sm`}
+          className={`max-w-full bg-[#171821] bg-opacity-10 backdrop-blur-sm`}
         >
           <CardHeader className="flex gap-3">
             <FlagOutlinedIcon sx={{ color: "#ff8906" }} />

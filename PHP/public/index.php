@@ -122,6 +122,7 @@ function route($uri, $method)
             }
             break;
 
+
             //logement
         case '/api/v1/user/logement':
             if ($method === 'GET') {
@@ -145,7 +146,7 @@ function route($uri, $method)
                 http_response_code(405);
                 echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
             }
-
+            break;
 
             //change password
 

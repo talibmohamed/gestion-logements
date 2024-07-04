@@ -24,6 +24,10 @@ import {
 import { setReclamations } from "../reclamationSlice";
 import { setLogements } from "../logementSlice";
 
+// import for get grash
+import { fetchStatisticsGraph } from "../services/userapi";
+import { setgraphs } from "../graphSlice";
+
 // Thunk to handle user login
 export const loginUserThunk = createAsyncThunk(
   "user/loginUser",
@@ -225,6 +229,29 @@ export const fetchLogementThunk = createAsyncThunk(
       return response;
     } catch (error) {
       console.error("Error fetching logement details:", error);
+      throw error;
+    }
+  }
+);
+
+//fetch statistics graph
+
+export const fetchStatisticsGraphThunk = createAsyncThunk(
+  "user/fetchStatisticsGraph",
+  async (_, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+    try {
+      const response = await fetchStatisticsGraph(jwt);
+      console.log(
+        "response from fetchStatisticsGraphThunk",
+        response.statistics
+      );
+      console.log(response);
+      dispatch(setgraphs(response.statistics));
+      return response;
+    } catch (error) {
+      console.error("Error fetching statistics graph:", error);
       throw error;
     }
   }

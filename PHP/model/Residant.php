@@ -133,8 +133,6 @@ class residant
     }
 
 
-
-
     //old password shoudlt be the same as new password
     public function changepassword($jwt, $password, $confirmedpassword)
     {
@@ -484,46 +482,60 @@ class residant
 
             // Query to fetch consumption statistics with month names in French
             $sql = $connection->prepare('
-            WITH months AS (
+                WITH months AS (
+                    SELECT 
+                        to_char(date_trunc(\'month\', current_date) - interval \'1 month\' * generate_series(0, 5), \'YYYY-MM\') AS month_year,
+                        EXTRACT(MONTH FROM date_trunc(\'month\', current_date) - interval \'1 month\' * generate_series(0, 5)) AS month_number
+                )
                 SELECT 
-                    to_char(date_trunc(\'month\', current_date) - interval \'1 month\' * generate_series(0, 5), \'YYYY-MM\') AS month_year,
-                    EXTRACT(MONTH FROM date_trunc(\'month\', current_date) - interval \'1 month\' * generate_series(0, 5)) AS month_number
-            )
-            SELECT 
-                m.month_year,
-                CASE m.month_number
-                    WHEN 1 THEN \'Janvier\'
-                    WHEN 2 THEN \'Février\'
-                    WHEN 3 THEN \'Mars\'
-                    WHEN 4 THEN \'Avril\'
-                    WHEN 5 THEN \'Mai\'
-                    WHEN 6 THEN \'Juin\'
-                    WHEN 7 THEN \'Juillet\'
-                    WHEN 8 THEN \'Août\'
-                    WHEN 9 THEN \'Septembre\'
-                    WHEN 10 THEN \'Octobre\'
-                    WHEN 11 THEN \'Novembre\'
-                    WHEN 12 THEN \'Décembre\'
-                END AS month_name,
-                COALESCE(SUM(c.elec_actuel), 0) AS elec_actuel,
-                COALESCE(SUM(c.eau_actuel), 0) AS eau_actuel
-            FROM 
-                months m
-            LEFT JOIN 
-                consommation c ON m.month_year = to_char(c.cons_date, \'YYYY-MM\') AND c.res_id = ?
-            GROUP BY 
-                m.month_year, m.month_number
-            ORDER BY 
-                m.month_year
-        ');
+                    m.month_year,
+                    CASE m.month_number
+                        WHEN 1 THEN \'Janvier\'
+                        WHEN 2 THEN \'Février\'
+                        WHEN 3 THEN \'Mars\'
+                        WHEN 4 THEN \'Avril\'
+                        WHEN 5 THEN \'Mai\'
+                        WHEN 6 THEN \'Juin\'
+                        WHEN 7 THEN \'Juillet\'
+                        WHEN 8 THEN \'Août\'
+                        WHEN 9 THEN \'Septembre\'
+                        WHEN 10 THEN \'Octobre\'
+                        WHEN 11 THEN \'Novembre\'
+                        WHEN 12 THEN \'Décembre\'
+                    END AS month_name,
+                    COALESCE(SUM(c.elec_actuel), 0) AS elec_actuel,
+                    COALESCE(SUM(c.eau_actuel), 0) AS eau_actuel
+                FROM 
+                    months m
+                LEFT JOIN 
+                    consommation c ON m.month_year = to_char(c.cons_date, \'YYYY-MM\') AND c.res_id = ?
+                GROUP BY 
+                    m.month_year, m.month_number
+                ORDER BY 
+                    m.month_year
+            ');
 
             $sql->execute([$res_id]);
             $statistics = $sql->fetchAll(PDO::FETCH_ASSOC);
 
             if ($statistics !== false) {
+                $electricity = [];
+                $water = [];
+                $months = [];
+
+                foreach ($statistics as $stat) {
+                    $electricity[] = $stat['elec_actuel'];
+                    $water[] = $stat['eau_actuel'];
+                    $months[] = $stat['month_name'];
+                }
+
                 return [
                     'status' => 'success',
-                    'statistics' => $statistics
+                    'statistics' => [
+                        'electricity' => $electricity,
+                        'water' => $water,
+                        'months' => $months
+                    ]
                 ];
             } else {
                 return [

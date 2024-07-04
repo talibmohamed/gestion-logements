@@ -184,3 +184,22 @@ export const fetchLogement = async (jwt) => {
     throw error;
   }
 };
+
+
+//get statisctics grash
+export const fetchStatisticsGraph = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/user/statisticsquota`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error in fetchStatisticsGraph:",
+      error.response || error.message || error
+    );
+    throw error;
+  }
+};

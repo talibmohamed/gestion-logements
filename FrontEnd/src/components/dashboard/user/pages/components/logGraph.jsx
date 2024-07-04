@@ -1,39 +1,44 @@
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Card, CardBody } from "@nextui-org/react";
-import { Box } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import PropTypes from "prop-types";
 
+const Graph = ({ title, data, xLabels }) => {
+  const cardRef = useRef(null);
+  const [chartWidth, setChartWidth] = useState(0);
 
-const xLabels = ["Janvier", "Fevrier", "Mars", "Avril", "May", "Juin"];
+  useEffect(() => {
+    const updateChartWidth = () => {
+      if (cardRef.current) {
+        setChartWidth(cardRef.current.clientWidth);
+      }
+    };
 
-const Graph = ({ title, data }) => {
-  const getWidth = () => {
-    if (window.innerWidth <= 640) {
-      return 400; // made for mobile screens
-    } else if (window.innerWidth <= 900) {
-      return 756; // made for tablet screens
-    } else if(window.innerWidth <= 1024){
-      return 731; // I made it for larger screens
-    } else if(window.innerWidth <= 1600){
-      return 575; // I made it for larger screens
-    } else{
-      return 680; 
-    }
-  };
+    // Initial width set
+    updateChartWidth();
+
+    // Update width on resize
+    window.addEventListener("resize", updateChartWidth);
+
+    // Cleanup event listener on unmount
+    return () => {
+      window.removeEventListener("resize", updateChartWidth);
+    };
+  }, []);
 
   return (
-    <div className="card-wrapper">
+    <div className="card-wrapper" ref={cardRef} style={{ width: '100%' }}>
       <Card
         isBlurred
         className="border-none bg-background/15 white:bg-default-100/50"
         shadow={false}
+        style={{ width: '100%' }}
       >
-        <CardBody>
+        <CardBody style={{ width: '100%' }}>
           <h2 className="mt-3 ml-3 text-left">{title}</h2>
-          <Box className="w-full">
+          <div className="w-full">
             <LineChart
-              width={getWidth()}
+              width={chartWidth} 
               height={300}
               series={data}
               xAxis={[{ data: xLabels, scaleType: "point" }]}
@@ -41,7 +46,7 @@ const Graph = ({ title, data }) => {
                 legend: { hidden: true },
               }}
             />
-          </Box>
+          </div>
           <div className="gap-12 custom-legend-graph">
             {data.map((item, index) => (
               <div className="legend-item-graph" key={index}>
@@ -67,6 +72,7 @@ Graph.propTypes = {
       value: PropTypes.number.isRequired,
     })
   ).isRequired,
+  xLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
 };
 
 export default Graph;
