@@ -873,62 +873,61 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                         </div>
 
                         <div className="flex w-full flex-wrap md:flex-nowrap items-center justify-center gap-4 datePicker">
-                          <Input
+                        <DatePicker
+                            type="date"
                             label="Mois de consommation"
-                            type="number"
-                            placeholder="AAAA-MM-JJ"
                             className="max-w-sm"
                             classNames={{
-                              label: "group-data-[filled-within=true]:text-zinc-400",
-                              input: [
-                                "bg-zinc-800",
-                                "group-data-[has-value=true]:text-white/90",
-                              ],
-                              innerWrapper: "bg-zinc-800",
-                              inputWrapper: [
-                                "bg-zinc-800",
-                                "group-data-[hover=true]:bg-zinc-800",
-                                "group-data-[focus=true]:bg-zinc-800 ",
-                                "group-data-[focus=true]:border-zinc-400 ",
-                                "!cursor-text",
-                              ],
+                              label:
+                              "group-data-[filled-within=true]:text-zinc-400",
+                            input: [
+                              "bg-transparent",
+                              "group-data-[has-value=true]:text-white/90",
+                            ],
+                            innerWrapper: "bg-transparent",
+                            inputWrapper: [
+                              "bg-zinc-800",
+                              "group-data-[hover=true]:bg-zinc-800",
+                              "group-data-[focus=true]:bg-zinc-800 ",
+                              "!cursor-text",
+                            ],
                             }}
-                            value={newFacture.fac_date}
+                            defaultValue={newFacture.fac_date}
                             onChange={(e) =>
                               setNewFacture({
                                 ...newFacture,
-                                fac_date:e.target.value,
+                                fac_date: e.target.value,
                               })
                             }
                           />
-                          <Input
-                            label="Mois de consommation"
-                            type="text"
-                            placeholder="AAAA-MM-JJ"
+                        <DatePicker
+                            type="date"
+                            label="Date d'echeance"
                             className="max-w-sm"
                             classNames={{
-                              label: "group-data-[filled-within=true]:text-zinc-400",
-                              input: [
-                                "bg-zinc-800",
-                                "group-data-[has-value=true]:text-white/90",
-                              ],
-                              innerWrapper: "bg-zinc-800",
-                              inputWrapper: [
-                                "bg-zinc-800",
-                                "group-data-[hover=true]:bg-zinc-800",
-                                "group-data-[focus=true]:bg-zinc-800 ",
-                                "group-data-[focus=true]:border-zinc-400 ",
-                                "!cursor-text",
-                              ],
+                              label:
+                              "group-data-[filled-within=true]:text-zinc-400",
+                            input: [
+                              "bg-transparent",
+                              "group-data-[has-value=true]:text-white/90",
+                            ],
+                            innerWrapper: "bg-transparent",
+                            inputWrapper: [
+                              "bg-zinc-800",
+                              "group-data-[hover=true]:bg-zinc-800",
+                              "group-data-[focus=true]:bg-zinc-800 ",
+                              "!cursor-text",
+                            ],
                             }}
-                            value={newFacture.fac_date}
+                            defaultValue={newFacture.fac_echeance}
                             onChange={(e) =>
                               setNewFacture({
                                 ...newFacture,
-                                fac_date:e.target.value,
+                                fac_echeance: e.target.value,
                               })
                             }
                           />
+
                         </div>
                       </ModalBody>
                       <ModalFooter>

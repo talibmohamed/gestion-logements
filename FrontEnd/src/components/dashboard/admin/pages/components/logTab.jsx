@@ -1069,8 +1069,11 @@ const LogTable = ({ columns, rows, title }) => {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="flat" onPress={onClose}>
-                  Close
+              <Button
+                  color="danger"
+                  variant="light"
+                  className="text-sm font-medium" onPress={onClose}>
+                  Fermer
                 </Button>
                 <Button color="primary" onPress={handleAddLogement}>
                   Enregistrer
@@ -1392,7 +1395,10 @@ const LogTable = ({ columns, rows, title }) => {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="flat" onClick={onClose}>
+              <Button
+                  color="danger"
+                  variant="light"
+                  className="text-sm font-medium" onClick={onClose}>
                   Fermer
                 </Button>
                 <Button color="primary" onClick={handleEditLogement}>
