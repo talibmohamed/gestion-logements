@@ -366,7 +366,7 @@ export const sendNotification = async (jwtToken, notificationData) => {
   }
 };
 
-// Function to fetch all consums
+
 export const fetchConsums = async (jwt) => {
   try {
     const response = await axios.get(`${baseURL}/admin/consommation`, {
@@ -374,6 +374,7 @@ export const fetchConsums = async (jwt) => {
         Authorization: `Bearer ${jwt}`,
       },
     });
+    console.log(response);
     return response.data;
   } catch (error) {
     console.error(

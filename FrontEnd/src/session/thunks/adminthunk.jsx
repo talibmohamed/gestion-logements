@@ -31,9 +31,11 @@ import {
   deleteFacture,
 } from "../services/adminapi";
 
-import { fetchReclamations,
+import {
+  fetchReclamations,
   updateReclamation,
-  deleteReclamation } from "../services/adminapi";
+  deleteReclamation,
+} from "../services/adminapi";
 
 import { sendNotification } from "../services/adminapi";
 import { fetchConsums, addConsum, updateConsum } from "../services/adminapi";
@@ -429,7 +431,10 @@ export const fetchConsumsThunk = createAsyncThunk(
 
     try {
       const response = await fetchConsums(jwt); // Call your API function to fetch Consums
-      dispatch(setConsums(response.consums));
+      dispatch(setConsums(response.consommations));
+      console.log('response');
+      console.log(response);
+      console.log('response');
       return response; // Return response if needed by the caller
     } catch (error) {
       console.error("Error fetching consums:", error);
@@ -437,7 +442,6 @@ export const fetchConsumsThunk = createAsyncThunk(
     }
   }
 );
-
 // Thunk to add a new consum
 export const addConsumThunk = createAsyncThunk(
   "consums/addConsum",
@@ -497,7 +501,6 @@ export const fetchReclamationsThunk = createAsyncThunk(
   }
 );
 
-
 // Thunk to update an existing Reclamation
 export const updateReclamationThunk = createAsyncThunk(
   "Reclamations/updateReclamation",
@@ -538,7 +541,6 @@ export const deleteReclamationThunk = createAsyncThunk(
     }
   }
 );
-
 
 export const fetchStatisticsGraphThunk = createAsyncThunk(
   "user/fetchStatisticsGraph",

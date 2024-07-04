@@ -1,6 +1,7 @@
+// Logement.jsx
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchLogementsThunk } from "../../../../session/thunks/adminthunk.jsx";
+import { fetchLogementsThunk, fetchConsumsThunk } from "../../../../session/thunks/adminthunk.jsx";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import LogTable from "./components/logTab.jsx";
 import ConsumTable from "./components/consommation.jsx";
@@ -33,19 +34,21 @@ const Logement = () => {
   }, []);
 
   const dispatch = useDispatch();
-  const logements = useSelector((state) => state.logements.logements);
-  // const consums = useSelector((state) => state.consums.consums);
+  const logements = useSelector((state) => state.logements?.logements);
+  const consums = useSelector((state) => state.consum?.consums);
+
+  console.log(consums);
 
   useEffect(() => {
     dispatch(fetchLogementsThunk());
   }, [dispatch]);
   
-  // useEffect(() => {
-  //   dispatch(fetchConsumsThunk());
-  // }, [dispatch]);
-
+  useEffect(() => {
+    dispatch(fetchConsumsThunk());
+  }, [dispatch]);
 
   const transformLogementsData = (logements) => {
+    if (!logements) return [];
     return logements.map((logement) => ({
       id: logement.log_id,
       num_de_log: logement.log_id,
@@ -56,25 +59,26 @@ const Logement = () => {
       piece: logement.piece,
       mc: logement.mc,
       address: logement.address,
-      quotaE: logement.quotas_electricite.toString(),
-      quotaW: logement.quotas_eau.toString(),
+      quotaE: logement.quotas_electricite?.toString() || "",
+      quotaW: logement.quotas_eau?.toString() || "",
       equipment_names: logement.equipment_names,
     }));
   };
 
-  // const transformConsumsData = (consums) => {
-  //   return consums.map((consum) => ({
-  //     id: consum.id,
-  //     num_de_log: consum.log_id,
-  //     nom: consum.nom,
-  //     type_log: consum.typelog,
-  //     ameliored: consum.is_ameliore ? "Oui" : "Non",
-  //     consumE: consum.consumE,
-  //     consumW: consum.consumW,
-  //   }));
-  // };
+  const transformConsumsData = (consums) => {
+    if (!consums) return [];
+    return consums.map((consum) => ({
+      id: consum.cons_id,
+      num_de_log: consum.log_id,
+      nom: consum.res_nom,
+      type_log: consum.typelog,
+      ameliored: consum.is_ameliore ? "Oui" : "Non",
+      consumE: consum.elec_actuel,
+      consumW: consum.eau_actuel,
+    }));
+  };
 
-  // const transformedConsums = transformConsumsData(consums);
+  const transformedConsums = transformConsumsData(consums);
   const transformedLogements = transformLogementsData(logements);
 
   return (
@@ -100,7 +104,7 @@ const Logement = () => {
           shadow="sm"
         >
           <CardBody>
-            {/* <ConsumTable columns={consumColumns} rows={transformedConsums} title="Consommation" /> */}
+            <ConsumTable columns={consumColumns} rows={transformedConsums} title="Consommation" />
           </CardBody>
         </Card>
       </div>

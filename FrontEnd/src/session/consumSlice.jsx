@@ -16,7 +16,7 @@ const consumSlice = createSlice({
       state.consums.push(action.payload);
     },
     updateConsum: (state, action) => {
-      const index = state.consums.findIndex(consum => consum.fac_id === action.payload.id);
+      const index = state.consums.findIndex(consum => consum.cons_id === action.payload.cons_id);
       if (index !== -1) {
         state.consums[index] = action.payload;
       }
