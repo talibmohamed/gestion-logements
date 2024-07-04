@@ -56,7 +56,7 @@ const SMALL_DEVICE_COLUMNS = [
 ];
 
 const statusColorMap = {
-  annulée: "primary",
+  annulée: "grey",
   résolu: "secondary",
   "non résolu": "primary",
   "en attente": "warning",
@@ -199,17 +199,13 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
   //   dispatch(fetchReclamationsThunk()); 
   // }, [dispatch]); 
 
+  const dispatch = useDispatch();
   
   const handleEditReclamation = async () => {
     // Validate all fields before dispatching
     if (
-     currentReclamation.rec_id === "" ||
-      currentReclamation.nom === "" ||
-      currentReclamation.rec_type === "" ||
-      currentReclamation.rec_desc === "" ||
-      currentReclamation.rec_date === "" ||
-      currentReclamation.rec_etat === "" ||
-      currentReclamation.rec_response === ""
+      currentReclamation.rec_id === "" ||
+      currentReclamation.rec_etat === "" 
     ) {
       // Handle invalid form data
       return;
@@ -218,12 +214,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     // Prepare the data to dispatch
     const reclamationData = {
       rec_id: currentReclamation.rec_id,
-      nom: currentReclamation.nom,
-      rec_type: currentReclamation.rec_type,
-      rec_desc: currentReclamation.rec_desc,
-      rec_date: currentReclamation.rec_date,
       rec_etat: currentReclamation.rec_etat,
-      rec_response: currentReclamatio
     };
 
     console.log(reclamationData);
@@ -1137,6 +1128,9 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     </SelectItem>
                     <SelectItem key="attente" textValue="Attente">
                       Attente
+                    </SelectItem>
+                    <SelectItem key="annuler" textValue="Annulée">
+                      Annulée
                     </SelectItem>
                   </Select>
                 </div>

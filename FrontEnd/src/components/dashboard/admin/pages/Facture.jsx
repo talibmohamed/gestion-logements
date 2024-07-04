@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import "./Overview.scss";
-import { columns, statusOptions } from "./components/facData";
+import { columns, users, statusOptions } from "./components/facData";
 import FactureTable from "./components/facTab.jsx";
 import { Card, CardBody } from "@nextui-org/react";
 import { useDispatch, useSelector } from "react-redux";
@@ -63,7 +63,7 @@ const Facture = () => {
         <CardBody>
           <FactureTable
             columns={columns}
-            rows={transformedFactures}
+            rows={users}
             statusOptions={statusOptions.map((option) => option.uid)}
             title="Factures"
           />
