@@ -204,13 +204,8 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
   const handleEditReclamation = async () => {
     // Validate all fields before dispatching
     if (
-     currentReclamation.rec_id === "" ||
-      currentReclamation.nom === "" ||
-      currentReclamation.rec_type === "" ||
-      currentReclamation.rec_desc === "" ||
-      currentReclamation.rec_date === "" ||
-      currentReclamation.rec_etat === "" ||
-      currentReclamation.rec_response === ""
+      currentReclamation.rec_id === "" ||
+      currentReclamation.rec_etat === "" 
     ) {
       // Handle invalid form data
       return;
@@ -219,12 +214,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     // Prepare the data to dispatch
     const reclamationData = {
       rec_id: currentReclamation.rec_id,
-      nom: currentReclamation.nom,
-      rec_type: currentReclamation.rec_type,
-      rec_desc: currentReclamation.rec_desc,
-      rec_date: currentReclamation.rec_date,
       rec_etat: currentReclamation.rec_etat,
-      rec_response: currentReclamation.rec_response,
     };
 
     console.log(reclamationData);
