@@ -29,7 +29,6 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-
 const Profile = () => {
   const position = [32.375289, -6.318726];
 
@@ -378,7 +377,8 @@ const Profile = () => {
                                 <ModalFooter>
                                   <Button
                                     color="danger"
-                                    variant="flat"
+                                    variant="light"
+                                    className="text-sm font-medium"
                                     onPress={onClose}
                                   >
                                     Fermer

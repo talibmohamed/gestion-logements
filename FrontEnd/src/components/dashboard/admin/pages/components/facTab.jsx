@@ -931,8 +931,11 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                         </div>
                       </ModalBody>
                       <ModalFooter>
-                        <Button color="danger" onPress={onClose}>
-                          Close
+                      <Button
+                  color="danger"
+                  variant="light"
+                  className="text-sm font-medium" onPress={onClose}>
+                          Fermer
                         </Button>
                         <Button color="primary" onPress={handleAddFacture}>
                           Enregistrer
@@ -1258,7 +1261,10 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                 </>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" onClick={onClose}>
+              <Button
+                  color="danger"
+                  variant="light"
+                  className="text-sm font-medium" onClick={onClose}>
                   Fermer
                 </Button>
               </ModalFooter>
@@ -1436,7 +1442,10 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onClick={onClose}>
+              <Button
+                  color="danger"
+                  variant="light"
+                  className="text-sm font-medium" onClick={onClose}>
                   Fermer
                 </Button>
                 <Button color="primary" onClick={handleEditFacture}>
@@ -1466,7 +1475,7 @@ const FactureTable = ({ columns, rows, statusOptions, title }) => {
               <ModalHeader className="text-xl">Attention</ModalHeader>
               <ModalBody>Êtes-vous sûr(e) de vouloir continuer ?</ModalBody>
               <ModalFooter>
-                <Button
+              <Button
                   color="danger"
                   variant="light"
                   className="text-sm font-medium"

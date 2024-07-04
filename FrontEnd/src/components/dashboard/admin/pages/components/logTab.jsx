@@ -65,20 +65,13 @@ const SMALL_DEVICE_COLUMNS = [
   "actions",
 ];
 
-// const transformLogementsData = (logements) => {
-//   return logements.map((logement) => ({
-//     id: logement.log_id,
-//     num_de_log: logement.log_id,
-//     nom: logement.nom,
-//     type_log: logement.typelog,
-//     ameliored: logement.is_ameliore ? "Oui" : "Non",
-//     mc: `${logement.piece} pièces (${logement.mc}m²)`,
-//     address: logement.address,
-//     quotaE: logement.quotas_electricite.toString(),
-//     quotaW: logement.quotas_eau.toString(),
-//     equipment_names: logement.equipment_names,
-//   }));
-// };
+const statusColorMap = {
+  disponible: "secondary",
+  "en maintenance":"warning ",
+  "occupé": "primary",
+};
+
+
 
 const LogTable = ({ columns, rows, title }) => {
   // const [scrollBehavior, setScrollBehavior] = React.useState("inside");
@@ -538,8 +531,17 @@ const LogTable = ({ columns, rows, title }) => {
                 </span>
               </Tooltip>
             </div>
+          );case "fac_etat":
+          return (
+            <Chip
+              className="capitalize"
+              color={statusColorMap[item.fac_etat]}
+              size="sm"
+              variant="flat"
+            >
+              {cellValue}
+            </Chip>
           );
-
         case "actions":
           return (
             <div className="relative flex items-center gap-2">
@@ -700,7 +702,7 @@ const LogTable = ({ columns, rows, title }) => {
               size="md"
               onPress={openAddModal}
             >
-              Ajouter
+              Ajouter un logement
             </Button>
           </div>
         </div>
@@ -1382,14 +1384,8 @@ const LogTable = ({ columns, rows, title }) => {
                     <SelectItem key="occupé" value="occupé">
                       occupé
                     </SelectItem>
-                    <SelectItem key="non_disponible" value="non_disponible">
-                      non disponible
-                    </SelectItem>
                     <SelectItem key="en_maintenance" value="en_maintenance">
                       en maintenance
-                    </SelectItem>
-                    <SelectItem key="autre" value="autre">
-                      autre
                     </SelectItem>
                   </Select>
                 </div>

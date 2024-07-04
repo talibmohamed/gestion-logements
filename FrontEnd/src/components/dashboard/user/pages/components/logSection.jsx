@@ -182,7 +182,7 @@ const LogSection = ({ title }) => {
                   <Button
                     color="danger"
                     variant="light"
-                    className="text-sm font-medium"
+                    className="text-sm font-medium" 
                     onPress={() => setPlanModalOpen(false)}
                   >
                     Fermer
@@ -316,7 +316,7 @@ const LogSection = ({ title }) => {
                       <Button
                         color="danger"
                         variant="light"
-                        className="text-sm font-medium"
+                        className="text-sm font-medium" 
                         onPress={onClose}
                       >
                         Fermer
@@ -539,7 +539,9 @@ const LogSection = ({ title }) => {
                       )}
                     </ModalBody>
                     <ModalFooter>
-                      <Button color="danger" variant="flat" onClick={onClose}>
+                      <Button color="danger"
+                  variant="light"
+                  className="text-sm font-medium" onClick={onClose}>
                         Fermer
                       </Button>
                     </ModalFooter>

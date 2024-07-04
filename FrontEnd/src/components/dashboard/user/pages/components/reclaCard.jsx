@@ -323,7 +323,9 @@ const ReclaCard = ({ title }) => {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button color="danger" variant="flat" onClick={closeModal}>
+            <Button color="danger"
+                  variant="light"
+                  className="text-sm font-medium"  onClick={closeModal}>
               Annuler
             </Button>
             {currentComplaint && (

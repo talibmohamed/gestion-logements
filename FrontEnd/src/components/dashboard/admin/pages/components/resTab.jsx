@@ -655,7 +655,7 @@ const ResidantTable = ({ columns, rows, title }) => {
               size="md"
               onPress={openAddModal}
             >
-              Ajouter
+              Ajouter un résidant
             </Button>
           </div>
         </div>

@@ -410,7 +410,8 @@ const Profile = () => {
                                 <ModalFooter>
                                   <Button
                                     color="danger"
-                                    variant="flat"
+                                    variant="light"
+                                    className="text-sm font-medium" 
                                     onPress={onClose}
                                   >
                                     Fermer

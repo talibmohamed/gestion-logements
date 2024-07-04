@@ -1229,7 +1229,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                   className="text-sm font-medium"
                   onPress={onClose}
                 >
-                  Fermer
+                  Confirmer
                 </Button>
                 <Button color="primary">Continuer</Button>
               </ModalFooter>

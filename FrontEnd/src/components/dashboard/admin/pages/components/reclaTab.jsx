@@ -974,7 +974,10 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="flat" onClick={onClose}>
+              <Button
+                  color="danger"
+                  variant="light"
+                  className="text-sm font-medium" onClick={onClose}>
                   Fermer
                 </Button>
               </ModalFooter>
@@ -1133,7 +1136,10 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="flat" onClick={onClose}>
+              <Button
+                  color="danger"
+                  variant="light"
+                  className="text-sm font-medium" onClick={onClose}>
                   Fermer
                 </Button>
                 <Button color="primary" onClick={handleEditReclamation}>
