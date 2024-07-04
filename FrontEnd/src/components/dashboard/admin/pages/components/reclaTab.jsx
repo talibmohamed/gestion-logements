@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
 import {
   Button,
   Input,
@@ -140,8 +142,8 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
       statusFilter !== "all" &&
       Array.from(statusFilter).length !== statusReclOptions.length
     ) {
-      filteredUsers = filteredUsers.filter((user) =>
-        Array.from(statusFilter).includes(user.rec_etat)
+      filteredUsers = filteredUsers.filter((item) =>
+        Array.from(statusFilter).includes(item.rec_etat)
       );
     }
 
@@ -302,7 +304,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
  //delete a reclamation
  const handleDeleteReclamation = async () => {
   // Get the Invoice ID
-  const rec_id = currentReclamation.frec_id;
+  const rec_id = currentReclamation.rec_id;
 
   // Validate all fields before dispatching
   if (!rec_id) {
@@ -366,8 +368,8 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
   }
 };
 
-  const renderCell = React.useCallback((user, columnKey) => {
-    const cellValue = user[columnKey];
+  const renderCell = React.useCallback((item, columnKey) => {
+    const cellValue = item[columnKey];
 
     switch (columnKey) {
       case "role":
@@ -380,152 +382,154 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
         return (
           <Chip
             className="capitalize"
-            color={statusColorMap[user.rec_etat]}
+            color={statusColorMap[item.rec_etat]}
             size="sm"
             variant="flat"
           >
             {cellValue}
           </Chip>
         );
-      case "actions":
-        return (
-          <div className="relative flex items-center gap-2">
-            {isMobile ? (
-              <Dropdown
-                classNames={{
-                  content: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
-                }}
-              >
-                <DropdownTrigger>
-                  <span className="icon-wrapper" onClick={handleDotsIconClick}>
-                    <VerticalDotsIcon />
-                  </span>
-                </DropdownTrigger>
-                <DropdownMenu
-                  aria-label="Action event example"
-                  onAction={(key) => {
-                    if (key === "details") handleDetailsIconClick(user);
-                    if (key === "edit") handleEditIconClick(user);
-                    if (key === "delete") handleDeleteIconClick(user);
+        case "actions":
+          return (
+            <div className="relative flex items-center gap-2">
+              {isMobile ? (
+                <Dropdown
+                  classNames={{
+                    content: "bg-[#18181b] dark:bg-[#18181b] text-[#e4e4e7]",
                   }}
                 >
-                  <DropdownItem key="details" startContent={<EyeIcon />}>
-                    Détails
-                  </DropdownItem>
-                  <DropdownItem key="edit" startContent={<EyeIcon />}>
-                    Modifier
-                  </DropdownItem>
-                  <DropdownItem
-                    key="delete"
+                  <DropdownTrigger>
+                    <span
+                      className="icon-wrapper"
+                      onClick={handleDotsIconClick}
+                    >
+                      <VerticalDotsIcon />
+                    </span>
+                  </DropdownTrigger>
+                  <DropdownMenu
+                    aria-label="Action event example"
+                    onAction={(key) => {
+                      if (key === "details") handleDetailsIconClick(item);
+                      if (key === "edit") handleEditIconClick(item);
+                      if (key === "delete") handleDeleteIconClick(item);
+                    }}
+                  >
+                    <DropdownItem key="details" startContent={<EyeIcon />}>
+                      Détails
+                    </DropdownItem>
+                    <DropdownItem key="edit" startContent={<EditIcon />}>
+                      Modifier
+                    </DropdownItem>
+                    <DropdownItem
+                      key="delete"
+                      color="danger"
+                      className="text-danger"
+                      startContent={<DeleteIcon />}
+                    >
+                      Supprimer
+                    </DropdownItem>
+                  </DropdownMenu>
+                </Dropdown>
+              ) : (
+                <>
+                  <Tooltip
+                    content="Détails"
+                    delay={0}
+                    closeDelay={0}
+                    motionProps={{
+                      variants: {
+                        exit: {
+                          opacity: 0,
+                          transition: {
+                            duration: 0.1,
+                            ease: "easeIn",
+                          },
+                        },
+                        enter: {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            ease: "easeOut",
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    <span
+                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                      onClick={() => handleDetailsIconClick(item)}
+                    >
+                      <EyeIcon />
+                    </span>
+                  </Tooltip>
+                  <Tooltip
+                    content="Modifier"
+                    delay={0}
+                    closeDelay={0}
+                    motionProps={{
+                      variants: {
+                        exit: {
+                          opacity: 0,
+                          transition: {
+                            duration: 0.1,
+                            ease: "easeIn",
+                          },
+                        },
+                        enter: {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            ease: "easeOut",
+                          },
+                        },
+                      },
+                    }}
+                  >
+                    <span
+                      className="text-lg text-default-400 cursor-pointer active:opacity-50"
+                      onClick={() => handleEditIconClick(item)}
+                    >
+                      <EditIcon />
+                    </span>
+                  </Tooltip>
+
+                  <Tooltip
                     color="danger"
-                    className="text-danger"
-                    startContent={<DeleteIcon />}
+                    content="Supprimer"
+                    delay={0}
+                    closeDelay={0}
+                    motionProps={{
+                      variants: {
+                        exit: {
+                          opacity: 0,
+                          transition: {
+                            duration: 0.1,
+                            ease: "easeIn",
+                          },
+                        },
+                        enter: {
+                          opacity: 1,
+                          transition: {
+                            duration: 0.15,
+                            ease: "easeOut",
+                          },
+                        },
+                      },
+                    }}
                   >
-                    Supprimer
-                  </DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-            ) : (
-              <>
-                <Tooltip
-                  content="Détails"
-                  delay={0}
-                  closeDelay={0}
-                  motionProps={{
-                    variants: {
-                      exit: {
-                        opacity: 0,
-                        transition: {
-                          duration: 0.1,
-                          ease: "easeIn",
-                        },
-                      },
-                      enter: {
-                        opacity: 1,
-                        transition: {
-                          duration: 0.15,
-                          ease: "easeOut",
-                        },
-                      },
-                    },
-                  }}
-                >
-                  <span
-                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                    onClick={() => handleDetailsIconClick(user)}
-                  >
-                    <EyeIcon />
-                  </span>
-                </Tooltip>
-
-                <Tooltip
-                  content="Modifier"
-                  delay={0}
-                  closeDelay={0}
-                  motionProps={{
-                    variants: {
-                      exit: {
-                        opacity: 0,
-                        transition: {
-                          duration: 0.1,
-                          ease: "easeIn",
-                        },
-                      },
-                      enter: {
-                        opacity: 1,
-                        transition: {
-                          duration: 0.15,
-                          ease: "easeOut",
-                        },
-                      },
-                    },
-                  }}
-                >
-                  <span
-                    className="text-lg text-default-400 cursor-pointer active:opacity-50"
-                    onClick={() => handleEditIconClick(user)}
-                  >
-                    <EditIcon />
-                  </span>
-                </Tooltip>
-
-                <Tooltip
-                  color="danger"
-                  content="Supprimer"
-                  delay={0}
-                  closeDelay={0}
-                  motionProps={{
-                    variants: {
-                      exit: {
-                        opacity: 0,
-                        transition: {
-                          duration: 0.1,
-                          ease: "easeIn",
-                        },
-                      },
-                      enter: {
-                        opacity: 1,
-                        transition: {
-                          duration: 0.15,
-                          ease: "easeOut",
-                        },
-                      },
-                    },
-                  }}
-                >
-                  <span
-                    className="text-lg text-danger cursor-pointer active:opacity-50"
-                    onClick={() => handleDeleteIconClick(user)}
-                  >
-                    <DeleteIcon />
-                  </span>
-                </Tooltip>
-              </>
-            )}
-          </div>
-        );
-      default:
-        return cellValue;
+                    <span
+                      className="text-lg text-danger cursor-pointer active:opacity-50"
+                      onClick={() => handleDeleteIconClick(item)}
+                    >
+                      <DeleteIcon />
+                    </span>
+                  </Tooltip>
+                </>
+              )}
+            </div>
+          );
+        default:
+          return cellValue;
     }
   }, [isMobile]);
 
@@ -1220,7 +1224,7 @@ ReclamationTable.propTypes = {
       rec_response: PropTypes.string.isRequired,
     })
   ).isRequired,
-  statusReclaOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
+  statusReclOptions: PropTypes.arrayOf(PropTypes.string).isRequired,
   title: PropTypes.string,
 };
 
