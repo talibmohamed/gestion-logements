@@ -229,7 +229,7 @@ const Login = () => {
                     </ModalBody>
                     <ModalFooter>
                       <Button color="primary" onPress={onClose}>
-                        Sign in
+                        Confirmer
                       </Button>
                     </ModalFooter>
                   </>
