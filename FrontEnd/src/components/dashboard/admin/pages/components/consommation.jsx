@@ -36,14 +36,16 @@ import {
   addConsumThunk,
   updateConsumThunk,
 } from "../../../../../session/thunks/adminthunk.jsx";
+//toast
+import { toast } from "react-toastify";
 
 const INITIAL_VISIBLE_COLUMNS = [
   "id",
   "num_de_log",
   "nom",
-  "type_log",
-  "ameliored",
+  "electricite",
   "consumE",
+  "eau",
   "consumW",
   "actions",
 ];
@@ -201,8 +203,6 @@ const ConsumTable = ({ columns, rows, title }) => {
   //     openDeleteModal();
   //   };
 
-
-  
   const dispatch = useDispatch();
 
   const handleAddConsum = async () => {
@@ -231,7 +231,7 @@ const ConsumTable = ({ columns, rows, title }) => {
       type_log: newConsum.type_log,
       ameliored: amelioreBoolean,
       consumE: newConsum.consumE,
-      consumW: newConsum.consumW
+      consumW: newConsum.consumW,
     };
 
     console.log(consumData);
@@ -291,16 +291,23 @@ const ConsumTable = ({ columns, rows, title }) => {
   };
 
   const handleEditConsum = async () => {
+    console.log(currentConsum);
     // Validate all fields before dispatching
     if (
       currentConsum.id === "" ||
-      currentConsum.num_de_log === "" ||
-      currentConsum.nom === "" ||
-      currentConsum.type_log === "" ||
-      currentConsum.ameliored === "" ||
       currentConsum.consumE === "" ||
       currentConsum.consumW === ""
     ) {
+      toast.error("plz fill the inputs", {
+        position: "bottom-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: 0,
+        theme: "dark",
+      });
       // Handle invalid form data
       return;
     }
@@ -312,13 +319,9 @@ const ConsumTable = ({ columns, rows, title }) => {
 
     // Prepare the data to dispatch
     const consumData = {
-      id: currentConsum.id,
-      num_de_log: currentConsum.num_de_log,
-      nom: currentConsum.nom,
-      type_log: currentConsum.type_log,
-      ameliored: isAmelioreBoolean,
-      consumE: currentConsum.consumE,
-      consumW: currentConsum.consumW,
+      cons_id: currentConsum.id,
+      elec_actuel: currentConsum.consumE,
+      eau_actuel: currentConsum.consumW,
     };
 
     //consol log consumData
@@ -329,7 +332,7 @@ const ConsumTable = ({ columns, rows, title }) => {
 
       // Handle response
       if (response && response.payload.status === "success") {
-        toast.success("Consum edited successfully", {
+        toast.success(response.payload.message, {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -341,7 +344,7 @@ const ConsumTable = ({ columns, rows, title }) => {
         });
       } else {
         // Handle other statuses or errors
-        toast.error("Failed to edit consum", {
+        toast.error(response.payload.message, {
           position: "bottom-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -1196,7 +1199,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                 <Button color="danger" variant="light" onClick={onClose}>
                   Fermer
                 </Button>
-                <Button color="primary" onClick={handleEditIconClick}>
+                <Button color="primary" onClick={handleEditConsum}>
                   Sauvegarder
                 </Button>
               </ModalFooter>

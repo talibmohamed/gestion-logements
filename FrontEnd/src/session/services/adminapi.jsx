@@ -405,7 +405,7 @@ export const addConsum = async (jwtToken, consumData) => {
 // Function to update a consum
 export const updateConsum = async (jwtToken, consumData) => {
   try {
-    const response = await axios.put(`${baseURL}/admin/consum`, consumData, {
+    const response = await axios.put(`${baseURL}/admin/consommation`, consumData, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${jwtToken}`,

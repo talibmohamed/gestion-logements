@@ -1,7 +1,10 @@
 // Logement.jsx
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchLogementsThunk, fetchConsumsThunk } from "../../../../session/thunks/adminthunk.jsx";
+import {
+  fetchLogementsThunk,
+  fetchConsumsThunk,
+} from "../../../../session/thunks/adminthunk.jsx";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import LogTable from "./components/logTab.jsx";
 import ConsumTable from "./components/consommation.jsx";
@@ -37,12 +40,14 @@ const Logement = () => {
   const logements = useSelector((state) => state.logements?.logements);
   const consums = useSelector((state) => state.consum?.consums);
 
+  console.log('consums');
   console.log(consums);
+  console.log('consums');
 
   useEffect(() => {
     dispatch(fetchLogementsThunk());
   }, [dispatch]);
-  
+
   useEffect(() => {
     dispatch(fetchConsumsThunk());
   }, [dispatch]);
@@ -71,8 +76,8 @@ const Logement = () => {
       id: consum.cons_id,
       num_de_log: consum.log_id,
       nom: consum.res_nom,
-      type_log: consum.typelog,
-      ameliored: consum.is_ameliore ? "Oui" : "Non",
+      electricite: consum.quotas_electricite,
+      eau: consum.quotas_eau,
       consumE: consum.elec_actuel,
       consumW: consum.eau_actuel,
     }));
@@ -104,7 +109,11 @@ const Logement = () => {
           shadow="sm"
         >
           <CardBody>
-            <ConsumTable columns={consumColumns} rows={transformedConsums} title="Consommation" />
+            <ConsumTable
+              columns={consumColumns}
+              rows={transformedConsums}
+              title="Consommation"
+            />
           </CardBody>
         </Card>
       </div>

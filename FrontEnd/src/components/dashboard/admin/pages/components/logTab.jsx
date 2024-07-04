@@ -72,7 +72,6 @@ const statusColorMap = {
 };
 
 
-
 const LogTable = ({ columns, rows, title }) => {
   // const [scrollBehavior, setScrollBehavior] = React.useState("inside");
   const [filterValue, setFilterValue] = React.useState("");
