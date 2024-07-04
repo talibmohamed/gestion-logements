@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
-
 import "react-toastify/dist/ReactToastify.css";
-
 import {
-  Table,
+  Table, Chip,
   TableHeader,
   TableColumn,
   TableBody,
@@ -48,7 +46,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "nom",
   "type_log",
   "ameliored",
-  "statut",
+  "log_statut",
   "mc",
   "address",
   "quotaE",
@@ -71,9 +69,7 @@ const statusColorMap = {
   "occupé": "primary",
 };
 
-
-
-const LogTable = ({ columns, rows, title }) => {
+const LogTable = ({ columns, rows, statusLogOptions, title }) => {
   // const [scrollBehavior, setScrollBehavior] = React.useState("inside");
   const [filterValue, setFilterValue] = React.useState("");
   const [visibleColumns, setVisibleColumns] = React.useState(
@@ -118,7 +114,7 @@ const LogTable = ({ columns, rows, title }) => {
   const [newLogement, setNewLogement] = useState({
     type_log: "",
     ameliore: "",
-    statut: "",
+    log_statut: "",
     nb_pieces: "",
     superficie: "",
     address: "",
@@ -134,6 +130,7 @@ const LogTable = ({ columns, rows, title }) => {
       is_ameliore: logement.is_ameliore,
       piece: logement.piece,
       mc: logement.mc,
+      log_status: logement.log_status,
       address: logement.address,
     });
     setEditModalOpen(true);
@@ -174,14 +171,18 @@ const LogTable = ({ columns, rows, title }) => {
   const filteredItems = React.useMemo(() => {
     let filteredUsers = [...rows];
 
-    if (hasSearchFilter) {
-      filteredUsers = filteredUsers.filter((rows) =>
-        rows.nom.toLowerCase().includes(filterValue.toLowerCase())
+    if (
+      statusFilter !== "all" &&
+      Array.from(statusFilter).length !== statusLogOptions.length
+    ) {
+      filteredUsers = filteredUsers.filter((user) =>
+        Array.from(statusFilter).includes(user.status)
       );
     }
 
     return filteredUsers;
-  }, [rows, filterValue]);
+  }, [rows, statusFilter]);
+
 
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -237,7 +238,7 @@ const LogTable = ({ columns, rows, title }) => {
     if (
       newLogement.type_log === "" ||
       newLogement.ameliore === "" ||
-      newLogement.statut == "" ||
+      newLogement.log_statut == "" ||
       newLogement.nb_pieces === "" ||
       newLogement.superficie === "" ||
       newLogement.address === ""
@@ -264,7 +265,7 @@ const LogTable = ({ columns, rows, title }) => {
     const logementData = {
       type_log: newLogement.type_log,
       is_ameliore: amelioreBoolean,
-      statut: newLogement.statut,
+      log_status: newLogement.log_statut,
       piece: parseInt(newLogement.nb_pieces),
       mc: parseInt(newLogement.superficie),
       address: newLogement.address,
@@ -336,6 +337,7 @@ const LogTable = ({ columns, rows, title }) => {
       currentLogement.ameliored === "" ||
       currentLogement.piece === "" ||
       currentLogement.mc === "" ||
+      currentLogement.log_statut === "" || 
       currentLogement.address === ""
     ) {
       // Handle invalid form data
@@ -531,18 +533,19 @@ const LogTable = ({ columns, rows, title }) => {
                 </span>
               </Tooltip>
             </div>
-          );case "fac_etat":
-          return (
-            <Chip
-              className="capitalize"
-              color={statusColorMap[item.fac_etat]}
-              size="sm"
-              variant="flat"
-            >
-              {cellValue}
-            </Chip>
           );
-        case "actions":
+          case "log_statut":
+            return (
+              <Chip
+                className="capitalize"
+                color={statusColorMap[item.log_statut]}
+                size="sm"
+                variant="flat"
+              >
+                {cellValue}
+              </Chip>
+            );
+          case "actions":
           return (
             <div className="relative flex items-center gap-2">
               {isMobile ? (
@@ -1765,6 +1768,7 @@ LogTable.propTypes = {
         .isRequired,
       nom: PropTypes.string.isRequired,
       type_log: PropTypes.string.isRequired,
+      log_statut: PropTypes.string.isRequired,
       ameliored: PropTypes.string,
       equip: PropTypes.arrayOf(PropTypes.string),
       actions: PropTypes.string,

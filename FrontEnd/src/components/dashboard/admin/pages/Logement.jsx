@@ -7,7 +7,7 @@ import ConsumTable from "./components/consommation.jsx";
 // import Graph from "./components/graph.jsx";
 import "./Statics.scss";
 import { Card, CardBody } from "@nextui-org/react";
-import { columns } from "./components/logData.jsx";
+import { columns, mockData, statusLogOptions } from "./components/logData.jsx";
 import { ToastContainer } from "react-toastify";
 import { consumColumns } from "./components/consumData.jsx";
 
@@ -88,7 +88,8 @@ const Logement = () => {
           <CardBody>
             <LogTable
               columns={columns}
-              rows={transformedLogements}
+              rows={mockData}
+              statusOptions={statusLogOptions.map((option) => option.uid)}
               title="Logements"
             />
           </CardBody>
