@@ -72,6 +72,7 @@ const statusColorMap = {
 const LogTable = ({ columns, rows, statusLogOptions, title }) => {
   // const [scrollBehavior, setScrollBehavior] = React.useState("inside");
   const [filterValue, setFilterValue] = React.useState("");
+  const [statusFilter, setStatusFilter] = React.useState("all");
   const [visibleColumns, setVisibleColumns] = React.useState(
     new Set(INITIAL_VISIBLE_COLUMNS)
   );
