@@ -56,7 +56,7 @@ const SMALL_DEVICE_COLUMNS = [
 ];
 
 const statusColorMap = {
-  annulée: "primary",
+  annulée: "grey",
   résolu: "secondary",
   "non résolu": "primary",
   "en attente": "warning",
@@ -199,6 +199,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
   //   dispatch(fetchReclamationsThunk()); 
   // }, [dispatch]); 
 
+  const dispatch = useDispatch();
   
   const handleEditReclamation = async () => {
     // Validate all fields before dispatching
@@ -223,7 +224,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
       rec_desc: currentReclamation.rec_desc,
       rec_date: currentReclamation.rec_date,
       rec_etat: currentReclamation.rec_etat,
-      rec_response: currentReclamatio
+      rec_response: currentReclamation.rec_response,
     };
 
     console.log(reclamationData);
@@ -1137,6 +1138,9 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     </SelectItem>
                     <SelectItem key="attente" textValue="Attente">
                       Attente
+                    </SelectItem>
+                    <SelectItem key="annuler" textValue="Annulée">
+                      Annulée
                     </SelectItem>
                   </Select>
                 </div>
