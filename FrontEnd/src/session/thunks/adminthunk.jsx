@@ -538,3 +538,25 @@ export const deleteReclamationThunk = createAsyncThunk(
     }
   }
 );
+
+
+export const fetchStatisticsGraphThunk = createAsyncThunk(
+  "user/fetchStatisticsGraph",
+  async (_, { getState, dispatch }) => {
+    const state = getState();
+    const jwt = state.auth.jwt_token;
+    try {
+      const response = await fetchStatisticsGraph(jwt);
+      console.log(
+        "response from fetchStatisticsGraphThunk",
+        response.statistics
+      );
+      console.log(response);
+      dispatch(setgraphs(response.statistics));
+      return response;
+    } catch (error) {
+      console.error("Error fetching statistics graph:", error);
+      throw error;
+    }
+  }
+);

@@ -4,13 +4,13 @@ CREATE TABLE equipement (
     equip_type VARCHAR(100) NOT NULL
 );
 
-CREATE TYPE statut_logement AS ENUM ('disponible', 'en_maintenance', 'occupé', 'non_disponible', 'autre');
+CREATE TYPE new_statut_logement AS ENUM ('disponible', 'en maintenance', 'occupé');
 
 CREATE TYPE typelog_enum AS ENUM ('cadre', 'ouvrier', 'agent de maitrise');
 
 CREATE TABLE logement (
     log_id          SERIAL PRIMARY KEY,
-    typelog         typelog_enum NOT NULL,
+    typelog         new_statut_logement NOT NULL,
     is_ameliore     BOOLEAN NOT NULL,
     description     VARCHAR(250),
     mc              INT NOT NULL,
@@ -157,6 +157,39 @@ CREATE TABLE typelog_info (
     equipement_ids integer[] null,
     PRIMARY KEY (typelog_id)
 );
+
+
+CREATE TABLE logement_history (
+    history_id      SERIAL PRIMARY KEY,
+    log_id          INTEGER REFERENCES logement (log_id),
+    statut          statut_logement NOT NULL,
+    date_updated    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE OR REPLACE FUNCTION update_logement_history_at_end_of_month()
+RETURNS void AS $$
+DECLARE
+    end_of_last_month TIMESTAMP;
+    previous_month VARCHAR(7);
+BEGIN
+    -- Calculate end of last month
+    end_of_last_month := DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 day';
+
+    -- Get previous month in 'YYYY-MM' format
+    previous_month := TO_CHAR(end_of_last_month, 'YYYY-MM');
+
+    -- Update logement_history with current statut values for previous month
+    INSERT INTO logement_history (log_id, statut, month_year)
+    SELECT log_id, statut, previous_month
+    FROM logement;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Schedule the function to run at the end of each month
+SELECT cron.schedule('0 0 1 * *', 
+    'SELECT update_logement_history_at_end_of_month()');
+
 
 
 -- Insert data into equipement

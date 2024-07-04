@@ -11,11 +11,6 @@ import {
   fetchStatisticsThunk,
 } from "../../../../session/thunks/adminthunk";
 
-const sampleData = [
-  { label: "vacant", data: [12, 6, 20, 4, 20, 1], color: "#96A7FF" },
-  { label: "non-vacant", data: [10, 2, 8, 16, 0, 4], color: "#f9769d" },
-];
-
 const Overview = () => {
   const [isMobile, setIsMobile] = useState(false);
   const dispatch = useDispatch();
@@ -94,20 +89,12 @@ const Overview = () => {
   ];
 
   // Calculate logement statistics dynamically
-  const logementStatuses = [
-    "disponible",
-    "en_maintenance",
-    "occupé",
-    "non_disponible",
-    "autre",
-  ];
-  
+  const logementStatuses = ["disponible", "en maintenance", "occupé"];
+
   const colors = {
-    disponible: "#28a745", // Green
-    en_maintenance: "#ffc107", // Yellow
-    occupé: "#F9769D", // Pink
-    non_disponible: "#dc3545", // Red
-    autre: "#6c757d", // Grey
+    disponible: "#96A7FF", // Green
+    "en maintenance": "#5F284A", // Yellow
+    occupé: "#f7769d", // Pink
   };
 
   const totalLogements = statistics?.logement?.total_logements_count || 0;
@@ -130,6 +117,26 @@ const Overview = () => {
     (statistics?.facture?.total_overdue_count || 0) +
     (statistics?.facture?.total_unpaid_count || 0) +
     " Factures";
+
+  const sampleData = [
+    {
+      label: "Disponible",
+      data: statistics?.logement_history?.disponible || [0, 0, 0, 0, 0, 0],
+      color: colors.disponible,
+    },
+    {
+      label: "Occupé",
+      data: statistics?.logement_history?.occupe || [0, 0, 0, 0, 0, 0],
+      color: colors.occupé,
+    },
+    {
+      label: "En Maintenance",
+      data: statistics?.logement_history?.en_maintenance || [0, 0, 0, 0, 0, 0],
+      color: colors["en maintenance"],
+    },
+  ];
+
+  const xLabels = statistics?.logement_history?.months;
 
   return (
     <div className="container mx-auto">
@@ -174,7 +181,11 @@ const Overview = () => {
           rows={transformedFactures}
           title="Factures récentes"
         /> */}
-        <Graph title="Graphe linéaire des logements" data={sampleData} />
+        <Graph
+          title="Graphe linéaire des logements"
+          data={sampleData}
+          xLabels={xLabels}
+        />
       </div>
     </div>
   );

@@ -290,6 +290,74 @@ class admin
             $logementStats[$statutCount['statut']] = $statutCount['count'];
         }
 
+
+        // Prepare the SQL query
+        $historyStmt = $connection->prepare("
+        WITH months AS (
+            -- Generate a series of the last 6 months excluding the current month
+            SELECT 
+                TO_CHAR(DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 month' * generate_series, 'YYYY-MM') AS month_year,
+                EXTRACT(MONTH FROM DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 month' * generate_series) AS month_number
+            FROM generate_series(1, 6) AS t(generate_series)
+        )
+        SELECT 
+            m.month_year AS mois_annee,
+            CASE m.month_number
+                WHEN 1 THEN 'Janvier'
+                WHEN 2 THEN 'Février'
+                WHEN 3 THEN 'Mars'
+                WHEN 4 THEN 'Avril'
+                WHEN 5 THEN 'Mai'
+                WHEN 6 THEN 'Juin'
+                WHEN 7 THEN 'Juillet'
+                WHEN 8 THEN 'Août'
+                WHEN 9 THEN 'Septembre'
+                WHEN 10 THEN 'Octobre'
+                WHEN 11 THEN 'Novembre'
+                WHEN 12 THEN 'Décembre'
+            END AS month_name,
+            COALESCE(SUM(CASE WHEN lh.statut = 'disponible' THEN 1 ELSE 0 END), 0) AS disponible_count,
+            COALESCE(SUM(CASE WHEN lh.statut = 'en maintenance' THEN 1 ELSE 0 END), 0) AS en_maintenance_count,
+            COALESCE(SUM(CASE WHEN lh.statut = 'occupé' THEN 1 ELSE 0 END), 0) AS occupe_count
+        FROM 
+            months m
+        LEFT JOIN 
+            logement_history lh ON m.month_year = lh.month_year
+        GROUP BY 
+            m.month_year, m.month_number
+        ORDER BY 
+            m.month_year ASC
+    ");
+
+        // Execute the query
+        $historyStmt->execute();
+
+        // Initialize arrays to hold data
+        $disponible = [];
+        $enMaintenance = [];
+        $occupe = [];
+        $months = [];
+
+        // Fetch the results into an associative array
+        $results = $historyStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Process the results into separate arrays
+        foreach ($results as $row) {
+            $months[] = $row['month_name'];
+            $disponible[] = (int) $row['disponible_count'];
+            $enMaintenance[] = (int) $row['en_maintenance_count'];
+            $occupe[] = (int) $row['occupe_count'];
+        }
+
+        // Combine the processed data into a single array
+        $historyStats = [
+            'months' => $months,
+            'disponible' => $disponible,
+            'en_maintenance' => $enMaintenance,
+            'occupe' => $occupe
+        ];
+
+
         $response = array(
             'statistics' => array(
                 'facture' => array(
@@ -301,7 +369,8 @@ class admin
                 'logement' => array_merge(
                     ['total_logements_count' => $allLogements],
                     $logementStats
-                )
+                ),
+                'logement_history' => $historyStats
             )
         );
 
@@ -978,10 +1047,12 @@ class admin
             $fac_etat = $data['fac_etat'];
             $fac_total = $data['fac_total'];
 
-            //check if user id exist 
-            $stmt = $connection->prepare("SELECT COUNT(*) FROM residant WHERE res_id = ?");
+            // Check if user id exists
+            $stmt = $connection->prepare("SELECT * FROM residant WHERE res_id = ?");
             $stmt->execute([$res_id]);
-            if ($stmt->fetchColumn() == 0) {
+            $residant = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$residant) {
                 return [
                     'status' => 'error',
                     'message' => 'User not found.'
@@ -1001,13 +1072,38 @@ class admin
                 ':fac_total' => $fac_total
             ]);
 
+            // Insert notification into database
+            $notificationTitle = 'Nouvelle Facture ajoutée';
+            $notificationDesc = "Une nouvelle facture a été ajoutée à votre compte.";
+            $stmtNotification = $connection->prepare('INSERT INTO notification (notif_titre, notif_desc, res_id) VALUES (:notif_titre, :notif_desc, :res_id)');
+            $stmtNotification->execute([
+                ':notif_titre' => $notificationTitle,
+                ':notif_desc' => $notificationDesc,
+                ':res_id' => $res_id
+            ]);
+
+            // Send email notification
+            $recipientEmail = $residant['email'];
+            $recipientNom = $residant['nom'];
+            $recipientPrenom = $residant['prenom'];
+            $subject = 'Nouvelle Facture ajoutée';
+            $body = "Bonjour $recipientNom $recipientPrenom, <br><br> Une nouvelle facture a été ajoutée à votre compte. <br><br> Cordialement, <br> L'équipe Houselytics";
+
+            require '../path/to/sendEmailFunction.php'; // Adjust the path accordingly
+            if (sendEmail($recipientEmail, $recipientNom, $recipientPrenom, $subject, $body)) {
+                return [
+                    'status' => 'success',
+                    'message' => 'Facture ajoutée avec succès. Notification envoyée par email.'
+                ];
+            } else {
+                return [
+                    'status' => 'success',
+                    'message' => 'Facture ajoutée avec succès. Erreur lors de l\'envoi de la notification par email.'
+                ];
+            }
+
             // Close the connection
             $connection = null;
-
-            return [
-                'status' => 'success',
-                'message' => 'Facture added successfully'
-            ];
         } catch (PDOException $e) {
             // Return error response if an exception occurs
             return [
@@ -1016,6 +1112,7 @@ class admin
             ];
         }
     }
+
 
     // Update facture in the database
     public function updateFacture($data)
@@ -1369,6 +1466,65 @@ class admin
             return [
                 'status' => 'error',
                 'message' => 'Database error: ' . $e->getMessage()
+            ];
+        }
+    }
+
+    public function getLogementStatistiques()
+    {
+        try {
+            $connection = $this->db->getConnection();
+
+            // Prepare the SQL query
+            $sql = $connection->prepare("
+                WITH months AS (
+                    -- Generate a series of the last 6 months excluding the current month
+                    SELECT 
+                        TO_CHAR(DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 month' * generate_series, 'YYYY-MM') AS month_year,
+                        EXTRACT(MONTH FROM DATE_TRUNC('MONTH', CURRENT_DATE) - INTERVAL '1 month' * generate_series) AS month_number
+                    FROM generate_series(1, 6) AS t(generate_series)
+                )
+                SELECT 
+                    m.month_year AS mois_annee,
+                    CASE m.month_number
+                        WHEN 1 THEN 'Janvier'
+                        WHEN 2 THEN 'Février'
+                        WHEN 3 THEN 'Mars'
+                        WHEN 4 THEN 'Avril'
+                        WHEN 5 THEN 'Mai'
+                        WHEN 6 THEN 'Juin'
+                        WHEN 7 THEN 'Juillet'
+                        WHEN 8 THEN 'Août'
+                        WHEN 9 THEN 'Septembre'
+                        WHEN 10 THEN 'Octobre'
+                        WHEN 11 THEN 'Novembre'
+                        WHEN 12 THEN 'Décembre'
+                    END AS month_name,
+                    COALESCE(COUNT(CASE WHEN lh.statut = 'disponible' THEN 1 END), 0) AS disponible,
+                    COALESCE(COUNT(CASE WHEN lh.statut = 'en maintenance' THEN 1 END), 0) AS en_maintenance,
+                    COALESCE(COUNT(CASE WHEN lh.statut = 'occupé' THEN 1 END), 0) AS occupé
+                FROM 
+                    months m
+                LEFT JOIN 
+                    logement_history lh ON m.month_year = lh.month_year
+                GROUP BY 
+                    m.month_year, m.month_number
+                ORDER BY 
+                    m.month_year DESC
+            ");
+
+            // Execute the query
+            $sql->execute();
+            $statistics = $sql->fetchAll(PDO::FETCH_ASSOC);
+
+            return [
+                'status' => 'success',
+                'statistics' => $statistics
+            ];
+        } catch (PDOException $e) {
+            return [
+                'status' => 'error',
+                'message' => $e->getMessage()
             ];
         }
     }

@@ -838,6 +838,15 @@ class AdminController
             echo json_encode(['status' => 'error', 'message' => 'Missing required fields']);
         }
     }
+
+    //get logement statistices
+    public function getLogementStatistiquesAPI()
+    {
+        $response = $this->admin->getLogementStatistiques();
+        http_response_code(200);
+        echo json_encode($response);
+        exit;
+    }
     
 
 

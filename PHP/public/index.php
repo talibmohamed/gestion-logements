@@ -173,44 +173,44 @@ function route($uri, $method)
             }
             break;
 
-// Handle the /api/v1/user/statisticsquota endpoint
-case '/api/v1/user/statisticsquota':
-    if ($method === 'GET') {
-        $jwtHandler = new JwtHandler();
-        $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
-        $jwt_token = str_replace('Bearer ', '', $jwt_token);
+            // Handle the /api/v1/user/statisticsquota endpoint
+        case '/api/v1/user/statisticsquota':
+            if ($method === 'GET') {
+                $jwtHandler = new JwtHandler();
+                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                $jwt_token = str_replace('Bearer ', '', $jwt_token);
 
-        // Validate the JWT token
-        $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+                // Validate the JWT token
+                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
 
-        if ($token_info['valid'] && $token_info['data']['role'] === 'residant') {
-            if (isset($token_info['data']['id'])) {
-                $res_id = $token_info['data']['id'];
-                $userController = new UserController();
-                $response = $userController->StatisticsQuotaAPI($res_id);
+                if ($token_info['valid'] && $token_info['data']['role'] === 'residant') {
+                    if (isset($token_info['data']['id'])) {
+                        $res_id = $token_info['data']['id'];
+                        $userController = new UserController();
+                        $response = $userController->StatisticsQuotaAPI($res_id);
 
-                // Output the response as JSON
-                http_response_code(200);
-                echo json_encode($response);
+                        // Output the response as JSON
+                        http_response_code(200);
+                        echo json_encode($response);
+                    } else {
+                        http_response_code(400); // Bad Request
+                        echo json_encode([
+                            'status' => 'error',
+                            'message' => 'Missing res_id in token data',
+                        ]);
+                    }
+                } else {
+                    http_response_code(401); // Unauthorized
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Unauthorized',
+                    ]);
+                }
             } else {
-                http_response_code(400); // Bad Request
-                echo json_encode([
-                    'status' => 'error',
-                    'message' => 'Missing res_id in token data',
-                ]);
+                http_response_code(405); // Method Not Allowed
+                echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
             }
-        } else {
-            http_response_code(401); // Unauthorized
-            echo json_encode([
-                'status' => 'error',
-                'message' => 'Unauthorized',
-            ]);
-        }
-    } else {
-        http_response_code(405); // Method Not Allowed
-        echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
-    }
-    break;
+            break;
 
 
             //check token
@@ -747,6 +747,35 @@ case '/api/v1/user/statisticsquota':
                     'status' => 'error',
                     'message' => 'Unauthorized',
                 ]);
+            }
+            break;
+
+
+            //get logement gistorick statistics
+        case '/api/v1/admin/logement-statistics':
+            if ($method === 'GET') {
+                $jwtHandler = new JwtHandler();
+                $jwt_token = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
+                $jwt_token = str_replace('Bearer ', '', $jwt_token);
+                $token_info = $jwtHandler->verifyJwtToken($jwt_token);
+
+                if ($token_info['valid'] && $token_info['data']['role'] === 'admin') {
+                    $adminController = new AdminController();
+                    $response = $adminController->getLogementStatistiquesAPI();
+
+                    // Output the response as JSON
+                    http_response_code(200);
+                    echo json_encode($response);
+                } else {
+                    http_response_code(401); // Unauthorized
+                    echo json_encode([
+                        'status' => 'error',
+                        'message' => 'Unauthorized',
+                    ]);
+                }
+            } else {
+                http_response_code(405); // Method Not Allowed
+                echo json_encode(['status' => 'error', 'message' => 'Method Not Allowed']);
             }
             break;
 

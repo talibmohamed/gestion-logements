@@ -5,7 +5,7 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import PropTypes from "prop-types";
 
 
-const xLabels = ["Janvier", "Fevrier", "Mars", "Avril", "May", "Juin"];
+const xLabels = ["Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin"];
 
 const Graph = ({ title, data }) => {
   const getWidth = () => {
@@ -33,7 +33,11 @@ const Graph = ({ title, data }) => {
             <LineChart
               width={getWidth()}
               height={300}
-              series={data}
+              series={data.map(item => ({
+                label: item.label,
+                data: item.data,
+                color: item.color,
+              }))}
               xAxis={[{ data: xLabels, scaleType: "point" }]}
               slotProps={{
                 legend: { hidden: true },
@@ -62,7 +66,8 @@ Graph.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
       label: PropTypes.string.isRequired,
-      value: PropTypes.number.isRequired,
+      data: PropTypes.arrayOf(PropTypes.number).isRequired,
+      color: PropTypes.string.isRequired,
     })
   ).isRequired,
 };

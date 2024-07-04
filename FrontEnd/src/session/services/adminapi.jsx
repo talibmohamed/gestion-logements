@@ -239,7 +239,6 @@ export const addResidant = async (jwtToken, residantData) => {
   }
 };
 
-
 // Function to update a residant
 export const updateResidant = async (jwtToken, residantData) => {
   try {
@@ -278,8 +277,6 @@ export const deleteResidant = async (jwtToken, data) => {
   }
 };
 
-
-
 // Function to fetch all Factures
 export const fetchFactures = async (jwt) => {
   try {
@@ -301,16 +298,12 @@ export const fetchFactures = async (jwt) => {
 // Function to add a Facture
 export const addFacture = async (jwtToken, factureData) => {
   try {
-    const response = await axios.post(
-      `${baseURL}/admin/facture`,
-      factureData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwtToken}`,
-        },
-      }
-    );
+    const response = await axios.post(`${baseURL}/admin/facture`, factureData, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    });
     console.log(response);
     return response.data;
   } catch (error) {
@@ -319,20 +312,15 @@ export const addFacture = async (jwtToken, factureData) => {
   }
 };
 
-
 // Function to update a Facture
 export const updateFacture = async (jwtToken, factureData) => {
   try {
-    const response = await axios.put(
-      `${baseURL}/admin/facture`,
-      factureData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwtToken}`,
-        },
-      }
-    );
+    const response = await axios.put(`${baseURL}/admin/facture`, factureData, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    });
     console.log(response);
     return response.data;
   } catch (error) {
@@ -358,7 +346,6 @@ export const deleteFacture = async (jwtToken, data) => {
   }
 };
 
-
 // Function to send avis
 export const sendNotification = async (jwtToken, notificationData) => {
   try {
@@ -378,7 +365,6 @@ export const sendNotification = async (jwtToken, notificationData) => {
     throw error;
   }
 };
-
 
 // Function to fetch all consums
 export const fetchConsums = async (jwt) => {
@@ -401,16 +387,12 @@ export const fetchConsums = async (jwt) => {
 // Function to add a Consum
 export const addConsum = async (jwtToken, consumData) => {
   try {
-    const response = await axios.post(
-      `${baseURL}/admin/consum`,
-      consumData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwtToken}`,
-        },
-      }
-    );
+    const response = await axios.post(`${baseURL}/admin/consum`, consumData, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    });
     console.log(response);
     return response.data;
   } catch (error) {
@@ -419,20 +401,15 @@ export const addConsum = async (jwtToken, consumData) => {
   }
 };
 
-
 // Function to update a consum
 export const updateConsum = async (jwtToken, consumData) => {
   try {
-    const response = await axios.put(
-      `${baseURL}/admin/consum`,
-      consumData,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${jwtToken}`,
-        },
-      }
-    );
+    const response = await axios.put(`${baseURL}/admin/consum`, consumData, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${jwtToken}`,
+      },
+    });
     console.log(response);
     return response.data;
   } catch (error) {
@@ -453,17 +430,14 @@ export const fetchReclamations = async (jwt) => {
     console.log(response);
 
     return response.data;
-  }
-  catch (error) {
+  } catch (error) {
     console.error(
       "Error in fetchReclamations:",
       error.response || error.message || error
     );
     throw error;
   }
-}
-
-
+};
 
 // Function to update a Facture
 export const updateReclamation = async (jwtToken, reclamationData) => {
@@ -499,6 +473,24 @@ export const deleteReclamation = async (jwtToken, data) => {
     return response.data;
   } catch (error) {
     console.error("Error in deleteReclamation:", error);
+    throw error;
+  }
+};
+
+//get statisctics grash
+export const fetchStatisticsGraph = async (jwt) => {
+  try {
+    const response = await axios.get(`${baseURL}/user/logement-statistics`, {
+      headers: {
+        Authorization: `Bearer ${jwt}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(
+      "Error in fetchStatisticsGraph:",
+      error.response || error.message || error
+    );
     throw error;
   }
 };
