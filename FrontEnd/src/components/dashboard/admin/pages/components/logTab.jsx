@@ -46,7 +46,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "nom",
   "type_log",
   "ameliored",
-  "statut",
+  "status",
   "mc",
   "address",
   "quotaE",

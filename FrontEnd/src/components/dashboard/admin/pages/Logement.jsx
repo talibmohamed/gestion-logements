@@ -60,7 +60,7 @@ const Logement = () => {
       nom: logement.nom,
       type_log: logement.typelog,
       ameliored: logement.is_ameliore ? "Oui" : "Non",
-      statut: logement.statut,
+      status: logement.statut,
       piece: logement.piece,
       mc: logement.mc,
       address: logement.address,
@@ -97,7 +97,7 @@ const Logement = () => {
           <CardBody>
             <LogTable
               columns={columns}
-              rows={mockData}
+              rows={transformedLogements}
               statusOptions={statusLogOptions.map((option) => option.uid)}
               title="Logements"
             />
