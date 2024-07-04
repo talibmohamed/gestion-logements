@@ -12,6 +12,10 @@ const Reclamation = () => {
   const dispatch = useDispatch();
   const reclamations = useSelector((state) => state.reclamation.reclamations);
 
+  console.log('reclamations');
+  console.log(reclamations);
+  console.log('reclamations');
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -37,6 +41,10 @@ const Reclamation = () => {
     rec_etat: reclamation.rec_etat,
     rec_response: reclamation.rec_response,
   }));
+
+  console.log('transformedReclamations');
+  console.log(transformedReclamations);
+  console.log('transformedReclamations');
 
   const statistics = useSelector((state) => state.statistics.statistics);
 

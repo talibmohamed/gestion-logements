@@ -1356,7 +1356,8 @@ class admin
                         r.rec_type, 
                         r.rec_date, 
                         r.rec_desc, 
-                        r.rec_etat 
+                        r.rec_etat,
+                        r.rec_response
                     FROM 
                         reclamation r
                     JOIN 
@@ -1402,14 +1403,19 @@ class admin
                 ];
             }
 
+            // Get date
+            $date = date('Y-m-d H:i:s');
+
             // Prepare SQL statement with named placeholders for update
-            $sql = $connection->prepare('UPDATE reclamation SET rec_etat = :rec_etat WHERE rec_id = :rec_id');
+            $sql = $connection->prepare('UPDATE reclamation SET rec_etat = :rec_etat, rec_response = :rec_response WHERE rec_id = :rec_id');
 
             // Execute SQL statement with data bindings
             $sql->execute([
                 ':rec_id' => $rec_id,
+                ':rec_response' => $date,
                 ':rec_etat' => $rec_etat
             ]);
+
 
             // Insert notification into database
             $res_id = $reclamation['res_id'];
@@ -1574,7 +1580,7 @@ class admin
     }
 
     // forgotPassword
-    
+
 
     // public function getLogementStatistiques()
     // {
