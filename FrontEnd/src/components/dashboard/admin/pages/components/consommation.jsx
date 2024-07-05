@@ -427,7 +427,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                 </Dropdown>
               ) : (
                 <>
-                  <Tooltip
+                 { /*<Tooltip
                     content="Détails"
                     delay={0}
                     closeDelay={0}
@@ -456,7 +456,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                     >
                       <EyeIcon />
                     </span>
-                  </Tooltip>
+                  </Tooltip>*/}
                   <Tooltip
                     content="Modifier"
                     delay={0}
@@ -751,7 +751,7 @@ const ConsumTable = ({ columns, rows, title }) => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Détails de la Facture
+                Détails sur la consommation
               </ModalHeader>
               <ModalBody>
                 {isMobile ? (
@@ -761,7 +761,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                       type="text"
                       label="Facture ID:"
                       variant="bordered"
-                      defaultValue={currentConsum.fac_id}
+                      defaultValue={currentConsum.id}
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -811,9 +811,9 @@ const ConsumTable = ({ columns, rows, title }) => {
                     <Input
                       isReadOnly
                       type="text"
-                      label="Type de Facture:"
+                      label="Electricite:"
                       variant="bordered"
-                      defaultValue={currentConsum.fac_type}
+                      defaultValue={currentConsum.electricite}
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -836,9 +836,9 @@ const ConsumTable = ({ columns, rows, title }) => {
 
                     <Input
                       isReadOnly
-                      label="Mois de Consommation"
+                      label="Electricite quota"
                       variant="bordered"
-                      defaultValue={currentConsum.fac_date}
+                      defaultValue={currentConsum.consumE}
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -860,9 +860,9 @@ const ConsumTable = ({ columns, rows, title }) => {
                     />
                     <Input
                       isReadOnly
-                      label="Echeance"
+                      label="Eau"
                       variant="bordered"
-                      defaultValue={currentConsum.fac_echeance}
+                      defaultValue={currentConsum.eau}
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -884,9 +884,9 @@ const ConsumTable = ({ columns, rows, title }) => {
                     />
                     <Input
                       isReadOnly
-                      label="Status"
+                      label="Eau quota"
                       variant="bordered"
-                      defaultValue={currentConsum.fac_etat}
+                      defaultValue={currentConsum.consumW}
                       className="max-w-sm"
                       classNames={{
                         label: "group-data-[filled-within=true]:text-zinc-400",
@@ -906,30 +906,7 @@ const ConsumTable = ({ columns, rows, title }) => {
                         ],
                       }}
                     />
-                    <Input
-                      isReadOnly
-                      label="Montant TTC"
-                      variant="bordered"
-                      defaultValue={currentConsum.fac_total}
-                      className="max-w-sm"
-                      classNames={{
-                        label: "group-data-[filled-within=true]:text-zinc-400",
-                        input: [
-                          "bg-transparent",
-                          "group-data-[has-value=true]:text-white/90",
-                        ],
-                        innerWrapper: "bg-transparent",
-                        inputWrapper: [
-                          "bg-transparent",
-                          "group-data-[hover=true]:bg-zinc-800",
-                          "group-data-[hover=true]:border-zinc-500",
-                          "group-data-[focus=true]:bg-transparent ",
-                          "group-data-[focus=true]:border-zinc-400 ",
-                          "!cursor-text",
-                          "border-zinc-600",
-                        ],
-                      }}
-                    />
+                    
                   </>
                 ) : (
                   <>
