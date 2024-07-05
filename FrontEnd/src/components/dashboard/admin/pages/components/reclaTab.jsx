@@ -185,18 +185,6 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     openDeleteModal();
   };
 
-  // const dispatch = useDispatch();
-  // const reclamationsState = useSelector(state => state.reclamations);
-  // const reclamation = reclamationsState?.reclamation || [];
-
-  // console.log("1");
-  // console.log(reclamation);
-  // console.log("1");
-
-  // useEffect(() => {
-  //   dispatch(fetchReclamationsThunk());
-  // }, [dispatch]);
-
   const dispatch = useDispatch();
 
   const handleEditReclamation = async () => {
@@ -372,7 +360,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
               <p className="text-bold text-small capitalize">{cellValue}</p>
             </div>
           );
-        case "status":
+        case "rec_etat":
           return (
             <Chip
               className="capitalize"
@@ -1129,7 +1117,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
                     <SelectItem key="en attente" textValue="en attente">
                       Attente
                     </SelectItem>
-                    <SelectItem key="Annulé" textValue="Annulé">
+                    <SelectItem key="annulé" textValue="annulé">
                       Annulée
                     </SelectItem>
                   </Select>
