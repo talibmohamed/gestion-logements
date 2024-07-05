@@ -46,7 +46,7 @@ const INITIAL_VISIBLE_COLUMNS = [
   "nom",
   "type_log",
   "ameliored",
-  "status",
+  "statut",
   "mc",
   "address",
   "quotaE",
@@ -115,7 +115,7 @@ const LogTable = ({ columns, rows, statusLogOptions, title }) => {
   const [newLogement, setNewLogement] = useState({
     type_log: "",
     ameliore: "",
-    status: "",
+    statut: "",
     nb_pieces: "",
     superficie: "",
     address: "",
@@ -131,7 +131,7 @@ const LogTable = ({ columns, rows, statusLogOptions, title }) => {
       is_ameliore: logement.is_ameliore,
       piece: logement.piece,
       mc: logement.mc,
-      status: logement.status,
+      statut: logement.statut,
       address: logement.address,
     });
     setEditModalOpen(true);
@@ -239,7 +239,7 @@ const LogTable = ({ columns, rows, statusLogOptions, title }) => {
     if (
       newLogement.type_log === "" ||
       newLogement.ameliore === "" ||
-      newLogement.status == "" ||
+      newLogement.statut == "" ||
       newLogement.nb_pieces === "" ||
       newLogement.superficie === "" ||
       newLogement.address === ""
@@ -266,7 +266,7 @@ const LogTable = ({ columns, rows, statusLogOptions, title }) => {
     const logementData = {
       type_log: newLogement.type_log,
       is_ameliore: amelioreBoolean,
-      status: newLogement.status,
+      statut: newLogement.statut,
       piece: parseInt(newLogement.nb_pieces),
       mc: parseInt(newLogement.superficie),
       address: newLogement.address,
@@ -331,19 +331,7 @@ const LogTable = ({ columns, rows, statusLogOptions, title }) => {
 
   const handleEditLogement = async () => {
     // Validate all fields before dispatching
-    if (
-      currentLogement.log_id === "" ||
-      currentLogement.type_log === "" ||
-      currentLogement.statut === "" ||
-      currentLogement.ameliored === "" ||
-      currentLogement.piece === "" ||
-      currentLogement.mc === "" ||
-      currentLogement.status === "" || 
-      currentLogement.address === ""
-    ) {
-      // Handle invalid form data
-      return;
-    }
+
 
     console.log(currentLogement);
 
@@ -535,11 +523,11 @@ const LogTable = ({ columns, rows, statusLogOptions, title }) => {
               </Tooltip>
             </div>
           );
-          case "status":
+          case "statut":
             return (
               <Chip
                 className="capitalize"
-                color={statusColorMap[item.status]}
+                color={statusColorMap[item.statut]}
                 size="sm"
                 variant="flat"
               >
@@ -1388,7 +1376,7 @@ const LogTable = ({ columns, rows, statusLogOptions, title }) => {
                     <SelectItem key="occupé" value="occupé">
                       occupé
                     </SelectItem>
-                    <SelectItem key="en_maintenance" value="en_maintenance">
+                    <SelectItem key="en maintenance" value="en maintenance">
                       en maintenance
                     </SelectItem>
                   </Select>
