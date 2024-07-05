@@ -128,7 +128,7 @@ class AdminController
             $statut = htmlspecialchars($data['statut'], ENT_QUOTES, 'UTF-8');
 
             // Validate statut against enum values
-            $allowed_statuts = ['disponible', 'en_maintenance', 'occupé', 'non_disponible', 'autre'];
+            $allowed_statuts = ['disponible', 'en maintenance', 'occupé'];
             if (!in_array($statut, $allowed_statuts)) {
                 http_response_code(400);
                 echo json_encode(['status' => 'error', 'message' => 'Invalid statut value']);
@@ -192,10 +192,10 @@ class AdminController
             $statut = htmlspecialchars($data['statut'], ENT_QUOTES, 'UTF-8');
 
             // Validate statut against enum values
-            $allowed_statuts = ['disponible', 'en_maintenance', 'occupé', 'non_disponible'];
+            $allowed_statuts = ['disponible', 'en maintenance', 'occupé'];
             if (!in_array($statut, $allowed_statuts)) {
                 http_response_code(400);
-                echo json_encode(['status' => 'error', 'message' => 'Invalid statut value']);
+                echo json_encode(['status' => 'error3', 'message' => 'Invalid statut value']);
                 return;
             }
 
@@ -218,12 +218,12 @@ class AdminController
             } else {
                 // Respond with 400 Bad Request if input validation fails
                 http_response_code(400);
-                echo json_encode(['status' => 'error', 'message' => 'Invalid input data']);
+                echo json_encode(['status' => 'error1', 'message' => 'Invalid input data']);
             }
         } else {
             // Respond with 400 Bad Request if required fields are missing
             http_response_code(400);
-            echo json_encode(['status' => 'error', 'message' => 'Invalid JSON data']);
+            echo json_encode(['status' => 'error2', 'message' => 'Invalid JSON data']);
         }
     }
 

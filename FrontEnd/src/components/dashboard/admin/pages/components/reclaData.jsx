@@ -10,6 +10,7 @@ const columns = [
     {name: "Actions", uid: "actions"}
 ];
 
-const statusReclOptions = ["annulee","en attente","resolue","non resolue"];
+const statusReclOptions = ["annulé","en attente","non résolu","non resolue"];
+
 
 export {columns, statusReclOptions};

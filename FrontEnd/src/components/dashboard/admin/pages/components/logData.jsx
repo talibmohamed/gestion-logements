@@ -8,7 +8,7 @@ const columns = [
   { name: "Pièces ( Superficie m² )", uid: "mc" },
   { name: "Electricité (kWh / mois) ", uid: "quotaE" },
   { name: "Eau (m³ / mois)", uid: "quotaW" },
-  { name: "Statut", uid: "status", sortable: true },
+  { name: "Statut", uid: "statut", sortable: true },
   { name: "Equipements", uid: "equip" },
   { name: "Actions", uid: "actions" },
 ];
