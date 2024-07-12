@@ -105,6 +105,7 @@ const ReclamationTable = ({ columns, rows, statusReclOptions, title }) => {
     });
     setEditModalOpen(true);
   };
+  
 
   const [isMobile, setIsMobile] = useState(false);
 
