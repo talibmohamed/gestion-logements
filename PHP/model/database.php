@@ -2,7 +2,7 @@
 class Database
 {
     private $host = 'aws-0-eu-central-1.pooler.supabase.com';
-    private $port = '5432';
+    private $port = '6543';
     private $dbname = 'postgres';
     private $user;
     private $password;
